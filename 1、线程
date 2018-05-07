@@ -1,4 +1,4 @@
-主要知识点：ThreadLocal、InheritableThreadLocal(获取父线程设置的线程本地变量)、以及如何在线程池中获取提交线程设置的值
+主要知识点：ThreadLocal、InheritableThreadLocal(获取父线程设置的线程本地变量)、保证线程池中传递值
 
 1、为了方便我们能够操作和某个线程相关的数据时，java在线程类中使用了一个map变量 保存这些数据，map的key是ThreadLocal.当线程销毁或者被GC的时候数据就不存
    在了。操作这个Map都是通过 threadlocal进行操作的
