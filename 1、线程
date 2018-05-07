@@ -43,6 +43,77 @@
      如果不为null则copy一份ThradLocalMap到子线程的t.inheritableThreadLocals成员变量中去
   3、因为复写了getMap(Thread)和CreateMap()方法,所以get值得时候，就可以在getMap(t)的时候就会从t.inheritableThreadLocals中拿到map对象，
        从而实现了可以拿到父线程ThreadLocal中的值
+       
+    new Thread(new Runnable() {
+            @Override
+            public void run() {
+                /**
+                 * 虽然copy了父类的值，但是key也是copy的父类的key对象,因此在子类中创建ThreadLocal是获取不到父类中的值
+                 */
+//                InheritableThreadLocal<Person> childLocal=new InheritableThreadLocal();
+                System.out.println("child.get()=="+parentLocal.get().name);
+
+            }
+        }).start();
+        
+        
+3、现在我们基本都是使用的线程池来执行任务，那么先线程池中怎么获取到父线程的值呢？
+   因此阿里巴巴 除了一个框架 github:alibaba/transmittable-thread-local，能解决这个问题
+   
+    ExecutorService executorService = Executors.newFixedThreadPool(1);
+        // 额外的处理，生成修饰了的对象executorService
+        executorService = TtlExecutors.getTtlExecutorService(executorService);
+        final TransmittableThreadLocal<String> parent = new TransmittableThreadLocal<String>();
+        parent.set("value-set-in-parent");
+        Callable call = new Callable() {
+            @Override
+            public Object call() throws Exception {
+                // Task或是Call中可以读取，值是"value-set-in-parent"
+                String value = parent.get();
+                System.out.println(value);
+                return "ok";
+            }
+        };
+        executorService.submit(call);
+        
+        实现原理：
+        1、包装executer 对象；
+        2、在使用线程池 执行 在submit或者execute的时候  对runable、或者call对象进行包装，保存下当前时刻的Map对象，然后在执行任务之前的时候
+        在set到当前Thread中，执行结束之后 在realease(remove) 对象
+        
+        1、
+           public <T> Future<T> submit(Runnable task, T result) {
+                 return this.executorService.submit(TtlRunnable.get(task), result);
+           } 
+           
+           2、
+           public final class TtlRunnable implements Runnable {
+             private final AtomicReference<Map<TransmittableThreadLocal<?>, Object>> copiedRef = new AtomicReference(TransmittableThreadLocal.copy());
+               private final Runnable runnable;
+            private final boolean releaseTtlValueReferenceAfterRun;
+
+         private TtlRunnable(Runnable runnable, boolean releaseTtlValueReferenceAfterRun) {
+            this.runnable = runnable;
+            this.releaseTtlValueReferenceAfterRun = releaseTtlValueReferenceAfterRun;
+        }
+        
+        3、
+            public void run() {
+        Map copied = (Map)this.copiedRef.get();
+        if(copied != null && (!this.releaseTtlValueReferenceAfterRun || this.copiedRef.compareAndSet(copied, (Object)null))) {
+            Map backup = TransmittableThreadLocal.backupAndSetToCopied(copied);
+
+            try {
+                this.runnable.run();
+            } finally {
+                TransmittableThreadLocal.restoreBackup(backup);
+            }
+
+        } else {
+            throw new IllegalStateException("TTL value reference is released after run!");
+        }
+    }
+    
 
     
 
