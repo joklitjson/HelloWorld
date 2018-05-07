@@ -1,0 +1,48 @@
+主要知识点：ThreadLocal、InheritableThreadLocal(获取父线程设置的线程本地变量)、以及如何在线程池中获取提交线程设置的值
+
+1、为了方便我们能够操作和某个线程相关的数据时，java在线程类中使用了一个map变量 保存这些数据，map的key是ThreadLocal.当线程销毁或者被GC的时候数据就不存
+   在了。操作这个Map都是通过 threadlocal进行操作的
+   
+     /* ThreadLocal values pertaining to this thread. This map is maintained
+     * by the ThreadLocal class. */
+    ThreadLocal.ThreadLocalMap threadLocals = null;
+    
+    entry是弱引用的
+     static class Entry extends WeakReference<ThreadLocal> {
+            /** The value associated with this ThreadLocal. */
+            Object value;
+
+            Entry(ThreadLocal k, Object v) {
+                super(k);
+                value = v;
+            }
+        }
+
+2、为了解决子线程不能获取到父线程设置的值的问题，出现了InheritableThreadLocal，
+   原理：1、在Thread类中设置来了一个新的Map变量 2、创建Thread的时候，从父线程inheritableThreadLocals copy到子线程inheritableThreadLocals中，
+    并且copy的时候使用的是浅度复制，key 和value 都是使用以前的对象地址
+    
+        /* ThreadLocal values pertaining to this thread. This map is maintained
+     * by the ThreadLocal class. */
+    ThreadLocal.ThreadLocalMap threadLocals = null;
+
+    /*
+     * InheritableThreadLocal values pertaining to this thread. This map is
+     * maintained by the InheritableThreadLocal class.
+     */
+    ThreadLocal.ThreadLocalMap inheritableThreadLocals = null;
+    
+     if (parent.inheritableThreadLocals != null)
+            this.inheritableThreadLocals =
+                ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);
+  
+  总结：
+  1、在创建InheritableThreadLocal对象的时候赋值给线程的t.inheritableThreadLocals变量
+  
+  2、在创建新线程的时候会check父线程中t.inheritableThreadLocals变量是否为null，
+     如果不为null则copy一份ThradLocalMap到子线程的t.inheritableThreadLocals成员变量中去
+  3、因为复写了getMap(Thread)和CreateMap()方法,所以get值得时候，就可以在getMap(t)的时候就会从t.inheritableThreadLocals中拿到map对象，
+       从而实现了可以拿到父线程ThreadLocal中的值
+
+    
+
