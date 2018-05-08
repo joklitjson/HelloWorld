@@ -9,9 +9,9 @@ this is first project
 
 3、Hystrix 、基于注解的Hystrix，
 
-4、jetcache 阿里的基于注解的缓存，支持多级缓存；了解javax.cache 标准
+4、jetcache 阿里的基于注解的缓存，支持多级缓存；异步更新机制，缓存穿透；了解javax.cache 标准,
 
-5、交接jms标准
+5、jms标准
 
 6、模板方法和策略模式的比较
 
