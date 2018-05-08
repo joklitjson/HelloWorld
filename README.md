@@ -18,4 +18,4 @@ this is first project
 7、构建redis高可用的方案，以及集群问题
 
 8、java  agent 是构架于java包上层的aop
-9、TTL 框架 可以实现 父线程-子线程 上线文值的传递，可以实现调用链跟踪系统
+9、TTL 框架 可以实现 父线程-子线程 上线文值的传递，可以实现调用链跟踪系统，以及logback-mdc-ttl 实现日志文件
