@@ -2,7 +2,6 @@ package leetcode;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.LinkedList;
 
 public class TrapWater {
     public static void main(String[] args) {
@@ -10,6 +9,7 @@ public class TrapWater {
         int [] arr=new int[]{4,2,0,3,2,5};
         System.out.println(trap(arr));
         System.out.println(trap2(arr));
+        System.out.println(trap3(arr));
     }
 
     public  static int trap(int[] height) {
@@ -58,6 +58,35 @@ public class TrapWater {
             ans+=Math.min(sufMax[i], preMax[i])-height[i];
         }
         return  ans;
+    }
+
+
+    /***
+     * 方案3 是有左右指针法，也是最前后缀的优化版本，也是属于竖向接水的
+     * @param height
+     * @return
+     */
+    public  static int trap3(int[] height) {
+        int ans=0;
+
+        int left=0,right= height.length-1;
+        int leftMax=height[left],rightMax=height[right];
+
+        while (left<right){
+            //计算最测的最大值
+            leftMax=Math.max(leftMax,height[left]);
+            rightMax=Math.max(rightMax,height[right]);
+            //所有当前是最低又高(一个趋势图)
+            if (leftMax<rightMax) {
+                //因此当前元素以及左侧能接水,并向右移动
+                ans+=leftMax-height[left++];
+            }
+            else {
+                //说明当前是左高右低
+                ans+=rightMax-height[right--];
+            }
+        }
+        return ans;
     }
 
 }
