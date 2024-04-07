@@ -77,7 +77,7 @@ public class QuickSort {
             while (left<right&& arr[left]<=pivotValue){
                 left++;
             }
-            //左指针小于右指针 才进行交换
+            //左指针小于右指针 才进行交换，left==right就不需要进行交换值了
             if (left<right){
                 //交换left、right的值
                 int tmp=arr[right];
@@ -85,7 +85,7 @@ public class QuickSort {
                 arr[left]=tmp;
             }
         }
-        //最后交换值
+        //pivotValue 放在合适的位置上，同时返回pivotValue所在的下表
         int tmp=arr[left];
         arr[left]=pivotValue;
         arr[low]=tmp;
