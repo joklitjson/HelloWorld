@@ -1,6 +1,4 @@
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -33,7 +31,8 @@ public class Main {
 
 //        System.out.println("第k大的值"+findKthLargest(new int[]{3,2,3,1,2,4,5,5,6},4));
 
-        System.out.println("第k大的值"+findKthLargest2(new int[]{3,2,1,5,6,4},2));
+//        System.out.println("第k大的值"+findKthLargest2(new int[]{3,2,1,5,6,4},2));
+
     }
 
     /**
