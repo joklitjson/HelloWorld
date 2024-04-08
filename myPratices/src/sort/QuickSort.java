@@ -61,11 +61,20 @@ public class QuickSort {
         if (start >= right) {
             return;
         }
-        int pivotIndex = partition(arr, start, right);
+        int pivotIndex = partition2(arr, start, right);
+//        int pivotIndex = partition(arr, start, right);
         //pivotIndex 位置已经排序了，所以下面两个区间不需要包含他们
         quickSort(arr, start, pivotIndex-1);
         quickSort(arr, pivotIndex + 1, right);
     }
+
+    /**
+     * 交换法：顾名思义：就是交换左右两边的值，因此需要再两边都找到元素才进行交换。
+     * @param arr
+     * @param low
+     * @param hight
+     * @return
+     */
     private  static int partition(int [] arr,int low,int hight){
         int left=low,right=hight;
         int pivotValue=arr[low];
@@ -90,6 +99,30 @@ public class QuickSort {
         arr[left]=pivotValue;
         arr[low]=tmp;
         return left;
+    }
 
+    /**
+     * 填坑法，就是每次循环中 在交换元素，不是等到双指针找到左右元素在交换
+     * @param arr
+     * @param left
+     * @param right
+     * @return
+     */
+    private  static int partition2(int [] arr,int left,int right){
+        int partionValue=arr[left];
+        while (left<right){
+            while (left<right&&arr[right]>partionValue){
+                right--;
+            }
+            arr[left]=arr[right];//直接先填充
+
+            while (left<right&&arr[left]<partionValue){
+                left++;
+            }
+            arr[right]=arr[left];
+        }
+        //partionValue放在合适的位置
+        arr[left]=partionValue;
+        return left;
     }
 }

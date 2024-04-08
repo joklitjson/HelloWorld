@@ -31,7 +31,9 @@ public class Main {
         System.out.println("移除堆顶之后的堆顶元素=="+priorityQueue.peek());
         System.out.println("Hello world!");
 
-        System.out.println("第k大的值"+findKthLargest(new int[]{3,2,3,1,2,4,5,5,6},4));
+//        System.out.println("第k大的值"+findKthLargest(new int[]{3,2,3,1,2,4,5,5,6},4));
+
+        System.out.println("第k大的值"+findKthLargest2(new int[]{3,2,1,5,6,4},2));
     }
 
     /**
@@ -113,12 +115,37 @@ public class Main {
         return count;
     }
 
+    /**
+     * 方案二：使用小跟堆，只保留k个数，遍历每次都去除根部的最小值，由于是小跟堆，因此根元素就是第k个最大值
+     * @param nums
+     * @param k
+     * @return
+     */
+    public static int findKthLargest2(int[] nums, int k) {
+
+        PriorityQueue<Integer> heap=new PriorityQueue<>(k);
+        for (int num:nums){
+            if (heap.size()==k){
+                //移除小于优先级队列的最小值，只保存k个大值
+                if (num>heap.peek()){
+                    heap.poll();
+                    heap.offer(num);
+                }
+            }
+            else {
+                heap.offer(num);
+            }
+        }
+        return  heap.peek();
+    }
+
     public static int findKthLargest(int[] nums, int k) {
-        return quickSelect(nums,0, nums.length -1,k);
+        return quickSelect(nums,0, nums.length -1,nums.length-k);
     }
     private static int quickSelect(int[] nums,int l,int r,  int k){
         int partionIndex=partion(nums,l,r,k);
-        if (partionIndex==k-1){
+        System.out.println("partionIndex="+partionIndex+"partionValue="+nums[partionIndex]+Arrays.toString(nums));
+        if (partionIndex==k){
             return nums[partionIndex];
         }
         if (k>partionIndex){
@@ -131,22 +158,29 @@ public class Main {
     //此时的排序是降序，从大到小
     private static int partion(int[] nums, int l,int r, int k){
 
+        if (l>=r){
+            return l;
+        }
         int partionValue=nums[l];
         int left=l,right=r;
-        while (left<=right){
-            while (right>=left&&nums[right]<partionValue){
+        while (left!=right){
+            while (right>left&&nums[right]>partionValue){
                 right--;
             }
-            while (left<=right&&nums[left]>partionValue){
+            while (left<right&&nums[left]<=partionValue){
                 left++;
             }
 
-            if (left<=right){
+            if (left!=right){
                 int tmp=nums[right];
                 nums[right]=nums[left];
                 nums[left]=tmp;
             }
         }
+
+        int tmp=nums[left];
+        nums[left]=partionValue;
+        nums[l]=tmp;
         return left;
     }
 }
