@@ -7,6 +7,8 @@ public class SelectionSort {
 
     /**
      * 选择排序:在未排序区间选择最小值，然后在和未排序区间的第一个值进行交换
+     * 优点：和冒泡排序相比，交换次数少，。
+     * 缺点：是不稳定排序，相同分数的数据，位置会发生变化
      * @param arr
      */
     private static void selectionSort(int [] arr){
