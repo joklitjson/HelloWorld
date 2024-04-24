@@ -5,9 +5,9 @@ package datastrucs;
  * 图的顶点类
  */
 public class Vertex {
-   public int data;
+   public Object data;
 
-   public Vertex(int data){
+   public Vertex(Object data){
        this.data=data;
    }
     public Vertex nextNode;
