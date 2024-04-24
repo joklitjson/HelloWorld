@@ -1,6 +1,6 @@
 package datastrucs;
 
-import java.util.Stack;
+import java.util.*;
 
 /**
  * 二叉树的 递归遍历和非递归遍历
