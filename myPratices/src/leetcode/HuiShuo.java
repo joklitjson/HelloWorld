@@ -16,7 +16,8 @@ public class HuiShuo {
      */
     public int findTargetSumWays(int[] nums, int target) {
 //        sumWaysBackTracks(nums,0,(-1)*target);
-        dfs(nums,0,(-1)*target);
+//        dfs(nums,0,(-1)*target);
+        dp(nums,target);
         return ans;
     }
 
@@ -74,6 +75,7 @@ public class HuiShuo {
     }
 
     /**
+     * 算法3 背包问题
      * 设nums的元素和为sum, 可以列出方程：
      *
      * package_a - package_b = target;
@@ -82,7 +84,46 @@ public class HuiShuo {
      * 所以根据题意给的target和sum，我们可以求出package_a的值。
      * 那这道题就可以转化为：给定一个大小为package_a的背包，有多少种组合方式能把背包装满？ 妥妥的0-1背包。
      */
-    private void dp(){
+    private void dp(int[] nums,int target) {
 
+        int sum = target;
+        for (int value : nums) {
+            sum += value;
+        }
+        //sum必须是偶数，非偶数直接返回
+        if (((sum & 1) == 1) || sum < 0) {
+            ans = 0;
+            return;
+        }
+        int halfSum = target >> 1;
+
+        int dp[][] = new int[nums.length][halfSum + 1];
+
+//        4.初始化·dp，因为是自下而上计算，所以需要先给出最小规模问题的解//·
+//        注意:dp[0][0]·表示为递归树中的叶节点，表示考虑完nums中所有数且target已经
+        dp[0][0] = 1;
+        if (nums[0] == 0) {
+//            如果·nums[0]·=·0，则选、不选它都能构成·target·=·0·的解，所以解有两个;
+            dp[0][0] = 2;
+        } else {
+            for (int j = 0; j <= halfSum; j++) {
+                if (j == nums[0]) {
+                    dp[0][j] = 1;
+                }
+            }
+        }
+        //自底向上搜索
+        for (int i = 1; i < nums.length; i++) {//遍历物品
+            for (int j = 0; j <= halfSum; j++) {//遍历背包容量
+                if (j < nums[i]) {//容量小于 第i个物品的体积
+                    dp[i][j] = dp[i - 1][j];
+                } else {
+                    //放置物品
+                    dp[i][j] = dp[i - 1][j] + dp[i - 1][j - nums[i]];
+                }
+            }
+        }
+        //答案就是数组的最后一个元素
+        ans = dp[nums.length - 1][halfSum];
     }
 }
