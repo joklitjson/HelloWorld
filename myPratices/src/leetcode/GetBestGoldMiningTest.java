@@ -44,7 +44,6 @@ public class GetBestGoldMiningTest {
      * @return
      */
     public static int getBestGoldMiningV2(int w, int n,int[]p,int[]g) {
-
         //创建表格
         int[][] dp = new int[n+1][w+1];
         for (int i = 1; i <= n; i++) {//金矿个数
