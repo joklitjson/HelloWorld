@@ -11,7 +11,7 @@ public class MaxLastSeq {
      */
     public int maxSubArray1(int[] nums) {
         int dp[]=new int[nums.length];// 以i结尾的最大子序列和
-        //分情况讨论，以i结尾的最大和序列 需要判断他签名的数字是否是大于零，若是小于零则 他自己是最大，不需要在添加签名的值
+        //分情况讨论，以i结尾的最大和序列 需要判断他前面的数字是否是大于零，若是小于零则 他自己是最大，不需要在添加签名的值
         dp[0]=nums[0];
         for (int i=1;i<nums.length;i++){
             if (dp[i-1]>0){
