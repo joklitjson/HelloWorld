@@ -21,6 +21,7 @@ public class BFSTemplete {
         queue.add(start);
         //校验是否已经访问过了
         Set<TreeNode> visited = new HashSet<>();
+        visited.add(start);//已经加入进来
         int step = 0;//定义需要的次数、或者最小深度
         while (!queue.isEmpty()) {
 
@@ -29,16 +30,20 @@ public class BFSTemplete {
             for (int i = 0; i < size; i++) {
                 // 把这些节点的相邻节点在一次加入到队列中,就是加入下一层节点
                 TreeNode node = queue.poll();
+
+                /* 划重点：这里判断是否到达终点 */
                 if (node == target) {
                     return step;
                 }
                 //3加入他的子节点
-                if (node.getLeft() != null) {
+                if (node.getLeft() != null && !visited.contains(node.getLeft())) {
                     queue.add(node.getLeft());
+                    visited.add(node.getLeft());
                 }
 
-                if (node.getRight() != null) {
+                if (node.getRight() != null && !visited.contains(node.getRight())) {
                     queue.add(node.getRight());
+                    visited.add(node.getRight());
                 }
             }
             step++;
