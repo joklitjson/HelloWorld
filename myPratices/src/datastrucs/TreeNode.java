@@ -1,13 +1,16 @@
 package datastrucs;
 
 public class TreeNode {
+
+    public int val;
     private int data;
-    private  TreeNode left;
-    private  TreeNode right;
+    public  TreeNode left;
+    public  TreeNode right;
 
 
     public TreeNode(int data){
         this.data=data;
+        this.val=data;
     }
     public int getData() {
         return data;
