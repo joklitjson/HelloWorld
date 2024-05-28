@@ -2,6 +2,11 @@ package tree;
 
 import datastrucs.TreeNode;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * 二叉搜索树 代码模板
  */
@@ -218,4 +223,71 @@ public class BstTemplete {
         }
         return root;
     }
+
+    /**
+     * 给定数字n，构造 [1,n]个数字的二叉搜索树
+     * 思路：按每个数字当做根节点，然后再把小于当前的数字构造左子节点，大于当前的数字构造右子节点
+     * @param n
+     * @return
+     */
+    int numTrees(int n) {
+        // 计算闭区间 [1, n] 组成的 BST 个数
+        return count(1, n);
+    }
+
+    // 备忘录
+    int[][] memo;
+    private int count(int lo, int hi) {
+        //表示当前是null节点
+        if(lo>hi){
+            return 1;
+        }
+        if (memo[lo][hi]!=0){
+            return memo[lo][hi];
+        }
+        int currentResult=0;
+        for (int i=lo;i<=hi;i++){
+            int leftCount=count(lo,i-1);
+            int rightCount=count(i+1,hi);
+            //左右所有情况的组合
+            currentResult+=leftCount*rightCount;
+        }
+        // 将结果存入备忘录
+        memo[lo][hi]=currentResult;
+        return currentResult;
+    }
+
+    /**
+     * 生成树，并且把数打印出来
+     * @param n
+     * @return
+     */
+    List<TreeNode> generateTrees(int n){
+        if (n==0){
+            return new ArrayList<>();
+        }
+    }
+    List<TreeNode> build(int low,int hi) {
+        if (low > hi) {
+            return Arrays.asList(null);
+        }
+        List<TreeNode> result = new ArrayList<>();
+
+        for (int i = low; i <= hi; i++) {
+            List<TreeNode> leftList = build(low, i - 1);
+            List<TreeNode> rightList = build(i + 1, hi);
+
+            for (TreeNode left : leftList) {
+                for (TreeNode right : rightList) {
+                    TreeNode current = new TreeNode();
+                    current.val = i;
+                    current.left = left;
+                    current.right = right;
+                    result.add(current);
+                }
+            }
+        }
+        return result;
+    }
+
 }
