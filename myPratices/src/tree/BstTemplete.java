@@ -176,4 +176,46 @@ public class BstTemplete {
         return root;
     }
 
+    /**
+     * 删除一个节点：先找到，然后再判断他的子孩子的数量
+     * 没有子节点：直接返回
+     * 只有一个子节点：直接当做此节点
+     * 有左右子节点：返回左边的最大值，或者返回右边的最小值，当做子节点
+     * @param root
+     * @param key
+     * @return
+     */
+    TreeNode deleteNode(TreeNode root, int key) {
+        if (root.val == key) {
+            if (root.left==null&&root.right==null){
+                return null;
+            }
+            else if (root.left==null&&root.right!=null){
+                return root.right;
+            }  else if (root.left!=null&&root.right==null){
+                return root.left;
+            }
+            else {
+                //查找右侧的最小值
+                TreeNode min=  findMin(root.right);
+                root.val=min.val;
+                root.right= deleteNode(root.right,min.val);//在执行删除
+                return root;
+            }
+
+        } else if (root.val < key) {
+            root.right = deleteNode(root.right, key);
+        } else {
+            root.left = deleteNode(root.left, key);
+        }
+
+        return root;
+    }
+
+    TreeNode findMin(TreeNode root) {
+        while (root.left != null) {
+            root = root.left;
+        }
+        return root;
+    }
 }
