@@ -1,17 +1,18 @@
 package datastrucs;
 
-public class TreeNode {
+public class Node {
 
     public int val;
     private int data;
 
-    public  TreeNode left;
-    public  TreeNode right;
+    public Node parent;
+    public Node left;
+    public Node right;
 
-    public TreeNode(){
+    public Node(){
 
     }
-    public TreeNode(int data){
+    public Node(int data){
         this.data=data;
         this.val=data;
     }
@@ -23,19 +24,19 @@ public class TreeNode {
         this.data = data;
     }
 
-    public TreeNode getLeft() {
+    public Node getLeft() {
         return left;
     }
 
-    public void setLeft(TreeNode left) {
+    public void setLeft(Node left) {
         this.left = left;
     }
 
-    public TreeNode getRight() {
+    public Node getRight() {
         return right;
     }
 
-    public void setRight(TreeNode right) {
+    public void setRight(Node right) {
         this.right = right;
     }
 }
