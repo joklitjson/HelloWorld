@@ -2,9 +2,7 @@ package tree;
 
 import datastrucs.TreeNode;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -225,12 +223,14 @@ public class BstTemplete {
     }
 
     /**
+     * 不同的二叉搜索树:
      * 给定数字n，构造 [1,n]个数字的二叉搜索树
      * 思路：按每个数字当做根节点，然后再把小于当前的数字构造左子节点，大于当前的数字构造右子节点
      * @param n
      * @return
      */
     int numTrees(int n) {
+        memo=new int[n][n];
         // 计算闭区间 [1, n] 组成的 BST 个数
         return count(1, n);
     }
@@ -266,12 +266,16 @@ public class BstTemplete {
         if (n==0){
             return new ArrayList<>();
         }
+        return  build(1,n);
     }
     List<TreeNode> build(int low,int hi) {
-        if (low > hi) {
-            return Arrays.asList(null);
-        }
         List<TreeNode> result = new ArrayList<>();
+
+        if (low > hi) {
+            result.add(null);
+            return result;
+        }
+
 
         for (int i = low; i <= hi; i++) {
             List<TreeNode> leftList = build(low, i - 1);
