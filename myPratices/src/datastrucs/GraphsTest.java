@@ -1,9 +1,7 @@
 package datastrucs;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.sql.Struct;
+import java.util.*;
 
 /**
  * 图的表示法以及两种遍历方式
@@ -27,22 +25,32 @@ public class GraphsTest {
 //        dfs(graph,0,visited);
 //        bfs(graph,0,new boolean[6]);
 
-        Graph graph = new Graph(7);
-        initGraph(graph);
-        int[] distances = dijkstra(graph, 0);
-        System.out.println(distances[6]);
-        System.out.println("输出完整路径：");
-        int[] prevs = dijkstraV2(graph, 0);
-        printPrevs(graph.vertices, prevs, graph.vertices.length- 1);
+//        Graph graph = new Graph(7);
+//        initGraph(graph);
+//        int[] distances = dijkstra(graph, 0);
+//        System.out.println(distances[6]);
+//        System.out.println("输出完整路径：");
+//        int[] prevs = dijkstraV2(graph, 0);
+//        printPrevs(graph.vertices, prevs, graph.vertices.length- 1);
+
+        int[][] prerequisites = new int[2][2];
+        prerequisites[0][0] = 0;
+        prerequisites[0][1] = 1;
+
+//        prerequisites[1][0]=0;
+//        prerequisites[1][1]=1;
+
+        System.out.println(new GraphsTest().canFinishBfs(2, prerequisites));
     }
 
     /**
      * 深度优先遍历
+     *
      * @param graph
      * @param start
      * @param visited
      */
-    private static void  dfs(Graph graph,int start, boolean[] visited) {
+    private static void dfs(Graph graph, int start, boolean[] visited) {
         System.out.println("当前访问节点:" + graph.getVertices()[start].data);
         visited[start] = true;//已经访问过了
         //遍历他的所到达的节点
@@ -60,6 +68,7 @@ public class GraphsTest {
      * 求最短路径算法
      * 时间复杂度 n的平方(因为有两次循环)
      * 优化点：可以把寻找最短距离的订单 使用小根堆处理
+     *
      * @param graph
      * @param startIndex
      * @return
@@ -125,7 +134,7 @@ public class GraphsTest {
         // 2、求起点到其他节点的距离，然后更新到距离表中
         for (Edge edge : graph.adj[startIndex]) {
             distances[edge.index] = edge.weight;
-            prevs[edge.index]=startIndex;
+            prevs[edge.index] = startIndex;
         }
         accessed[startIndex] = true;
 
@@ -153,7 +162,7 @@ public class GraphsTest {
                 //新的距离 小于 之前的距离
                 if ((minDistance + edge.weight) < preDistance) {
                     distances[edge.index] = minDistance + edge.weight;
-                    prevs[edge.index]=minDistanceIndex;//更新前置顶点
+                    prevs[edge.index] = minDistanceIndex;//更新前置顶点
                 }
             }
         }
@@ -192,6 +201,7 @@ public class GraphsTest {
 
     /**
      * 输出路径
+     *
      * @param vertexes
      * @param prev
      * @param i
@@ -207,21 +217,21 @@ public class GraphsTest {
     /**
      * 图的广度优先遍历
      */
-    private static void  bfs(Graph graph, int start, boolean[] visited){
-        Queue<Integer> queue=new LinkedList<>();
+    private static void bfs(Graph graph, int start, boolean[] visited) {
+        Queue<Integer> queue = new LinkedList<>();
         //第一个入队列
         queue.offer(start);
 
-        while (!queue.isEmpty()){
-            int font= queue.poll();
-            if (visited[font]){
+        while (!queue.isEmpty()) {
+            int font = queue.poll();
+            if (visited[font]) {
                 continue;
             }
-            System.out.println("遍历的当前节点是："+graph.vertices[font].data);
-            visited[font]=true;
+            System.out.println("遍历的当前节点是：" + graph.vertices[font].data);
+            visited[font] = true;
             //把他的邻居都加入队列
-            for (Edge value:graph.adj[font]){
-                if (!visited[value.index]){
+            for (Edge value : graph.adj[font]) {
+                if (!visited[value.index]) {
                     queue.add(value.index);
                 }
             }
@@ -229,17 +239,22 @@ public class GraphsTest {
     }
 
     //邻接表表示法
-    static class  Graph{
+    static class Graph {
 
-        private Vertex [] vertices;
+        // 邻接表
+        // graph[x] 存储 x 的所有邻居节点
+        public List<Integer>[] graph;
+
+        private Vertex[] vertices;
         public LinkedList<Edge>[] adj;//图的边 数组,类似于hashMap
-        public Graph(int size){
-            vertices=new Vertex[size];
-            adj=new LinkedList[size];
+
+        public Graph(int size) {
+            vertices = new Vertex[size];
+            adj = new LinkedList[size];
             //初始化每一个数组
-            for (int i=0;i<size;i++){
-                vertices[i]=new Vertex(i);
-                adj[i]=new LinkedList<>();
+            for (int i = 0; i < size; i++) {
+                vertices[i] = new Vertex(i);
+                adj[i] = new LinkedList<>();
             }
         }
 
@@ -267,4 +282,193 @@ public class GraphsTest {
             this.weight = weight;
         }
     }
+
+    List<List<Integer>> result = null;
+    boolean visited[] = null;
+
+    //一幅有向无环图，生成图的所有路径,由于是没有环的，因此不需要设置visited数组
+    List<List<Integer>> allPathsSourceTarget(int[][] graph) {
+        result = new ArrayList<>();
+        int n = graph.length;
+        boolean visited[] = new boolean[n];
+        traverse(graph, 0, new LinkedList<>());
+        return result;
+    }
+
+    private void traverse(int[][] graph, int s, LinkedList<Integer> path) {
+        int n = graph.length;
+        path.add(s);
+        if (s == n - 1) {
+            result.add(new ArrayList<>(path));
+            path.removeLast();
+            return;
+        }
+        //遍历他的邻居
+        for (int neight : graph[s]) {
+            traverse(graph, neight, path);
+        }
+        //删除最后一个
+        path.removeLast();
+    }
+
+
+    boolean hasCycle = false;
+//    boolean[] visited=null;
+
+    /**
+     * 选修某些课程之前需要一些先修课程。 先修课程按数组 prerequisites 给出，其中 prerequisites[i] = [ai, bi] ，
+     * 表示如果要学习课程 ai 则 必须 先学习课程  bi 。
+     *
+     * @param numCourses
+     * @param prerequisites
+     * @return
+     */
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        List<Integer>[] graph = buildNeights(numCourses, prerequisites);
+        visited = new boolean[numCourses + 1];
+        boolean[] onPath = new boolean[numCourses + 1];
+        //因为可能是一个无环图，因此需要循环没一个节点
+        for (int i = 0; i < numCourses; i++) {
+            if (!hasCycle) {
+                traverse(graph, onPath, i);
+            }
+        }
+        return !hasCycle;
+    }
+
+    /**
+     * 使用BFS计算是否有环：使用环的入度和出度概念
+     * @param numCourses
+     * @param prerequisites
+     * @return
+     */
+    public boolean canFinishBfs(int numCourses, int[][] prerequisites) {
+        List<Integer>[] grapths = buildNeights(numCourses, prerequisites);
+        int[] indegree = new int[numCourses];
+
+        //计算元素的入度
+        for (int [] row: prerequisites) {
+            int from=row[1];
+            int to=row[0];
+            if (from!=to){
+                indegree[to] ++;
+            }
+        }
+        Queue<Integer> queue = new LinkedList();
+
+        for (int i = 0; i < numCourses; i++) {
+            //入度==0 表示他没有依赖项了
+            if (indegree[i] == 0) {
+                queue.offer(i);
+            }
+        }
+        int count = 0;//入度为0的元素
+        while (!queue.isEmpty()) {
+            int element = queue.poll();
+            count++;
+            for (int next : grapths[element]) {
+                indegree[next]--;
+                if (indegree[next] == 0) {
+                    queue.offer(next);
+                }
+            }
+        }
+
+        // 如果所有节点都被遍历过，说明不成环
+        return count == numCourses;
+    }
+
+        private void traverse(List<Integer>[] graph, boolean[] onPath, int e) {
+
+        //在当前的路径中再次遍历到了当前元素
+        if (onPath[e]) {
+            hasCycle = true;
+            return;
+        }
+
+        //已经被遍历或则已经发现了环
+        if (visited[e] || hasCycle) {
+            return;
+        }
+        visited[e] = true;
+        onPath[e] = true;//当前遍历的路径
+        for (Integer element : graph[e]) {
+            traverse(graph, onPath, element);
+        }
+        onPath[e] = false;
+    }
+
+    /**
+     * 构建邻接表
+     *
+     * @param prerequisites
+     * @return
+     */
+    private List<Integer>[] buildNeights(int n, int[][] prerequisites) {
+        List<Integer>[] result = new LinkedList[n];
+        //初始化数据
+        for (int i = 0; i < n; i++) {
+            result[i] = new LinkedList<>();
+        }
+        for (int row[] : prerequisites) {
+            int from = row[1];
+            int to = row[0];
+            if (from != to) {
+                //被依赖的课程作为起点
+                result[from].add(to);
+            }
+
+        }
+        return result;
+    }
+
+
+    List<Integer> postOrders = new ArrayList<>();
+
+    /**
+     * 返回 可能的拓扑排序结构
+     *
+     * @param numCourses
+     * @param prerequisites
+     * @return
+     */
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        List<Integer>[] grapths = buildNeights(numCourses, prerequisites);
+        visited = new boolean[numCourses + 1];
+        boolean onPath[]=new boolean[numCourses];
+        for (int i = 0; i < numCourses; i++) {
+            travse(grapths, i,onPath);
+        }
+
+        if (hasCycle) {
+            return new int[0];
+        }
+
+        Collections.reverse(postOrders);
+        int[] result = postOrders.stream().mapToInt(Integer::valueOf).toArray();
+
+        return result;
+    }
+
+    private void travse( List<Integer>[] grapths, int element, boolean onPath[]) {
+        if (onPath[element]) {
+            hasCycle = true;
+        }
+
+        if (visited[element] || hasCycle) {
+            return;
+        }
+        visited[element]=true;
+        onPath[element]=true;
+
+        for (int neight:grapths[element]){
+            travse(grapths,neight,onPath);
+        }
+
+        //后续遍历的地方添加元素
+        postOrders.add(element);
+
+        onPath[element]=false;
+    }
+
 }
