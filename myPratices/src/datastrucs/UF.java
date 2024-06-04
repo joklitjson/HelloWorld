@@ -50,6 +50,10 @@ public class UF {
         }
     }
 
+    public int getCount() {
+        return count;
+    }
+
     /**
      * 查找a的父节点s
      * @param x
@@ -72,5 +76,15 @@ public class UF {
 
         return x;
     }
+
+    //计算图的连通分量
+    int countComponents(int n, int[][] edges){
+        UF uf=new UF(n);
+        for (int[] edge:edges){
+            uf.union(edge[0],edge[1]);
+        }
+        return uf.getCount();
+    }
+
 
 }
