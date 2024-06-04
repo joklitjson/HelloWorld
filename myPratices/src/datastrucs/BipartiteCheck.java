@@ -92,8 +92,14 @@ public class BipartiteCheck {
         }
     }
 
+    /**
+     * 构建无向图
+     * @param n
+     * @param graph
+     * @return
+     */
     private List<Integer> [] buildGraph(int n,int[][] graph){
-        List<Integer> [] graphs=new LinkedList[n];
+        List<Integer> [] graphs=new LinkedList[n+1];
 
         //初始化邻接表
         for (int i=0;i<n;i++){
