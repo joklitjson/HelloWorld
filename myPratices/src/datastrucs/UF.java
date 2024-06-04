@@ -86,5 +86,33 @@ public class UF {
         return uf.getCount();
     }
 
+    /**
+     * ["c==c","b==d","x!=z"]，算法返回 true
+     * @param equations
+     * @return
+     */
+    boolean equationsPossible(String[] equations) {
 
-}
+        UF uf = new UF(26);
+
+        // 1、先把相等的进行联通
+        for (String str : equations) {
+            if (str.charAt(1) == '=') {
+                uf.union(str.charAt(0) - 'a', str.charAt(3) - 'a');
+            }
+        }
+        // 2、判断不相等的是否能联通，如果联通则从图
+        for (String str : equations) {
+            if (str.charAt(1) == '!') {
+                boolean result = uf.connect(str.charAt(0) - 'a', str.charAt(3) - 'a');
+                if (result) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+
+    }
