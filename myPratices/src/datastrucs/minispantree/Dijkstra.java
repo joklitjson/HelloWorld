@@ -170,6 +170,7 @@ public class Dijkstra {
 
         int n=graph.length;
         //到
+
         double[] probability=new double[n];
         Arrays.fill(probability,-1);//填充最细
     }
