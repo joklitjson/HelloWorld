@@ -103,7 +103,11 @@ public class GraphsTest {
             if (minDistanceIndex == -1) {
                 continue;
             }
-            accessed[minDistance] = true;
+            // 在这里加一个判断就行了，其他代码不用改
+//            if (minDistanceIndex == end) {
+//                return curDistFromStart;
+//            }
+            accessed[minDistanceIndex] = true;
             //5、计算
             for (Edge edge : graph.getAdj()[minDistanceIndex]) {
                 if (accessed[edge.index]) {
