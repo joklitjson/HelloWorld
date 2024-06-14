@@ -161,30 +161,79 @@ public class Dijkstra {
     //此题目取的是最大值，和diskstra算法的取最短路径相反，因此里面的逻辑需要写反
     double maxProbability(int n, int[][] edges, double[] succProb, int start, int end){
 
+        //1、构造邻接表
+        List<double[]> [] graph=new LinkedList[n];
+
+        for (int i=0;i<n;i++){
+            graph[i]=new LinkedList<>();
+        }
+        for (int i=0;i<edges.length;i++) {
+            int[] edge = edges[i];
+            int from = edge[0];
+            int to = edge[1];
+            double pos = succProb[i];
+            //把邻居节点和概率加入进去
+            graph[from].add(new double[]{(double) to, pos});
+            graph[to].add(new double[]{(double) from, pos});
+        }
+        double pos=  maxProbabilityDijstra(start,end,graph);
+
+        return pos;
     }
 
-    private double[] maxProbabilityDijstra(int start, int end, List<double[]> [] graph){
+    private static double maxProbabilityDijstra(int start, int end, List<double[]> [] graph) {
 
         //需要把最大的放在上面
-        PriorityQueue<State> priorityQueue=new PriorityQueue<>((a,b)->(int) ((b.probability-a.probability)*100));
+        PriorityQueue<State> priorityQueue = new PriorityQueue<>((a, b) -> (int) ((b.probability - a.probability) * 100));
 
-        int n=graph.length;
+        int n = graph.length;
         //到
 
-        double[] probability=new double[n];
-        Arrays.fill(probability,-1);//填充最细
+        double[] probability = new double[n];
+        Arrays.fill(probability, -1);//填充最小值
+        // base case，start 到 start 的概率就是 1
+        probability[start]=1;
+        priorityQueue.offer(new State(start, 1.0));
+
+        while (!priorityQueue.isEmpty()) {
+            State state = priorityQueue.poll();
+            int currentNode = state.nodeId;
+            double currPro = state.probability;
+            if (currentNode==end){
+                return currPro;
+            }
+            if (probability[currentNode]>currPro){
+                continue;
+            }
+            for (double[] edge : graph[currentNode]) {
+                int nxtNode = (int)edge[0];
+                double nxtPro = edge[1];
+
+                //当前节点*下一个节点M的概率，大于start->M的概率则更新
+                if (probability[nxtNode] < nxtPro * probability[currentNode]) {
+                    probability[nxtNode] = nxtPro * probability[currentNode];
+                    //更新
+                    priorityQueue.offer(new State(nxtNode, probability[nxtNode]));
+                }
+            }
+        }
+
+        //如果到这里了说明没有
+        return 0.0;
     }
 
     public static void main(String[] args) {
-        int [][] arr=new int[][]{{1,2,2},{3,8,2},{5,3,5}};
-
+//        int [][] arr=new int[][]{{1,2,2},{3,8,2},{5,3,5}};
+//
         Dijkstra dijkstra=new Dijkstra();
-        System.out.println(dijkstra.minimumEffortPath(arr));;
+//        System.out.println(dijkstra.minimumEffortPath(arr));;
 
 //        int [][] delays=new int[][] {{2,1,1},{2,3,1},{3,4,1}};
 //
 //        System.out.println("预计延迟时间--==="+dijkstra.networkDelayTime(delays,4,2));
-
+//        n = 3, edges = [[0,1],[1,2],[0,2]], succProb = [0.5,0.5,0.2], start = 0, end = 2
+        double pos= dijkstra.maxProbability(3,new int[][]{{0,1},{1,2},{0,2}},new double[]{0.5,0.5,0.2},0,2);
+        System.out.println("最大的概率是="+pos);
     }
     static class State{
 
