@@ -70,8 +70,11 @@ public class Dijkstra {
             for (int[] neig: graph[current.nodeId]){
                 int nextNodeId=neig[0];
                 int nextHeight=Math.abs(neig[1]-toDistance);
-                if (nextHeight<distance[nextNodeId]){
-                    distance[nextNodeId]=nextHeight;
+                // 计算从 (curX, curY) 达到 (nextX, nextY) 的消耗
+                int effortToNextNode = Math.max(toDistance, nextHeight);
+
+                if (effortToNextNode<distance[nextNodeId]){
+                    distance[nextNodeId]=effortToNextNode;
                     //向队列中插入一条新的节点路径
                     priorityQueue.offer(new State(nextNodeId, distance[nextNodeId]));
                 }
@@ -154,6 +157,23 @@ public class Dijkstra {
 
     }
 
+    // 输入一幅无向图，边上的权重代表概率，返回从 start 到达 end 最大的概率
+    //此题目取的是最大值，和diskstra算法的取最短路径相反，因此里面的逻辑需要写反
+    double maxProbability(int n, int[][] edges, double[] succProb, int start, int end){
+
+    }
+
+    private double[] maxProbabilityDijstra(int start, int end, List<double[]> [] graph){
+
+        //需要把最大的放在上面
+        PriorityQueue<State> priorityQueue=new PriorityQueue<>((a,b)->(int) ((b.probability-a.probability)*100));
+
+        int n=graph.length;
+        //到
+        double[] probability=new double[n];
+        Arrays.fill(probability,-1);//填充最细
+    }
+
     public static void main(String[] args) {
         int [][] arr=new int[][]{{1,2,2},{3,8,2},{5,3,5}};
 
@@ -167,6 +187,11 @@ public class Dijkstra {
     }
     static class State{
 
+        public State(int nodeId,double probability){
+            this.nodeId=nodeId;
+            this.probability=probability;
+        }
+
         public State(int nodeId,int toCurrentDistance){
             this.nodeId=nodeId;
             this.toCurrentDistance=toCurrentDistance;
@@ -176,5 +201,10 @@ public class Dijkstra {
 
         //start节点到当前节点的距离
         public  int toCurrentDistance;
+
+        /**
+         * 到达该节点的概率
+         */
+        public double probability;
     }
 }
