@@ -23,7 +23,7 @@ public class KruskalMiniTree {
         for (int[] row : edges) {
             int u = row[0];
 
-            int v = row[0];
+            int v = row[1];
 
             //如果新添加的两条边 之前就联通，则能形成一个环，因此就不是一棵树
             if (uf.connect(u, v)) {

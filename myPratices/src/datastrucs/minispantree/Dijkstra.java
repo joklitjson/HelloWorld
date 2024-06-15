@@ -31,7 +31,7 @@ public class Dijkstra {
             if (toDistance>distance[current.nodeId]){
                 continue;
             }
-            //计算他的邻居节点的距离
+            //计算从起点到他的邻居节点的距离，是否小于已经查找到的距离
             for (int[] neig: graph[current.nodeId]){
                 int nextNodeId=neig[0];
                 int nextWeight=neig[1];
