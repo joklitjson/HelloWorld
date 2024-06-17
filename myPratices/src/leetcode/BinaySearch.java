@@ -6,6 +6,24 @@ public class BinaySearch {
         System.out.println(search(new int[]{3,1},1));
     }
 
+
+    public int  binaySearch(int [] nums,int target) {
+        int l = 0, h = nums.length - 1;
+
+        while (l < h) {
+            int middle = l + (h - l) / 2;
+
+            if (target == nums[middle]) {
+                return middle;
+            } else if (nums[middle] > target) {
+                h = middle - 1;
+            } else {
+                l = middle + 1;
+            }
+        }
+        return -1;
+    }
+
     /**
      * 旋转数组的二分搜索
      *
