@@ -80,6 +80,7 @@ public class MergeLinkedList {
 
     ListNode detectCycle(ListNode head) {
 
+
         ListNode fast = head, slow = head;
 
         while (slow != null&&fast.next != null) {
