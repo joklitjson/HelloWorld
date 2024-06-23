@@ -1,6 +1,7 @@
 package greedy;
 
 import java.util.Arrays;
+import java.util.Map;
 
 public class IntervalSchedule {
 
@@ -67,5 +68,41 @@ public class IntervalSchedule {
         }
 
         return count;
+    }
+
+    int videoStitching(int[][] clips, int t) {
+        Arrays.sort(clips, (a, b) -> {
+            //先按start 升序排列，在按end降序排列
+            if (a[0] == b[0]) {
+                return b[1] - a[1];
+            }
+            return a[0] - b[0];
+        });
+
+        int res = 0;
+        int currentEnd =0, nextEnd = 0;
+        int i = 0, n = clips.length;
+        while (i < n && clips[i][0] <= currentEnd) {
+
+            while (i < n && clips[i][0] <= currentEnd) {
+                nextEnd = Math.max(nextEnd, clips[i][1]);
+                i++;
+            }
+            res++;
+            currentEnd = nextEnd;
+            // 已经可以拼出区间 [0, T]
+            if (currentEnd >= t) {
+                return res;
+            }
+        }
+
+        //找不到
+        return -1;
+    }
+
+    public static void main(String[] args) {
+
+        int res=new IntervalSchedule().videoStitching(new int[][]{{0,2},{4,6},{8,10},{1,9},{1,5},{5,9}},10);
+        System.out.println("videoStitching="+res);
     }
     }
