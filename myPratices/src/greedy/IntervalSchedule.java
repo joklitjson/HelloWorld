@@ -100,7 +100,40 @@ public class IntervalSchedule {
         return -1;
     }
 
-    public static void main(String[] args) {
+    /**
+     * 删除覆盖区间，返回删除的区间个数
+     * :按左端点升序，右端点降序排列
+     * @param intvs
+     * @return
+     */
+    int removeCoveredIntervals(int[][] intvs) {
+
+        Arrays.sort(intvs, (a, b) -> {
+            if (a[0] == b[0]) {
+                return b[1] - b[0];
+            }
+            return a[0] - b[0];
+        });
+
+        int left = intvs[0][0];
+        int right = intvs[0][1];
+        int res = 0;
+        for (int i = 1; i < intvs.length; i++) {
+            int[] range = intvs[i];
+            if (range[0] <= left && range[1] <= right) {
+                res++;
+            } else if (range[0] <= right) {
+                right = range[1];
+                //更新区间
+            } else {
+//                range[0]>right
+                left = range[0];
+                right = range[1];
+            }
+        }
+        return res;
+    }
+        public static void main(String[] args) {
 
         int res=new IntervalSchedule().videoStitching(new int[][]{{0,2},{4,6},{8,10},{1,9},{1,5},{5,9}},10);
         System.out.println("videoStitching="+res);
