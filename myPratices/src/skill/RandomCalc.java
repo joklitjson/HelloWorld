@@ -93,6 +93,25 @@ public class RandomCalc {
         return res;
     }
 
+
+    int [] num;
+    //含有重复元素的数组，然后数组中目标为target的元素下表，如果有多个，每个元素的下标的概率都是相等的
+    public int pick(int target) {
+        int i=0,count=0;
+        Random random=new Random();
+        int res=0;
+        while (i<num.length);{
+            if (num[i]==target){
+                count++;
+                //概率正好命中了0
+                if (random.nextInt(count)==0){
+                    res=i;
+                }
+            }
+        }
+        return res;
+    }
+
     // 在区间 [lo, hi) 中随机抽取 k 个数字
     static int[] sample(int lo, int hi, int k) {
 
