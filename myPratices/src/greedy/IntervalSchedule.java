@@ -1,6 +1,8 @@
 package greedy;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class IntervalSchedule {
@@ -50,20 +52,21 @@ public class IntervalSchedule {
      * 射气球：
      * 这个问题和区间调度算法一模一样！如果最多有n个不重叠的区间，那么就至少需要n个箭头穿透所有区间：
      * 求 不重叠区间的数量，唯一不同的是 气球的边界相等也重叠
+     *
      * @param intvs
      * @return
      */
     int findMinArrowShots(int[][] intvs) {
-        Arrays.sort(intvs,(a,b)->a[1]-b[1]);
+        Arrays.sort(intvs, (a, b) -> a[1] - b[1]);
 
-        int count=1;
-        int currentEnd=intvs[0][1];
+        int count = 1;
+        int currentEnd = intvs[0][1];
 
-        for (int i=1;i<intvs.length;i++){
-            int nextStart=intvs[i][0];
-            if (nextStart>currentEnd){
+        for (int i = 1; i < intvs.length; i++) {
+            int nextStart = intvs[i][0];
+            if (nextStart > currentEnd) {
                 count++;
-                currentEnd=intvs[i][1];
+                currentEnd = intvs[i][1];
             }
         }
 
@@ -80,7 +83,7 @@ public class IntervalSchedule {
         });
 
         int res = 0;
-        int currentEnd =0, nextEnd = 0;
+        int currentEnd = 0, nextEnd = 0;
         int i = 0, n = clips.length;
         while (i < n && clips[i][0] <= currentEnd) {
 
@@ -103,6 +106,7 @@ public class IntervalSchedule {
     /**
      * 删除覆盖区间，返回删除的区间个数
      * :按左端点升序，右端点降序排列
+     *
      * @param intvs
      * @return
      */
@@ -133,9 +137,90 @@ public class IntervalSchedule {
         }
         return res;
     }
-        public static void main(String[] args) {
 
-        int res=new IntervalSchedule().videoStitching(new int[][]{{0,2},{4,6},{8,10},{1,9},{1,5},{5,9}},10);
-        System.out.println("videoStitching="+res);
+
+    //区间合并问题
+    //先按start升序，end降序排列,如果下一个区间的左边界在上一个区间的之间，则扩大右边界
+    public int[][] merge(int[][] intervals) {
+
+        Arrays.sort(intervals,(a,b)->{
+            if (a[0]==b[0]){
+                return b[0]-a[0];
+            }
+            return a[0]-b[0];
+        });
+
+        List<int[]> mergeList=new ArrayList<>();
+        int start=intervals[0][0];
+        int end=intervals[0][1];
+
+
+        for (int i=1;i<intervals.length;i++){
+
+            if (intervals[i][0]<=end){
+                //合并区间
+                end=Math.max(intervals[i][1],end);
+            }
+            else {
+                //不想交，新开一个区间
+                mergeList.add(new int[]{start,end});
+                start=intervals[i][0];
+                end=intervals[i][1];
+            }
+        }
+        mergeList.add(new int[]{start,end});
+        return mergeList.toArray(new int[mergeList.size()][1]);
     }
+
+
+    //求区间列表的交集，每个区间中的元素都是不想交的
+    //方案：定义两个指针 一起遍历他们俩数组，如果两个线段有交集，在求交集，然后end小的一方在向前移动
+    public int[][] intervalIntersection(int[][] firstList, int[][] secondList) {
+
+        List<int[]> res=new ArrayList<>();
+        int i=0,j=0;
+
+        while (i<firstList.length&&j<secondList.length){
+            // 判断有交集的情况
+            int aStart=firstList[i][0],aEnd=firstList[i][1];
+            int bStart=secondList[j][0],bEnd=secondList[j][1];
+
+            if (aStart>bEnd||aEnd<bStart){
+                //两则没有交集
+            }
+            else {
+                //右交集
+                res.add(new int[]{Math.max(aStart,bStart),Math.min(aEnd,bEnd)});
+            }
+            //移动指针：谁小谁移动
+            if (aEnd<bEnd){
+                i++;
+            }
+            else {
+                j++;
+            }
+        }
+
+        return res.toArray(new int[res.size()][2]);
     }
+    public static void main(String[] args) {
+
+        int res = new IntervalSchedule().videoStitching(new int[][]{{0, 2}, {4, 6}, {8, 10}, {1, 9}, {1, 5}, {5, 9}}, 10);
+        System.out.println("videoStitching=" + res);
+
+//        int[][] merged= new IntervalSchedule().merge(new int[][]{{1,3},{2,6},{8,10},{15,18}});
+        int[][] merged= new IntervalSchedule().merge(new int[][]{{1,3},{3,6}});
+        System.out.println("区间合并结果===:");
+        for (int [] range:merged){
+            System.out.print(Arrays.toString(range)+" ");
+        }
+
+        System.out.println();
+        int[][] intervalIntersection= new IntervalSchedule().intervalIntersection(new int[][]{{0,2},{5,10},{13,23},{24,25}},new int[][]{{1,5},{8,12},{15,24},{25,26}});
+
+        System.out.println("区间交集结果===:");
+        for (int [] range:intervalIntersection){
+            System.out.print(Arrays.toString(range)+" ");
+        }
+    }
+}
