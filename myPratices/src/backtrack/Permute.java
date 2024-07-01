@@ -16,10 +16,16 @@ public class Permute {
     }
 
     private void backtrack(int[] nums,List<Integer> result,boolean []  visited) {
+        //全排列问题
         if (result.size() == nums.length) {
             res.add(new ArrayList<>(result));
             return;
         }
+        //如果让你计算k个数的全排列：
+//        if (result.size() == k) {
+//            res.add(new ArrayList<>(result));
+//            return;
+//        }
 
         //回溯
         for (int i = 0; i < nums.length; i++) {
