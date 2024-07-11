@@ -2,6 +2,7 @@ package linkedList;
 
 public class ReverseLinkedList {
 
+
     /**
      * 递归法反转链表：
      *
@@ -14,7 +15,7 @@ public class ReverseLinkedList {
             return head;
         }
         ListNode last = reverse(head.next);
-        head.next.next = head;//让head的下一个元素只想head
+        head.next.next = head;//让head的下一个元素指向head(先成环，在切断)
         head.next = null;//把header的下一个元素设置成空
 //        last 一直是原链表的最后一个元素
         return last;
@@ -46,6 +47,21 @@ public class ReverseLinkedList {
         }
         //此方法就是为了递归到m节点
         head.next= reverseBetween(head.next, m - 1, n - 1);
+        return head;
+    }
+
+    ListNode reverseBetween2(ListNode head, int m, int n) {
+
+        int start=m;
+        ListNode pre=null,current=head;
+        //1、先找到第m个节点，以及他的前驱节点，在向后翻转
+        while (start!=1){
+            pre=current;
+            current=current.next;
+            start--;
+        }
+        ListNode reversed=   reverseN(current,n-m+1);
+        pre.next=reversed;
         return head;
     }
 
@@ -155,7 +171,8 @@ public class ReverseLinkedList {
 //        ListNode head=reverseLinkedList.reverse(dummy.next);
 //        ListNode head=reverseLinkedList.reverseN(dummy.next,3);
 //            ListNode head = reverseLinkedList.reverseBetween(dummy.next, 2, 4);
-            ListNode head = reverseLinkedList.reverseKGroup(dummy.next, 3);
+            ListNode head = reverseLinkedList.reverseBetween2(dummy.next, 2, 5);
+//            ListNode head = reverseLinkedList.reverseKGroup(dummy.next, 3);
             p = head;
             System.out.print("反转后的链表顺序：");
             while (p != null) {
