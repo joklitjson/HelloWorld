@@ -15,8 +15,11 @@ public class MergeLinkedList {
                 p.next = p1;
                 p1 = p1.next;
             }
+//            向后移动
+            p = p.next;
         }
 
+//        直接连接后面的有序的链表
         if (p1 != null) {
             p.next = p1;
         }
@@ -26,6 +29,12 @@ public class MergeLinkedList {
         return dummyNode.next;
     }
 
+    /**
+     * 合并k个有序链表
+     *
+     * @param lists
+     * @return
+     */
     ListNode mergeKLists(ListNode[] lists) {
 
         ListNode dummy = new ListNode();
@@ -50,6 +59,12 @@ public class MergeLinkedList {
         return dummy.next;
     }
 
+    /**
+     * 查找链表的中间节点
+     *
+     * @param head
+     * @return
+     */
     ListNode middleNode(ListNode head) {
         //快慢指针
         ListNode fast = head, slow = head;
@@ -66,7 +81,7 @@ public class MergeLinkedList {
     boolean hasCycle(ListNode head) {
         ListNode fast = head, slow = head;
 
-        while (fast != null&&fast.next != null  ) {
+        while (fast != null && fast.next != null) {
             fast = fast.next.next;
             slow = slow.next;
 
@@ -79,11 +94,8 @@ public class MergeLinkedList {
     }
 
     ListNode detectCycle(ListNode head) {
-
-
         ListNode fast = head, slow = head;
-
-        while (slow != null&&fast.next != null) {
+        while (slow != null && fast.next != null) {
             fast = fast.next.next;
             slow = slow.next;
 
@@ -93,7 +105,7 @@ public class MergeLinkedList {
         }
 
         //遇到了空指针 说明没有环
-        if (fast.next == null || fast == null) {
+        if (fast == null || fast.next == null) {
             return null;
         }
 
@@ -107,4 +119,4 @@ public class MergeLinkedList {
         return slow;
     }
 
-    }
+}
