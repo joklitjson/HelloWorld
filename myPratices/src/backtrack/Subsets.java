@@ -12,15 +12,15 @@ public class Subsets {
 //            System.out.println(Arrays.toString(element.toArray()));
 //        }
 
-//        combine(3,2);
-//        for (List<Integer> element:res){
-//            System.out.println(Arrays.toString(element.toArray()));
-//        }
-        combinationSum2(new int[]{10,1,2,7,6,1,5},8);
-
+        combine(3,3);
         for (List<Integer> element:res){
             System.out.println(Arrays.toString(element.toArray()));
         }
+//        combinationSum2(new int[]{10,1,2,7,6,1,5},8);
+//
+//        for (List<Integer> element:res){
+//            System.out.println(Arrays.toString(element.toArray()));
+//        }
     }
    static List<List<Integer>> res=new ArrayList<>();
     // 求子集问题
@@ -66,7 +66,10 @@ public class Subsets {
 
             trace.add(i);
 
-            backtrackCombine(n, i + 1, k, trace);
+//            backtrackCombine(n, i + 1, k, trace);
+            //可重复选择
+            backtrackCombine(n, i , k, trace);
+
 
             trace.remove(trace.size() - 1);
         }
@@ -109,3 +112,4 @@ public class Subsets {
         }
     }
     }
+
