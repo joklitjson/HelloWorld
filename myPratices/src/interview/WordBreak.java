@@ -3,6 +3,7 @@ package interview;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 单词拆分，就是 能否使用一个集合中的单词组成一个目标字符串
@@ -18,7 +19,7 @@ public class WordBreak {
 
 //        System.out.println(wordBreak("hellow", Arrays.asList("ll","he","ow")));
 //        System.out.println(wordBreak("leetcode", Arrays.asList("le", "code","et")));
-        System.out.println(wordBreak("a", Arrays.asList("b")));
+        System.out.println(wordBreakDP("hellow", Arrays.asList("ll","he","ow")));
     }
    static boolean  wordBreak(String s, List<String> wordDict) {
        wordSet.addAll(wordDict);
@@ -85,5 +86,20 @@ public class WordBreak {
         memo[index] = 0;
         //遍历完成，都不能被匹配
         return false;
+    }
+
+    public static boolean wordBreakDP(String s, List<String> wordDict) {
+        Set<String> wordDictSet = new HashSet(wordDict);
+        boolean[] dp = new boolean[s.length() + 1];
+        dp[0] = true;
+        for (int i = 1; i <= s.length(); i++) {
+            for (int j = 0; j < i; j++) {
+                if (dp[j] && wordDictSet.contains(s.substring(j, i))) {
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+        return dp[s.length()];
     }
 }
