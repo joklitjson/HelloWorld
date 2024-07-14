@@ -5,6 +5,8 @@ public class BruteForce {
     public static void main(String[] args) {
         System.out.println(search("abcfdff","dff"));;
     }
+
+//    比暴力匹配算法（‌时间复杂度为O(n * m)）‌
     //时间复杂度 O(M*N)
     static int search(String txt, String pat) {
         int m = txt.length();
