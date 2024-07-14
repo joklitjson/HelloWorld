@@ -7,6 +7,7 @@ public class RabinKarp {
         System.out.println(search("abcddffg","ffg"));
     }
 
+    //Rabin-Karp算法的时间复杂度为O(n+m)，其中n是文本长度，m是模式长度。
     // 在文本串 txt 中搜索模式串 pat 的起始索引
     static int search(String txt, String pat) {
         int N = txt.length(), L = pat.length();
