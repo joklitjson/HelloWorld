@@ -5,6 +5,9 @@ import java.util.Arrays;
  * BM算法采用从右向左比较 的方法
  * 应用到了两种启发式规则，即坏字符规则 和好后缀规则 ，来决定向右跳跃的距离。
  * 在BM算法匹配的过程中，取坏字符规则和好后缀规则中跳跃的较大者作为跳跃的距离。
+ *
+ * 总结
+ * https://github.com/Walter0507/HBHSAlgorithm/blob/master/src/main/java/com/hbhs/algorithm/string/onePattern/Sunday.java
  */
 public class BoyerMoore {
 
