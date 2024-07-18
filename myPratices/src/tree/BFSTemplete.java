@@ -2,13 +2,40 @@ package tree;
 
 import datastrucs.TreeNode;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
+/**
+ * 二叉树的层序遍历
+ * 也可以使用DFS实现层序遍历输出节点
+ */
 public class BFSTemplete {
 
+
+    /**
+     * 使用深度遍历 把一层的节点放在一个数组中
+     * @param node
+     * @param list
+     * @param depth
+     */
+    private void dfsCengxuTravel(TreeNode node, List<List<Integer>> list, int depth){
+        if (node==null){
+            return;
+        }
+        if (depth>list.size()){
+            list.add(new ArrayList<>());
+        }
+        //获取当前层次，然在加入数组
+        //锯齿形遍历，层级是奇数从左到右，，层级偶数则从右向左
+        if (depth%2==1){
+            list.get(depth-1).add(node.val);
+        }else {
+            list.get(depth-1).add(1,node.val);
+        }
+
+        //遍历子节点
+        dfsCengxuTravel(node.left,list,depth+1);
+        dfsCengxuTravel(node.right,list,depth+1);
+    }
     /**
      * BFS 算法 模板，其实就是从一个起点向一个目标搜索，一层一层 向外扩散，因此能找到最短路径
      * 比如A路寻星问题
