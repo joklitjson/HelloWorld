@@ -3,9 +3,9 @@ package sort;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
+ * https://blog.csdn.net/qq_36256590/article/details/126663121
  * 将数组分到有限数量的桶子里。每个桶子再个别排序（有可能再使用别的排序算法或是以递归方式继续使用桶排序进行排序）。
  * 简单概括就是：划分多个范围相同的区间，每个子区间自排序，最后合并（分治思想的体现）。
  * 补充： 映射函数一般是 f = array[i] / k; k^2 = n; n是所有元素个数.
