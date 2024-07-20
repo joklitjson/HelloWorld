@@ -1,6 +1,9 @@
 package sort;
 
 
+/**
+ * 泡泡排序：比较相邻元素大小，如果逆序则交换位置，因此一次冒泡之后会把最大值交换到数组的尾部，因此称为冒泡排序
+ */
 public class BubbleSortCalc {
     public static void main(String[] args) {
         bubbleSort(new int[]{1,31,4,1,2,5,7,8,});
