@@ -206,3 +206,5 @@ FloodFill 填色算法，注意有时候需要使用visited数组记录已经访
 7、线段树：首先线段树是一棵二叉树, 平常我们所指的线段树都是指一维线段树。 故名思义, 线段树能解决的是线段上的问题,
     这个线段也可指区间. 我们先来看线段树的逻辑结构。
 https://seramasumi.github.io/docs/Algorithms/mc-%E5%BE%AE%E8%AF%BE%E5%A0%82-%E7%BA%BF%E6%AE%B5%E6%A0%91_Segment_Tree.html
+
+8、链表排序、合并多个有序链表，一般都是使用归并排序进行合并：把链表分成两个子链表，两两排序在合并

@@ -30,6 +30,24 @@ public class Subsets {
         return res;
     }
 
+    //可以使用二进制 实现，每个数字是否选择，有两种情况，因此就有n^2次不同的结果
+    public static List<List<Integer>> subsets2(int[] nums) {
+        res.clear();
+        int n=nums.length;
+        List<Integer> tmp=new ArrayList<>();
+        for (int mask=0;mask<(1<<n);mask++){
+            //计算位数是1的数 有哪几个
+            for (int i=0;i<nums.length;i++){
+                if ((mask&(1<<i))==1){
+                    tmp.add(nums[i] );
+                }
+            }
+            //一次结果
+            res.add(new ArrayList<>(tmp));
+        }
+        return res;
+    }
+
     private static void backtrack(int[] nums,int start,List<Integer> trace){
         res.add(new ArrayList<>(trace));
 

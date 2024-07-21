@@ -31,12 +31,16 @@ public class MergeLinkedList {
 
     /**
      * 合并k个有序链表
+     * 还可以使用归并合并：https://leetcode.cn/problems/vvXgSW/solutions/1412116/he-bing-pai-xu-lian-biao-by-leetcode-sol-w1zb/
      *
      * @param lists
      * @return
      */
     ListNode mergeKLists(ListNode[] lists) {
 
+        if (lists==null||lists.length==0){
+            return null;
+        }
         ListNode dummy = new ListNode();
         ListNode p = dummy;
         //小跟堆
@@ -59,12 +63,97 @@ public class MergeLinkedList {
         return dummy.next;
     }
 
+    //使用归并的思想:自顶向下
+    public ListNode mergeKLists2(ListNode[] lists) {
+        if (lists == null || lists.length == 0) {
+            return null;
+        }
+        if (lists.length == 1) {
+            return lists[0];
+        }
+        merge(lists, 0, lists.length - 1);
+
+        return lists[0];
+    }
+
+    //使用归并思想：自底向上
+    public ListNode mergeKLists3(ListNode[] lists) {
+        if (lists == null || lists.length == 0) {
+            return null;
+        }
+        if (lists.length == 1) {
+            return lists[0];
+        }
+
+        int n=lists.length,grap=1;
+
+        //
+        for (;grap<n;grap=grap*2){
+            // 基本分区合并(随着间隔的成倍增长，一一合并，二二合并，四四合并...)
+            for (int l=0;l<n-grap;l+=2*grap){
+//                grap=1:[0,1]、【2、3】【4、5】合并
+//                grap=2:>>>[0,2],[4,6]合并
+                System.out.println("grap="+grap+"; range=["+l+","+(l+grap)+"]");
+               lists[l]=merge(lists[l],lists[l+grap]);
+           }
+        }
+        //如果还有剩余 需要再次合并
+        return grap<n-1? merge(lists[0],lists[grap]):lists[0];
+    }
+
     /**
-     * 查找链表的中间节点
-     *
-     * @param head
-     * @return
+     * 自顶向下的合并
+     * @param lists
+     * @param left
+     * @param right
      */
+    public void merge(ListNode[] lists,int left,int right) {
+        if (left >= right) {
+            return;
+        }
+        int middle = (left + right) / 2;
+        merge(lists, left, middle);
+        merge(lists, middle + 1, right);
+
+        //合并在一起
+        lists[left] = merge(lists[left], lists[middle + 1]);
+    }
+
+    //合并思想
+    public ListNode merge(ListNode node1, ListNode node2) {
+        ListNode dummy=new ListNode(-1);
+        ListNode cur=dummy;
+
+        while (node1!=null&&node2!=null){
+            if (node1.val<node2.val){
+                cur.next=node1;
+                node1=node1.next;
+            }
+            else {
+                cur.next=node2;
+                node2=node2.next;
+            }
+            //移动游标
+            cur=cur.next;
+        }
+
+        if (node1!=null){
+            cur.next=node1;
+        }
+
+        if (node2!=null){
+            cur.next=node2;
+        }
+        return dummy.next;
+    }
+
+
+        /**
+         * 查找链表的中间节点
+         *
+         * @param head
+         * @return
+         */
     ListNode middleNode(ListNode head) {
         //快慢指针
         ListNode fast = head, slow = head;
