@@ -1,9 +1,6 @@
 package mydatastructs;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class MonotonicQueue {
 
@@ -54,10 +51,49 @@ public class MonotonicQueue {
         return re;
     }
 
+
+    /**
+     * 使用优先级队列，存储value,index二元组，就是大根堆，堆顶是最大值，每次看看最大值是否在窗口范围内
+     * @param nums
+     * @param k
+     * @return
+     */
+    static int[] maxSlidingWindow2(int[] nums, int k) {
+
+        PriorityQueue<int[]> priorityQueue = new PriorityQueue<int[]>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[0] != o2[0] ? o2[0] - o1[0] : o2[1] - o1[1];
+            }
+        });
+
+        for (int i = 0; i < k; i++) {
+            priorityQueue.add(new int[]{nums[i], i});
+        }
+        int n = nums.length;
+        int[] ans = new int[n - k + 1];
+        //第一个最大值
+        ans[0] = priorityQueue.peek()[0];
+
+        for (int i = k; i < n; i++) {
+            //入队列
+            priorityQueue.add(new int[]{nums[i], i});
+            //不在窗口内
+            while (priorityQueue.peek()[1] <= i - k) {
+                priorityQueue.poll();
+            }
+            //新的最大值
+            ans[i - k + 1] = priorityQueue.peek()[0];
+        }
+        return ans;
+    }
     public static void main(String[] args) {
 
         int[] nums= new MonotonicQueue().maxSlidingWindow(new int[]{1,3,-1,-3,5,3,6,7},3);
         System.out.println(Arrays.toString(nums));
+
+        int[] nums2= maxSlidingWindow2(new int[]{1,3,-1,-3,5,3,6,7},3);
+        System.out.println(Arrays.toString(nums2));
 
     }
 }
