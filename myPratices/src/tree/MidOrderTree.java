@@ -33,6 +33,7 @@ public class MidOrderTree {
             }
             //需要出栈了
             cur = stack.pop();
+            /*********中序遍历的代码位置***********/
             result.add(cur.val);
             rank++;
             cur = cur.right;

@@ -18,7 +18,7 @@ public class PostOrderTraversal {
 
         Stack<TreeNode> stack = new Stack<>();
         TreeNode cur = root;
-        TreeNode pre = null;//前面遍历到的节点：出栈的节点
+        TreeNode pre = null;//前面遍历到的节点：已经出栈的节点
         while (!stack.isEmpty() || cur != null) {
 
             while (cur != null) {
