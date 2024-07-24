@@ -53,4 +53,26 @@ public class ReorderList {
 
         return slow;
     }
+
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        if (headA == null || headB == null) {
+            return null;
+        }
+        ListNode l1 = headA, l2 = headB;
+        while (l1 != l2) {
+            if (l1 != null) {
+                l1 = l1.next;
+            } else {
+                l1 = headB;
+            }
+
+            if (l2 != null) {
+                l2 = l2.next;
+            } else {
+                l2 = headA;
+            }
+        }
+
+        return l1;
+    }
 }
