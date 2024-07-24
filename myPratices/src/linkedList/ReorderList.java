@@ -1,5 +1,6 @@
 package linkedList;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class ReorderList {
@@ -74,5 +75,43 @@ public class ReorderList {
         }
 
         return l1;
+    }
+
+    //把所有的节点复制一份，然后存放在map中
+    public Node copyRandomList(Node head) {
+        HashMap<Node,Node> map=new HashMap<>();
+        Node cur=head;
+        while (cur!=null) {
+            Node copy = new Node(cur.val);
+            map.put(cur, copy);
+            cur = cur.next;
+        }
+
+        Node copyHead = new Node(-1);
+         cur=head;
+        Node copyHeadCur=copyHead;
+        while (cur!=null) {
+            Node copy = map.get(cur);
+            copyHeadCur.next=copy;
+            if (cur.random!=null){
+                Node copyRandom = map.get(cur.random);
+                copy.random=copyRandom;
+            }
+            cur = cur.next;
+            copyHeadCur=copyHeadCur.next;
+        }
+        return copyHead.next;
+    }
+}
+
+class Node {
+    int val;
+    Node next;
+    Node random;
+
+    public Node(int val) {
+        this.val = val;
+        this.next = null;
+        this.random = null;
     }
 }
