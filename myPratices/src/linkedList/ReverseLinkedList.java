@@ -67,7 +67,7 @@ public class ReverseLinkedList {
 
 
     //使用迭代法翻转链表
-    ListNode reverseIterator(ListNode head) {
+    static ListNode reverseIterator(ListNode head) {
         // pre current next
         ListNode pre=null,curr=head,next=null;
         while (curr!=null){
@@ -171,8 +171,9 @@ public class ReverseLinkedList {
 //        ListNode head=reverseLinkedList.reverse(dummy.next);
 //        ListNode head=reverseLinkedList.reverseN(dummy.next,3);
 //            ListNode head = reverseLinkedList.reverseBetween(dummy.next, 2, 4);
-            ListNode head = reverseLinkedList.reverseBetween2(dummy.next, 2, 5);
+//            ListNode head = reverseLinkedList.reverseBetween2(dummy.next, 2, 5);
 //            ListNode head = reverseLinkedList.reverseKGroup(dummy.next, 3);
+            ListNode head=reverseList22(dummy.next);
             p = head;
             System.out.print("反转后的链表顺序：");
             while (p != null) {
@@ -181,4 +182,27 @@ public class ReverseLinkedList {
             }
             System.out.println();
         }
+
+
+    // 迭代法
+    public static ListNode reverseList22(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode pre = head, current = head.next, next;
+        boolean flag=true;
+        while (current != null) {
+            //获取下一个node
+            next = current.next;
+            current.next = pre;
+           // 只有第一次需要设置为空,因此此种写法不被推荐
+            if (flag) {
+                pre.next = null;
+                flag = false;
+            }
+            pre = current;
+            current = next;
+        }
+        return pre;
+    }
 }
