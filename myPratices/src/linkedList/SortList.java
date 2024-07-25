@@ -17,7 +17,7 @@ public class SortList {
             cus=cus.next;
         }
         System.out.println();
-        ListNode sorted= sortList2(dummy.next);
+        ListNode sorted= insertionSortList(dummy.next);
         cus=sorted;
         while (cus!=null){
             System.out.print(cus.val+" ");
@@ -32,7 +32,7 @@ public class SortList {
      * @param head
      * @return
      */
-    public static ListNode sortList2(ListNode head) {
+    public static ListNode insertionSortList(ListNode head) {
         if (head == null || head.next == null) {
             return head;
         }

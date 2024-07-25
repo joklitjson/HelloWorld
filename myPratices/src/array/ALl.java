@@ -1,8 +1,38 @@
 package array;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ALl {
     public static void main(String[] args) {
-        System.out.println(searchMatrix(new int[][]{{5}},5));
+//        System.out.println(searchMatrix(new int[][]{{5}},5));
+        List<List<Integer>> triangle=new ArrayList<List<Integer>>();
+//        [[2],[3,4],[6,5,7],[4,1,8,3]]
+        List<Integer> dd=new ArrayList<>();
+        dd.add(2);
+        triangle.add(dd);
+        dd=new ArrayList<>();
+        dd.add(3);
+        dd.add(4);
+        triangle.add(dd);
+
+        dd=new ArrayList<>();
+        dd.add(6);
+        dd.add(5);
+        dd.add(7);
+
+        triangle.add(dd);
+
+        dd=new ArrayList<>();
+        dd.add(4);
+        dd.add(1);
+        dd.add(8);
+        dd.add(3);
+
+        triangle.add(dd);
+//        triangle.add(Arrays.asList(4,1,8,3).iterator());
+
+        System.out.println(minimumTotal(triangle));
     }
 
     /**
@@ -68,5 +98,78 @@ public class ALl {
             }
         }
         return false;
+    }
+
+
+    /**
+     * 动态规划算法:定义dp[i][j] 表示的是从顶部到第i,j节点的最小路径，则最小路径路径只跟他的上一层的对应节点和上一层的左边节点的值有关
+     * dp[i][j]=min(dp[i-1][j-1],dp[i-1][j])+grid[i][j]:
+     * 还可以优化成一维数组
+     * @param triangle
+     * @return
+     */
+    public static int minimumTotal(List<List<Integer>> triangle) {
+        if (triangle == null || triangle.size() == 0) {
+            return 0;
+        }
+        if (triangle.size() == 1) {
+            return triangle.get(0).get(0);
+        }
+
+        int m = triangle.size();
+        int dp[][] = new int[m][m];
+        //初始化第一个
+        dp[0][0] = triangle.get(0).get(0);
+        for (int i = 1; i < m; i++) {
+            //特殊处理每一行的 第一个元素和最后一个元素
+            dp[i][0] = dp[i - 1][0] + triangle.get(i).get(0);
+
+            for (int j = 1; j < i; j++) {
+                dp[i][j] = Math.min(dp[i - 1][j], dp[i - 1][j - 1]) + triangle.get(i).get(j);
+            }
+            //最后一个元素
+            dp[i][i] = dp[i - 1][i - 1] + triangle.get(i).get(i);
+        }
+
+        //然后再遍历最后一行
+        int min = dp[m - 1][0];//
+        for (int i = 1; i < m; i++) {
+            min = Math.min(min, dp[m - 1][i]);
+        }
+
+        return min;
+    }
+
+    public static int minimumTotal2(List<List<Integer>> triangle) {
+        if (triangle == null || triangle.size() == 0) {
+            return 0;
+        }
+        if (triangle.size() == 1) {
+            return triangle.get(0).get(0);
+        }
+
+        int m = triangle.size();
+        int dp[] = new int[m];
+        //初始化第一个
+        dp[0] = triangle.get(0).get(0);
+        for (int i = 1; i < m; i++) {
+            //优先处理最后一个元素
+            dp[i] = dp[i-1] + triangle.get(i).get(i);
+
+            for (int j = i-1; i>=1; j--) {//排除最后一个元素0
+                //倒序遍历不会覆盖上一层的前面部分元素
+                dp[j] = Math.min(dp[j], dp[j - 1]) + triangle.get(i).get(j);
+            }
+            //处理第一个元素
+            dp[0] = dp[0] + triangle.get(i).get(0);
+        }
+
+        //然后再遍历最后一行
+        int min = dp[0];//
+        for (int i = 1; i < m; i++) {
+            min = Math.min(min, dp[i]);
+        }
+
+        return min;
     }
 }
