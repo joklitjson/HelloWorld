@@ -1,7 +1,7 @@
 package leetcode;
 
-import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.PriorityQueue;
 
 public class Ugly {
@@ -43,7 +43,15 @@ public class Ugly {
         return n == 1;
     }
 
-    //求第n个丑数，其实就是求多个链表的合并
+    //
+
+    /**
+     * 求第n个丑数，其实就是求多个链表的合并
+     *
+     * [不能进行简单的相加]
+     * @param n
+     * @return
+     */
     static int nthUglyNumber(int n) {
 
         int ans[] = new int[n + 1];
@@ -77,34 +85,30 @@ public class Ugly {
         return ans[n];
     }
 
-    //求第n个丑数，其实就是求多个链表的合并
+    /**
+     * 每次取出堆顶元素 x，则 x 是堆中最小的丑数，由于 2x,3x,5x 也是丑数，因此将 2x,3x,5x 加入堆。[注意去重]
+     * @param n
+     * @return
+     */
     static int nthUglyNumber2(int n) {
 
-        int ans[] = new int[n + 1];
-        int cur = 0;
-        //设置第一个
-        ans[cur++] = 1;
-
-        // 可以理解为三个有序链表的头节点的值
-        int product2 = 2, product3 = 3, product5 = 5;
-
-        while (cur <= n) {
-            int min = Math.min(Math.min(product2, product3), product5);
-            ans[cur++] = min;
-
-            //合p1 p2 p3三个链表,往后递增
-            if (min == product2) {
-                product2 += 2;
-            }
-            if (min == product3) {
-                product3 += 3;
-            }
-            if (min == product5) {
-                product5 += 5;
+        int[] factors = {2, 3, 5};
+        HashSet see = new HashSet();
+        PriorityQueue<Long> priorityQueue = new PriorityQueue<>();
+        priorityQueue.offer(1L);
+        Long ugly = 0L;
+        for (int i = 0; i < n; i++) {
+            ugly = priorityQueue.poll();
+            for (int fac : factors) {
+                Long value = ugly * fac;
+                if (see.add(value)) {
+                    priorityQueue.offer((long) value);
+                }
             }
         }
-        System.out.println(Arrays.toString(ans));
-        return ans[n - 1];
+
+        //获取顶部元素
+        return ugly.intValue();
     }
 
 
