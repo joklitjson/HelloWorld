@@ -177,7 +177,8 @@ public class ReorderList {
         return small.next;
     }
 
-    //头插法
+    //头插法：相对位置发生了改变
+    //可以采用尾插法：元素的相对位置可以保持不变
     public ListNode partition2(ListNode head, int x) {
         ListNode dummy=new ListNode(-1);
         ListNode cur=dummy;
