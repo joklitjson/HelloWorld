@@ -1,7 +1,5 @@
 package slidwindow;
 
-import java.util.Map;
-
 public class RabinKarp {
     public static void main(String[] args) {
         System.out.println(search("abcddffg","ffg"));

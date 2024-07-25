@@ -1,4 +1,4 @@
-package leetcode;
+package slidwindow;
 
 import java.util.*;
 
@@ -164,6 +164,11 @@ public class SliceWindowTest {
         return left;
     }
 
+    /**
+     * 无重复元素的最大子字符
+     * @param s
+     * @return
+     */
     public static int lengthOfLongestSubstring(String s) {
         Map<Character, Integer> map = new HashMap<>();
         int left = 0, right = 0;
@@ -172,7 +177,7 @@ public class SliceWindowTest {
             //必须要大于左指针,优先排除无效指针数据
             if (map.containsKey(s.charAt(right))&&map.get(s.charAt(right))>=left) {
 //原则上 map.getOrDefault(s.charAt(right),0)+1是最大值，但是也有可能历史中有此数据，
-// 因此会有误判的情况，所以需要比较下left和当前left值的最大值。主要原因还是由于map清空历史数据的问题
+// 因此会有误判的情况，所以需要比较下left和当前left值的最大值。主要原因还是由于map未清空历史数据的问题
                 left = Math.max(left, map.getOrDefault(s.charAt(right), 0) + 1);
             }
             map.put(s.charAt(right), right);
