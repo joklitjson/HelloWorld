@@ -137,10 +137,6 @@ public class ReorderList {
             Node  orgNext=  cur.next.next;//原链表的next节点
             Node copy=  cur.next;
             point.next=copy;
-            if (cur.random!=null){
-                //随机节点在原链表的随机节点的下一个节点
-                copy.random=cur.random.next;
-            }
             copy.next=null;
             point=copy;
 //            cur.next=orgNext;//回复原链表
