@@ -9,7 +9,7 @@ public class SortList {
 
         ListNode dummy=new ListNode(-1);
         ListNode cus=dummy;
-        Random random=new Random(100);
+        Random random=new Random();
         for (int i=0;i<10;i++){
             cus.next=new ListNode(random.nextInt(100));
 
@@ -17,7 +17,7 @@ public class SortList {
             cus=cus.next;
         }
         System.out.println();
-        ListNode sorted= sortList(dummy.next);
+        ListNode sorted= sortList2(dummy.next);
         cus=sorted;
         while (cus!=null){
             System.out.print(cus.val+" ");
@@ -25,6 +25,37 @@ public class SortList {
         }
         System.out.println();
 
+    }
+
+    /**
+     * 插入排序:
+     * @param head
+     * @return
+     */
+    public static ListNode sortList2(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode dummy = new ListNode(-1);
+        dummy.next = head;
+        ListNode cur = head.next;
+        head.next=null;//先切断和前面的联系
+        //插入排序
+        while (cur != null) {
+            ListNode tmp = cur;
+            cur = cur.next;//指向下一个
+            //需要把cur插入到当前链表中
+            ListNode pre = dummy;
+            //寻找一个大于他的节点
+            while (pre.next != null && pre.next.val < tmp.val) {
+                pre = pre.next;
+            }
+            //把当前节点插入到pre后面
+            tmp.next = pre.next;
+            pre.next = tmp;
+        }
+
+        return dummy.next;
     }
 
     public static ListNode sortList(ListNode head) {
