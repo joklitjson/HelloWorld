@@ -28,20 +28,6 @@ public class DoublePointInArray {
         return slow + 1;
     }
 
-    /* 删除*/
-    ListNode deleteDuplicates(ListNode head) {
-        ListNode fast = head, slow = head;
-
-        while (fast != null) {
-            if (fast.val != slow.val) {
-                slow.next = fast;
-                slow = fast;
-            }
-            fast = fast.next;
-        }
-        slow.next = null;//断开于后面的联系
-        return head;
-    }
 
     /**
      * 移除指定元素
