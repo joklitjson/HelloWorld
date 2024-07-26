@@ -449,15 +449,14 @@ public class SliceWindowTest {
             return 0;
         }
         int n = nums.length;
-        Double maxAvg = null;
-        double sum = 0;
-
+        //先求最大的和
+        int sum = 0, maxSum = Integer.MIN_VALUE;
         int l = 0, r = 0;
         while (r < n) {
             sum += nums[r];
             //达到了窗口的大小
             if (r - l + 1 == k) {
-                maxAvg = maxAvg == null ? sum / k : Math.max(maxAvg, sum / k);
+                maxSum = Math.max(maxSum, sum);
 
                 //移除最左侧的元素
                 sum -= nums[l];
@@ -465,6 +464,6 @@ public class SliceWindowTest {
             }
             r++;
         }
-        return maxAvg;
+        return 1.0 * maxSum / k;
     }
 }
