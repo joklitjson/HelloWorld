@@ -11,8 +11,12 @@ public class SliceWindowTest {
 
 //        System.out.println("第k大的值"+findKthLargest2(new int[]{3,2,1,5,6,4},2));
 
-        System.out.println("最长无重复字符=====" + lengthOfLongestSubstring("abba"));
-        System.out.println(minSubArrayLen(7,new int[]{2,3,1,2,4,3}));
+//        System.out.println("最长无重复字符=====" + lengthOfLongestSubstring("abba"));
+//        System.out.println(minSubArrayLen(7,new int[]{2,3,1,2,4,3}));
+
+//        System.out.println(minimumRecolors("WBBWWBBWBW",7));
+//        System.out.println(minimumDifference(new int[]{9,4,1,7},2));
+        System.out.println(maximumLengthSubstring("bcbbbcba"));
     }
 
     /**
@@ -286,5 +290,115 @@ public class SliceWindowTest {
             }
         }
         return ans == Integer.MAX_VALUE ? 0 : ans;
+    }
+
+    /**
+     * 先固定左端点的值，然后右端点向右扩展
+     * 最长的奇偶交替的数组最长奇偶子数组
+     * @param nums
+     * @param threshold
+     * @return
+     */
+    public int longestAlternatingSubarray(int[] nums, int threshold) {
+
+        int i = 0, j = 0, n = nums.length, ans = 0;
+        while (i < n) {
+            //左边界一定是偶数开头的
+            if (nums[i] % 2 == 1 || nums[i] > threshold) {
+                i++;
+                continue;
+            }
+            //寻找右边界
+            int pre = nums[i] % 2;
+            j = i + 1;
+            while (j<n&&nums[j] <= threshold && nums[j] % 2 != pre) {
+                pre = nums[j] % 2;
+                j++;
+            }
+            ans = Math.min(ans, j - i );
+            i = j;
+        }
+        return ans;
+    }
+
+    /**
+     * 2379. 得到 K 个黑块的最少涂色次数
+     * @param blocks
+     * @param k
+     * @return
+     */
+    public static int minimumRecolors(String blocks, int k) {
+
+//        思路:计算窗口内的小的白色数量
+        int n = blocks.length();
+        if (k > n) {
+            return -1;
+        }
+        int maxblack = 0;
+        int ans=Integer.MAX_VALUE;
+        for (int i = 0; i < blocks.length(); i++) {
+            char c = blocks.charAt(i);
+            //窗口内的元素
+            if (c == 'B') {
+                maxblack += 1;
+            }
+            //移除窗口的左侧元素
+            if (i >= k) {
+                //移除窗口左侧的B
+                if (blocks.charAt(i - k) == 'B') {
+                    maxblack -= 1;
+                }
+            }
+            //和上一次的比较
+            ans = Math.min(k - maxblack, ans);
+        }
+
+        return ans;
+    }
+
+    /**
+     * 1984. 学生分数的最小差值
+     * @param nums
+     * @param k
+     * @return
+     */
+    public static int minimumDifference(int[] nums, int k) {
+        if (nums.length==1||nums.length<k){
+            return 0;
+        }
+        Arrays.sort(nums);
+        int min = Integer.MAX_VALUE;
+        //直接初始化从k-1个开始
+        for (int i = k-1; i < nums.length; i++) {
+            min = Math.min(min, (nums[i] - nums[i - k+1]));
+        }
+        return min;
+    }
+
+    /**
+     * 3090. 每个字符最多出现两次的最长子字符串
+     * @param s
+     * @return
+     */
+    public static int maximumLengthSubstring(String s) {
+
+        int cnt[] = new int[26];
+        int n = s.length();
+        int l = 0, r = 0;
+        int ans = -1;
+        while (r < n) {
+            int idx = s.charAt(r) - 'a';
+            cnt[idx]++;
+            //加入之后的值超过了
+            while (cnt[idx] > 2) {
+                //收缩左边界
+                cnt[s.charAt(l) - 'a']--;
+                l++;
+            }
+            ans = Math.max(ans, r - l + 1);
+            r++;
+        }
+
+        return ans;
     }
 }
