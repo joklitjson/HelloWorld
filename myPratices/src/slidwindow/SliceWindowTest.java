@@ -17,6 +17,7 @@ public class SliceWindowTest {
 //        System.out.println(minimumRecolors("WBBWWBBWBW",7));
 //        System.out.println(minimumDifference(new int[]{9,4,1,7},2));
         System.out.println(maximumLengthSubstring("bcbbbcba"));
+        System.out.println(findMaxAverage(new int[]{-1},1));
     }
 
     /**
@@ -400,5 +401,70 @@ public class SliceWindowTest {
         }
 
         return ans;
+    }
+
+    /**
+     * 1876. 长度为三且各字符不同的子字符串
+     * @param s
+     * @return
+     */
+    public static int countGoodSubstrings(String s) {
+        if (s == null || s.length() < 3) {
+            return 0;
+        }
+        int[] cnt = new int[26];
+        int count = 0, n = s.length();
+        int l = 0, r = 0;
+        //定义左右边界，不断的加大右边界
+        while (r < n) {
+            int idx = s.charAt(r) - 'a';
+            cnt[idx]++;
+            r++;
+            //右重复字符，收缩左边界
+            while (cnt[idx] > 1) {
+                //
+                cnt[s.charAt(l) - 'a']--;
+                l++;
+            }
+            //长度满足窗口的长度
+            if (r - l == 3) {
+                count += 1;
+                cnt[s.charAt(l) - 'a']--;
+                l++;
+            }
+        }
+        return count;
+    }
+
+
+    /**
+     * 643. 子数组最大平均数 I
+     * @param nums
+     * @param k
+     * @return
+     */
+    public static double findMaxAverage(int[] nums, int k) {
+
+        if (nums.length < k) {
+            return 0;
+        }
+        int n = nums.length;
+        Double maxAvg = null;
+        double sum = 0;
+
+        int l = 0, r = 0;
+        while (r < n) {
+            sum += nums[r];
+            //达到了窗口的大小
+            if (r - l + 1 == k) {
+                maxAvg = maxAvg == null ? sum / k : Math.max(maxAvg, sum / k);
+
+                //移除最左侧的元素
+                sum -= nums[l];
+                l++;
+            }
+            r++;
+        }
+        return maxAvg;
     }
 }
