@@ -6,7 +6,81 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import java.util.Stack;
+
 public class DeleteDump {
+
+    public static void main(String[] args) {
+        ListNode dummy = new ListNode(-1);
+        ListNode p = dummy;
+        for (int i = 0; i < 6; i++) {
+            p.next = new ListNode(i + 1);
+            p = p.next;
+        }
+       ;
+
+        ListNode head= removeNthFromEnd2(dummy.next,1);
+        p = head;
+        System.out.print("修改后的链表顺序：");
+        while (p != null) {
+            System.out.print(p.val + " ");
+            p = p.next;
+        }
+        System.out.println();
+    }
+
+    /**
+     * 删除链表第n个节点
+     * @param head
+     * @param n
+     * @return
+     */
+    public  static ListNode removeNthFromEnd(ListNode head, int n) {
+
+        //未什么需要创建头节点？因为头节点也可能被删除
+        ListNode dummy=new ListNode(-1);
+        dummy.next=head;
+        ListNode fast=head,slow=dummy;
+        int count=0;
+        while (fast!=null&&count<n){
+            fast=fast.next;
+            count++;
+        }
+        while (fast!=null){
+            slow=slow.next;
+            fast=fast.next;
+        }
+
+        //slow的位置就是要删除链表的前一个节点
+        slow.next=slow.next.next;
+        return dummy.next;
+    }
+
+    //使用栈
+    public  static ListNode removeNthFromEnd2(ListNode head, int n) {
+
+        ListNode cur=head;
+        Stack<ListNode> stack=new Stack<>();
+        while (cur!=null){
+            stack.push(cur);
+            cur=cur.next;
+        }
+
+        int count=n;
+        ListNode deleted=null;
+        while (!stack.isEmpty()&&count>0){
+            deleted= stack.pop();
+            count--;
+        }
+        if (stack.isEmpty()){
+            return deleted.next;
+        }
+        else {
+            stack.peek().next = deleted.next;
+            return head;
+        }
+
+    }
 
     /* 删除*/
     ListNode deleteDuplicates(ListNode head) {
