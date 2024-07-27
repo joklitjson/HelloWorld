@@ -7,7 +7,8 @@ import java.util.*;
  * 1、给定窗口大小k，求窗口里的和、差最大、最小、平均值，等
  *  做法：直接定义r指针，r>k表示达到了窗口的大小，因此可以求值了
  *  做法2：使用set、map 限制大小，超过窗口，则从集合中删除左边界元素
- * 2、给定限制条件，找符合条件的最大、最小窗口k
+ * 2、给定限制条件，找符合条件的最大、最小窗口k，
+ *         如限定不重复字符串，求最大长度，摘水果 限定两种水果，求最大的水果数量
  *      做法1：使用双指针，不断扩大右指针，收缩左边界 求最大的窗口
  *      做法2：使用hash、set之类的， 存储元素的个数、索引等。遍历元素的同时，看看已经遍历过的元素是否有满足条件的，
  * 3、两个字符串的比较：
@@ -21,13 +22,15 @@ public class SliceWindowTest {
 
 //        System.out.println("第k大的值"+findKthLargest2(new int[]{3,2,1,5,6,4},2));
 
-//        System.out.println("最长无重复字符=====" + lengthOfLongestSubstring("abba"));
+        System.out.println("最长无重复字符=====" + lengthOfLongestSubstring2("abcabcbb"));
 //        System.out.println(minSubArrayLen(7,new int[]{2,3,1,2,4,3}));
 
 //        System.out.println(minimumRecolors("WBBWWBBWBW",7));
 //        System.out.println(minimumDifference(new int[]{9,4,1,7},2));
-        System.out.println(maximumLengthSubstring("bcbbbcba"));
-        System.out.println(findMaxAverage(new int[]{-1},1));
+//        System.out.println(maximumLengthSubstring("bcbbbcba"));
+//        System.out.println(findMaxAverage(new int[]{-1},1));
+
+//        System.out.println(containsNearbyAlmostDuplicate(new int[]{1,5,9,1,5,9},2,3));
     }
 
     /**
@@ -202,6 +205,26 @@ public class SliceWindowTest {
             }
         }
         return maxLongst;
+    }
+
+    public static int lengthOfLongestSubstring2(String s) {
+        if (s==null){
+            return 0;
+        }
+        int r=0,l=0,longest=0,n=s.length();
+        int [] cnt=new int[256];//如果有空格 则这里放大长度
+
+        while (r<n){
+            int idx=s.charAt(r)-0;
+            cnt[idx]++;
+            r++;
+            //缩小左边界
+            while (l<n&&cnt[idx]>1){
+                cnt[s.charAt(l++)-0]--;
+            }
+            longest=Math.max(longest,r-l);
+        }
+        return longest;
     }
 
     /**
@@ -483,6 +506,7 @@ public class SliceWindowTest {
     public boolean containsNearbyDuplicate(int[] nums, int k) {
 
         int n = nums.length, l = 0, r = 0;
+        //对应的索引下表
         HashMap<Integer, Integer> map = new HashMap<>();
         for (int i = 0; i < n; i++) {
             //map中存在着这样的元素，而且他俩的差值是小于k的
@@ -492,6 +516,18 @@ public class SliceWindowTest {
                 map.put(nums[i], i);
             }
         }
+
+        return false;
+    }
+
+    /**
+     * LCR 057. 存在重复元素 III
+     * @param nums
+     * @param k
+     * @param t
+     * @return
+     */
+    public static boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
 
         return false;
     }
