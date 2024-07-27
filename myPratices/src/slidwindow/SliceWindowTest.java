@@ -311,7 +311,7 @@ public class SliceWindowTest {
      * @param nums
      * @return
      */
-    public static int minSubArrayLen(int target, int[] nums) {
+    public static int minSubArrayLen2(int target, int[] nums) {
         int ans = Integer.MAX_VALUE;
         //滑动窗口算法，让指针向右滑动，直到和大于target，然后在慢慢收紧left边界，找到最小长度数组
         int left = 0, right = 0, sum = 0;
@@ -319,7 +319,7 @@ public class SliceWindowTest {
         while (right < nums.length) {
             sum += nums[right++];
             while (sum >= target) {
-                ans = Math.min(ans, right - left + 1);
+                ans = Math.min(ans, right - left);
                 sum -= nums[left++];
             }
         }
@@ -602,5 +602,123 @@ public class SliceWindowTest {
         }
 
         return ans;
+    }
+
+    public List<Integer> findAnagrams(String s, String p) {
+
+        List<Integer> ans = new ArrayList<>();
+        int m = s.length(), n = p.length();
+
+        if (m < n) {
+            return ans;
+        }
+
+        int sCnt[] = new int[26];
+        int pCnt[] = new int[26];
+
+        for (int i = 0; i < n; i++) {
+            sCnt[s.charAt(i) - 'a']++;
+            pCnt[p.charAt(i) - 'a']++;
+        }
+
+//        先把狂口的前m个进行比较，相同则加入到答案中
+        if (Arrays.equals(sCnt, pCnt)) {
+            ans.add(0);
+        }
+
+        //对sCnt进行操作，窗口移动的同时减去s的左侧元素，然后在加上s的右侧元素，保证了窗口的大小不变
+        for (int i = 0; i < m - n; i++) {
+            sCnt[s.charAt(i) - 'a']--;
+            sCnt[s.charAt(n + i) - 'a']++;
+            if (Arrays.equals(sCnt, pCnt)) {
+                ans.add(i + 1);
+            }
+        }
+        return ans;
+    }
+
+    //LCR 014. 字符串的排列
+    public boolean checkInclusion(String s1, String s2) {
+
+        List<Integer> ans = new ArrayList<>();
+        int m = s2.length(), n =s1.length();
+
+        if (m < n) {
+            return false;
+        }
+
+        int sCnt[] = new int[26];
+        int pCnt[] = new int[26];
+
+        for (int i = 0; i < n; i++) {
+            sCnt[s2.charAt(i) - 'a']++;
+            pCnt[s1.charAt(i) - 'a']++;
+        }
+
+//        先把狂口的前m个进行比较，相同则加入到答案中
+        if (Arrays.equals(sCnt, pCnt)) {
+            return true;
+        }
+
+        //对sCnt进行操作，窗口移动的同时减去s的左侧元素，然后在加上s的右侧元素，保证了窗口的大小不变
+        for (int i = 0; i < m - n; i++) {
+            sCnt[s2.charAt(i) - 'a']--;
+            sCnt[s2.charAt(n + i) - 'a']++;
+            if (Arrays.equals(sCnt, pCnt)) {
+              return true;
+            }
+        }
+        return false;
+    }
+
+    public int numSubarrayProductLessThanK(int[] nums, int k) {
+
+        if (k<=0){
+            return 0;
+        }
+        int l=0,r=0,n=nums.length;
+        int ans=0;
+
+        long res=1;
+        while (r<n) {
+            res *= nums[r];
+
+
+            //收缩边界
+            while (l < r && res >= k) {
+                res = res / nums[l];
+                l++;
+            }
+
+            ans += r - l + 1;
+
+            r++;
+        }
+
+        return ans;
+    }
+
+    /**
+     * LCR 008. 长度最小的子数组
+     * @param target
+     * @param nums
+     * @return
+     */
+    public int minSubArrayLen(int target, int[] nums) {
+
+        int l = 0, r = 0, n = nums.length;
+        int sum = 0;
+        int ans = Integer.MAX_VALUE;
+        while (r < n) {
+            sum += nums[r];
+            r++;
+
+            //收缩左边界
+            while (sum >= target) {
+                ans = Math.min(ans, r - l);
+                sum -= nums[l++];
+            }
+        }
+        return ans == Integer.MAX_VALUE ? 0 : ans;
     }
 }
