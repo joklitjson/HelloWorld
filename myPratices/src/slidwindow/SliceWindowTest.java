@@ -2,6 +2,16 @@ package slidwindow;
 
 import java.util.*;
 
+/**
+ * 滑动窗口问题总结：
+ * 1、给定窗口大小k，求窗口里的和、差最大、最小、平均值，等
+ *  做法：直接定义r指针，r>k表示达到了窗口的大小，因此可以求值了
+ *  做法2：使用set、map 限制大小，超过窗口，则从集合中删除左边界元素
+ * 2、给定限制条件，找符合条件的最大、最小窗口k
+ *      做法1：使用双指针，不断扩大右指针，收缩左边界 求最大的窗口
+ *      做法2：使用hash、set之类的， 存储元素的个数、索引等。遍历元素的同时，看看已经遍历过的元素是否有满足条件的，
+ * 3、两个字符串的比较：
+ */
 public class SliceWindowTest {
     public static void main(String[] args) {
 
@@ -465,5 +475,96 @@ public class SliceWindowTest {
             r++;
         }
         return 1.0 * maxSum / k;
+    }
+
+
+
+    //hash表的方式
+    public boolean containsNearbyDuplicate(int[] nums, int k) {
+
+        int n = nums.length, l = 0, r = 0;
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            //map中存在着这样的元素，而且他俩的差值是小于k的
+            if (map.containsKey(nums[i]) && (i - map.get(nums[i])) <= k) {
+                return true;
+            } else {
+                map.put(nums[i], i);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     *    * 219. 存在重复元素 IIv,-懵？bv-nmn?b
+     *      * 滑动窗口的多种形式v-,面？。bv-,nmn?.b
+     *      * 1、使用set保持k个元素，把多余的元素从set中删除，然后新加入的元素判断是否存在set中，存在则表示可以
+     * @param nums
+     * @param k
+     * @return
+     */
+    public boolean containsNearbyDuplicate1(int[] nums, int k) {
+        Set<Integer> set = new HashSet<>();
+        for (int i = 0; i < nums.length; i++) {
+            if (i > k) {
+                // 移除左边队列的元素
+                set.remove(nums[i - k - 1]);
+            }
+            // 未添加成功表示set中已经存在了值相同的元素
+            if (!set.add(nums[i])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * 594. 最长和谐子序列
+     * 先排序，定义左右两个指针，判断指针的元素差值 是否满足条件，然后在找最大的窗口
+     * @param nums
+     * @return
+     */
+    public int findLHS(int[] nums) {
+
+        Arrays.sort(nums);
+        int n = nums.length, l = 0, r = 0;
+        int ans = 0;
+        while (r < n) {
+
+            //收缩左边界
+            while (nums[r] - nums[l] > 1) {
+                l++;
+            }
+
+            //符合条件，求最大值
+            if (nums[r] - nums[l] == 1) {
+                ans = Math.max(ans, r - l + 1);
+            }
+            r++;
+        }
+        return ans;
+    }
+
+    public int findLHS2(int[] nums) {
+
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int val : nums) {
+            map.put(val, map.getOrDefault(val, 0) + 1);
+        }
+
+        int ans = 0;
+        for (Integer key : map.keySet()) {
+
+            //看看已经遍历的元素是否存在 value-1的元素，如果存在，则计算他们的长度
+//            if (map.containsKey(key + 1)) { 也可以使用key+1
+            if (map.containsKey(key - 1)) {
+
+                ans = Math.max(ans, map.get(key) + map.get(key - 1));
+            }
+        }
+
+        return ans;
     }
 }
