@@ -12,6 +12,7 @@ public class JishuSort {
     /**
      * 1、基本计数排序算法，把值当做下标，一个下标中可能会有多个值，
      * 分为计算和收集阶段
+     * 缺点：基础版能够解决一般的情况，但是它有一个缺陷，那就是存在空间浪费的问题。
      * @param arr
      */
     private static  void countSort(int [] arr){
@@ -42,6 +43,11 @@ public class JishuSort {
        }
     }
 
+    /**
+     * 如果我们想要原始数组中的相同元素按照本来的顺序的排列，那该怎么处理呢？
+     * 方案：倒序遍历原始元素，然后再填充到新数组中
+     * @param arr
+     */
     private static void  countSort2(int [] arr){
         int max=arr[0],min=arr[0];
         for (int value:arr){
@@ -58,7 +64,7 @@ public class JishuSort {
             sortArr[value-min]++;
         }
 
-        //2、记录之前的位移量
+        //2、记录之前的位移量(表示他的位置)
         //.统计数组做变形，后面的元素等于前面的元素之和
         for (int i=1;i< sortArr.length;i++){
             sortArr[i]+=sortArr[i-1];
