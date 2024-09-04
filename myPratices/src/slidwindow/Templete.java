@@ -86,4 +86,46 @@ public class Templete {
         //f(i)=max(f(i-1)+num[i],num[i])还可以进行状态压缩：设置一个变量，前面一个的最大值
         return max;
     }
+
+    public int maxSubArray2(int[] nums) {
+
+        int currMax=0;//当前元素的最大值，要么自己成为最大值，要么连上前面一个元素的最大值 成为最大值
+        int max=0;//全局元素的最大值
+
+        for (int val:nums){
+            currMax=Math.max(currMax,currMax+val);
+            max=Math.max(currMax,max);//全局元素的最大值
+        }
+
+        return max;
+    }
+
+        /**
+         * 环形数组最大子数组
+         * max(subArr)=Max(subarr,sum-miSubarr)
+         * @param nums
+         * @return
+         */
+    public int maxSubarraySumCircular(int[] nums) {
+//        统一注释，total为数组的总和，
+//        maxSum为最大子数组和，minSum为最小子数组和，
+//        curMax为包含当前元素的最大子数组和，curMin为包含当前元素的最小子数组和
+        Integer curMax = 0, maxSum = nums[0];
+        Integer curMin = 0, minSum = nums[0], sum = 0;
+
+        for (int val : nums) {
+            // 以 nums[i-1] 结尾的子数组选或不选（取 max）+ x = 以 x 结尾的最大子数组和
+            curMax = Math.max(curMax + val, val);
+            maxSum = Math.max(maxSum,curMax);
+
+            // 以 nums[i-1] 结尾的子数组选或不选（取 min）+ x = 以 x 结尾的最小子数组和
+            curMin = Math.min(curMin + val, val);
+            minSum = Math.min(minSum,curMin);
+
+            sum += val;
+        }
+
+        // sum == minSum  全是负数
+        return sum == minSum ? maxSum : Math.max(maxSum, sum - minSum);
+    }
     }
