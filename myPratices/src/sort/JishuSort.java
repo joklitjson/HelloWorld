@@ -82,4 +82,44 @@ public class JishuSort {
             System.out.print(value+" ");
         }
     }
+
+    /**
+     * 排序数组，相对位置不变
+     * 类似计数排序
+     * @param arr1
+     * @param arr2
+     * @return
+     */
+    public int[] relativeSortArray(int[] arr1, int[] arr2) {
+
+        int max=Integer.MIN_VALUE;
+        for(int val:arr1){
+            max=Integer.max(max,val);
+        }
+
+        int count[]=new int[max+1];
+        //统计元素个数
+        for (int val:arr1){
+            count[val]++;
+        }
+        int index=0;
+        int [] sorted=new int[arr1.length];
+
+        //遍历数组2，填充排序数组
+        for (int val:arr2){
+            while (count[val]>0){
+                sorted[index++]=val;
+                count[val]--;
+            }
+        }
+
+        //count 数组 只剩下不在arr2中的元素了,从小数开始在遍历一遍，填充到排序集合中
+        for (int i=0;i<=max;i++){
+            while (count[i]>0){
+                sorted[index++]=i;
+                count[i]--;
+            }
+        }
+        return sorted;
+    }
 }

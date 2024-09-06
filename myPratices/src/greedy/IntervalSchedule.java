@@ -1,9 +1,6 @@
 package greedy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class IntervalSchedule {
 
@@ -223,4 +220,71 @@ public class IntervalSchedule {
             System.out.print(Arrays.toString(range)+" ");
         }
     }
+
+    public int[][] merge2(int[][] intervals) {
+        //优先按照区间的起点排序，起点相同的，按终点升序
+
+        Arrays.sort(intervals,(a,b)->{
+            return a[0]!=b[0]?a[0]-b[0]:a[1]-b[1];
+        });
+
+        List<int[]> ans=new ArrayList<>();
+        int start=intervals[0][0],end=intervals[0][1];
+        for (int[] one:intervals){
+            if (one[0]<=end){
+                //合并区间
+                end=Math.max(one[1],end);
+            }
+            else {
+                ans.add(new int[]{start,end});
+                //新开启一个区间
+                start=one[0];
+                end=one[1];
+            }
+        }
+        ans.add(new int[]{start,end});
+
+        return ans.toArray(new int[0][0]);
+    }
+
+
+    /**
+     * 狒狒吃香蕉
+     * 二分遍历吃香蕉的速度，分别判断当前速度是否满足条件
+     * 最小速度是
+     * @param piles
+     * @param h
+     * @return
+     */
+    public int minEatingSpeed(int[] piles, int h) {
+
+        int lowSpeed = 1, maxSpeed = 1;
+        for (int val : piles) {
+            maxSpeed = Math.max(val, maxSpeed);
+        }
+        while (lowSpeed < maxSpeed) {
+            int mid = (maxSpeed - lowSpeed) / 2 + lowSpeed;
+            if (canFinish(mid, piles, h)) {
+                maxSpeed = mid;
+            } else {
+                lowSpeed = mid + 1;
+            }
+        }
+        return lowSpeed;
+    }
+
+    private boolean canFinish(int speed,int[] piles, int h){
+        int cost=0;
+        for (int val:piles){
+            //向上取整
+            cost+=(val-1)/speed+1;
+            //已经超时了
+            if (cost>h){
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
+
