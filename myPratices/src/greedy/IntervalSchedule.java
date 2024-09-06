@@ -286,5 +286,56 @@ public class IntervalSchedule {
         return true;
     }
 
+
+    /**
+     * 求平方根：列入二分法求
+     * @param x
+     * @return
+     */
+    public int mySqrt(int x) {
+        int ans = 1;
+        int low = 1, hi = x;
+        while (low < hi) {
+            int mid = (hi - low) / 2 + low;
+            if ((long) mid * mid <= x) {
+                //缩小middle
+                ans = mid;
+                low = mid + 1;
+            } else {
+                hi = mid - 1;
+            }
+        }
+        return ans;
+    }
+
+
+     Random random=null;
+    //构造前缀和数组，然后再根据最大值生成一个随机数，然后再前缀和数组中进行 二分查找小于目标元素最右侧的元素 下标
+    int prefixSum[]=null;
+    int sum=0;
+    public void Solution(int[] w) {
+        random=new Random();
+        prefixSum=new int[w.length];
+        for (int i=0;i<w.length;i++){
+            prefixSum[i]=sum+w[i];
+            sum=prefixSum[i];
+        }
+    }
+
+    public int pickIndex() {
+        int target = random.nextInt(sum) + 1;
+
+        int left = 0, right = prefixSum.length - 1;
+        while (left < right) {
+            int middle = (right - left) / 2 + left;
+            if (target <= prefixSum[middle]) {
+                right = middle;
+            } else {
+                left = middle + 1;
+            }
+        }
+        //获取
+        return right;
+    }
 }
 
