@@ -3,31 +3,37 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) {
 
-
-        LinkedList<Integer> stack=new LinkedList<>();
-
-        /**
-         * 双向队列 左边是头，右边是last
-         */
-        stack.offerFirst(1);
-        stack.offerFirst(2);
-        stack.offerFirst(3);
-        stack.offerLast(6);
-        System.out.println(stack);
+        LinkedList<Character> str = new LinkedList<>();
+        for (char c : "6-(9-5)*2".toCharArray()) {
+            str.add(c);
+        }
+        System.out.println("6-(9-5)*2==="+calc(str));
 
 
-        PriorityQueue<Integer> priorityQueue=new PriorityQueue<>();
-
-        priorityQueue.offer(12);
-        priorityQueue.offer(16);
-        priorityQueue.offer(1);
-        priorityQueue.offer(14);
-        priorityQueue.offer(4);
-        System.out.println("堆顶元素=="+priorityQueue.peek());
-
-        priorityQueue.poll();
-        System.out.println("移除堆顶之后的堆顶元素=="+priorityQueue.peek());
-        System.out.println("Hello world!");
+//        LinkedList<Integer> stack=new LinkedList<>();
+//
+//        /**
+//         * 双向队列 左边是头，右边是last
+//         */
+//        stack.offerFirst(1);
+//        stack.offerFirst(2);
+//        stack.offerFirst(3);
+//        stack.offerLast(6);
+//        System.out.println(stack);
+//
+//
+//        PriorityQueue<Integer> priorityQueue=new PriorityQueue<>();
+//
+//        priorityQueue.offer(12);
+//        priorityQueue.offer(16);
+//        priorityQueue.offer(1);
+//        priorityQueue.offer(14);
+//        priorityQueue.offer(4);
+//        System.out.println("堆顶元素=="+priorityQueue.peek());
+//
+//        priorityQueue.poll();
+//        System.out.println("移除堆顶之后的堆顶元素=="+priorityQueue.peek());
+//        System.out.println("Hello world!");
 
 //        System.out.println("第k大的值"+findKthLargest(new int[]{3,2,3,1,2,4,5,5,6},4));
 
@@ -181,5 +187,49 @@ public class Main {
         nums[left]=partionValue;
         nums[l]=tmp;
         return left;
+    }
+
+    public static int calc(LinkedList<Character> list) {
+        Stack<Integer> numStack = new Stack<Integer>();
+
+        int num = 0;
+        String operator = "+";//默认数字的符合都是正的
+        while (!list.isEmpty()) {
+            Character character = list.remove(0);
+            if (Character.isDigit(character)) {
+                num += num * 10 + (character - '0');
+            }
+            //开启递归模式计算括号中的内容
+            if (character == '(') {
+                num = calc(list);
+            }
+
+            //遇到新的符号位，或者集合为空了,因此需要把数字压入盏中
+            if (!Character.isDigit(character) || list.isEmpty()) {
+                if (operator.equals("+")) {
+                    numStack.push(num);
+                } else if (operator.equals("-")) {
+                    numStack.push(-num);
+                } else if (operator.equals("*")) {
+                    int before = numStack.pop();
+                    numStack.push(before * num);
+                } else if (operator.equals("/")) {
+                    int before = numStack.pop();
+                    numStack.push(before / num);
+                }
+                operator = character.toString();
+                num = 0;
+            }
+            //当前扩展中的计算完成
+            if (character == ')') {
+                break;
+            }
+
+        }
+        int result = 0;
+        while (!numStack.isEmpty()) {
+            result += numStack.pop();
+        }
+        return result;
     }
 }
