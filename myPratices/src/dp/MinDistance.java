@@ -35,6 +35,8 @@ public class MinDistance {
         //定义dp数组，函数：s[i]的场地，变成s2[j]的长度需要的操作步骤
         //基本case s1长度==0时，需要变成s2任意长度 需要的的步骤就是s2[j]的长度
         //base case s2.length()==2时，s1的任意长度字符变成s2的长度就是s1的长度
+
+//        dp[i][j] 代表 word1 中前 i 个字符，变换到 word2 中前 j 个字符，最短需要操作的次数
         int [][]dp=new int[m+1][n+1];
         //两则都是
         dp[0][0]=0;
