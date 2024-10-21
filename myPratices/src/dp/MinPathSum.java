@@ -1,10 +1,10 @@
 package dp;
 
-public class DpMain {
+public class MinPathSum {
 
     /**
      * 从左上角到右下角的最小路径和：
-     * 定义dp[i][j]表示从左上角当i,j的最小路径，则dp[i][j] 只能从上、左节点达到，
+     * 定义dp[i][j]表示从左上角到i,j的最小路径，则dp[i][j] 只能从上、左节点达到，
      * @param grid
      * @return
      */

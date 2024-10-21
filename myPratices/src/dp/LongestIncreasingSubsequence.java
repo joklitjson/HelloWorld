@@ -2,6 +2,9 @@ package dp;
 
 import java.util.Arrays;
 
+/**
+ * 最大递增长度
+ */
 public class LongestIncreasingSubsequence {
     public static void main(String[] args) {
 
