@@ -44,6 +44,8 @@ public class MaximumBags {
 
     /**
      * 01背包压缩
+     * 注意到dp[i][j]都是通过上一行dp[i-1][..]转移过来的，之前的数据都不会再使用了。
+     *  ：唯一需要注意的是j应该从后往前反向遍历，因为每个物品（或者说数字）只能用一次，以免之前的结果影响其他的结果。
      * @param weight
      * @param value
      * @param capacity
@@ -53,7 +55,7 @@ public class MaximumBags {
         int m = weight.length;
         int[]dp = new int[capacity + 1];
         for (int i = 1; i <= m; i++) {
-            for (int j = 1; j <= capacity; j++) {
+            for (int j = capacity; j>=1; j++) {//注意：状态压缩 此处需要逆序遍历，防止覆盖上一次的数据
 
                 //第i个物品需要的容量大于背包容量
                 if (weight[i] > j) {
