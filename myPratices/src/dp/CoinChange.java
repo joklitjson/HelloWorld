@@ -10,6 +10,14 @@ public class CoinChange {
 
         System.out.println(coinChangeDP(new int[]{1,5,10},11));
     }
+
+    /**
+     * 类似 0-1背包问题
+     * 若只使用coins中的前i个硬币的面值，若想凑出金额j，有dp[i][j]种凑法。
+     * @param coins
+     * @param amount
+     * @return
+     */
     // coins 中是可选硬币面值，amount 是目标金额
     static int  coinChange(int[] coins, int amount) {
         //i表示凑够的金额
@@ -27,6 +35,13 @@ public class CoinChange {
                 if (nextAmount < 0) {
                     continue;
                 } else {
+//                    综上就是两种选择，而我们想求的dp[i][j]是「共有多少种凑法」，
+//                    所以dp[i][j]的值应该是以上两种选择的结果之和：for (int i = 1; i <= n; i++) {
+                    //    for (int j = 1; j <= amount; j++) {
+                    //        if (j - coins[i-1] >= 0)
+                    //            dp[i][j] = dp[i - 1][j] 
+                    //                     + dp[i][j-coins[i-1]];
+                    //                            return dp[N][W]
                     dp[i] = Math.min(dp[i], dp[nextAmount] + 1);
                 }
             }
