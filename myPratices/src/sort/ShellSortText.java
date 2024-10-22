@@ -12,27 +12,28 @@ public class ShellSortText {
 
     public static void main(String[] args){
         int [] arr={1,33,44,12,4,6,8,10,111};
-        shellSort(arr);
-        System.out.println(Arrays.toString(arr));
+        int [] arr2={1,33,44,12,4,6,8,10,111};
+        shellSort2(arr2);
+        System.out.println(Arrays.toString(arr2));
     }
 
+    private static void shellSort2(int [] arr){
 
-    private static void shellSort(int [] arr){
-        int d=arr.length;
+        int grap=arr.length;
 
-        while (d>1) {
-            d = d / 2;
-            for (int x = 0; x < d; x++) {
-                //内部希尔排序
-                for (int i = x + d; i < arr.length; i += d) {
-                    int tmp = arr[i];
-                    int j = i - d;//第一个原始
-                    for (; j >= 0 && arr[j] > tmp; j = j - d) {
-                        arr[j + d] = arr[j];
-                    }
-                    //最后一个赋值
-                    arr[j + d] = tmp;
+        while (grap>1){
+            grap=grap/2;//增量缩小
+
+            for (int i=grap;i<arr.length;i+=grap){
+                int tmp=arr[i];
+                int j=i;
+                //内部插入排序
+                for (;j>=grap&&arr[j-grap]>tmp;j-=grap){
+                    //把元素向后移动
+                    arr[j]=arr[j-grap];
                 }
+                //把tmp 放在j这个位置
+                arr[j]=tmp;
             }
         }
     }

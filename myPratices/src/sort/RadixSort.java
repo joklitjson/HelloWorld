@@ -13,6 +13,14 @@ public class RadixSort {
 
         System.out.println(Arrays.toString(radixSortStr(new String[]{"abc","ab","ff","ha","jukf","aaa","bbb","ccc","wsdfg"},5)));
     }
+
+    /**
+     * 1、总体分成两个步骤：计算、收集
+     * 计算 就是计算每个数的余数，然后在放在指定的余数列表中，
+     * 收集：就是把List<list> 中的数据再次放在数组中，然后在把基数增加*10,直到达到最大长度
+     * @param arr
+     * @param maxLength
+     */
     private static void radixSort(int [] arr,int maxLength) {
         int index = 0;
         int m = 0;
