@@ -8,7 +8,7 @@ public class CoinChange {
 
 //        System.out.println(coinChange(new int[]{1,5,10},11));
 
-        System.out.println(coinChangeDP(new int[]{1,5,10},11));
+        System.out.println(coinChangeDG(new int[]{1,5,10},11));
     }
 
     /**
@@ -49,8 +49,13 @@ public class CoinChange {
         return dp[amount] == amount ? -1 : dp[amount];
     }
 
-    //递归写法
-    static int  coinChangeDP(int[] coins, int amount) {
+    /**
+     * 递归写法的含义就是：架设 需要凑amount，在内部循环使用coins凑钱， 子问题就是需要凑够 subprobrom=amount-coin,因此再次进行递归
+     * @param coins
+     * @param amount
+     * @return
+     */
+    static int coinChangeDG(int[] coins, int amount) {
         if (amount <= 0) {
             return 0;
         }
@@ -61,7 +66,7 @@ public class CoinChange {
                 continue;
             }
             //+1，表示使用当前的硬币
-            res = Math.min(res, coinChangeDP(coins, amount - coin)+1);
+            res = Math.min(res, coinChangeDG(coins, amount - coin)+1);
         }
 
         return res;

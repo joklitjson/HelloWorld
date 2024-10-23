@@ -24,7 +24,7 @@ public class ShellSortText {
         while (grap>1){
             grap=grap/2;//增量缩小
 
-            for (int i=grap;i<arr.length;i+=grap){
+            for (int i=grap;i<arr.length;i++){
                 int tmp=arr[i];
                 int j=i;
                 //内部插入排序
