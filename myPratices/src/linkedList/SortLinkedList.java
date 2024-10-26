@@ -2,8 +2,12 @@ package linkedList;
 
 import java.util.Random;
 
-//使用快慢指针，找到中间节点，然后在把左右两部分进行排序，在合并
-public class SortList {
+
+/**
+ * 1、对链表使用归并排序方法  先找到中间节点，然后在把左右两边的链表进行合并
+ * 2、对链表使用插入排序，把没一个节点 插入到新的链表中
+ */
+public class SortLinkedList {
 
     public static void main(String[] args) {
 
@@ -28,7 +32,7 @@ public class SortList {
     }
 
     /**
-     * 插入排序:
+     * 插入排序: 对链表进行排序
      * @param head
      * @return
      */
@@ -58,14 +62,19 @@ public class SortList {
         return dummy.next;
     }
 
-    public static ListNode sortList(ListNode head) {
+    /**
+     * 使用归并排序 对链表进行排序
+     * @param head
+     * @return
+     */
+    public static ListNode mergeSortLinkedList(ListNode head) {
 
         if (head == null || head.next == null) {
             return head;
         }
         ListNode middle = splitList(head);
-        ListNode left = sortList(head);
-        ListNode right = sortList(middle);
+        ListNode left = mergeSortLinkedList(head);
+        ListNode right = mergeSortLinkedList(middle);
 
         return merge(left, right);
     }

@@ -115,7 +115,8 @@ public class MergeLinkedList {
         merge(lists, left, middle);
         merge(lists, middle + 1, right);
 
-        //合并在一起
+        //合并在一起：
+//        因为每次合并都是把两个链表(归并中的两部分的第一个节点)合并，然后在放在左侧链表中，因此这里的右侧节点是 middle+1
         lists[left] = merge(lists[left], lists[middle + 1]);
     }
 
@@ -182,6 +183,12 @@ public class MergeLinkedList {
         return false;
     }
 
+    /**
+     * 判断链表是否有环：如果slow==fast 表示有环，如果slow=null 或者fast.next==null,表示链表没有环
+     * 然后在把慢指针指向头节点，再次让快慢指针一步步的向后移动，相遇就是环的起点
+     * @param head
+     * @return
+     */
     ListNode detectCycle(ListNode head) {
         ListNode fast = head, slow = head;
         while (slow != null && fast.next != null) {

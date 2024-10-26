@@ -45,6 +45,11 @@ public class ReorderList {
         return pre;
     }
 
+    /**
+     * 快慢指针 寻找中间节点
+     * @param head
+     * @return
+     */
     private ListNode getMid(ListNode head) {
 
         ListNode fast = head, slow = head;
@@ -105,12 +110,16 @@ public class ReorderList {
         return copyHead.next;
     }
 
-    //把所有的节点复制一份，然后存放在map中
+    /**
+     * 1、在每个节点中间插入复制的节点：
+     * 2、再次遍历老节点，如果有随机节点，在设置该节点的复制节点的随机节点
+     * 3、翻个链表，返回复制的节点
+     * @param head
+     * @return
+     */
     public Node copyRandomList2(Node head) {
-
         Node cur=head,next=null;
         while (cur!=null){
-
             next=cur.next;
             //copy的节点加入到当前节点和下一个节点之间
             Node copy = new Node(cur.val);
@@ -146,7 +155,9 @@ public class ReorderList {
     }
 
     /**
-     * 创建两个队列
+     *  分割链表：给定一个链表和一个值，以该值为界把链表分割成两部分且原始相对位置不变。
+     *
+     * 方案一：创建两个队列
      * 方案二：头插法：把小于x的值直接插入到头部，(jdk hashmap 扩容就是采用的此方法，但是有死循环问题，目前1.8已经修改)
      * 方案三：递归排序，小于的都排在前面，大于的都排在后面
      * @param head
