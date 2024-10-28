@@ -82,7 +82,12 @@ public class DeleteDump {
 
     }
 
-    /* 删除*/
+    /**
+     * 删除重复元素：只保留一个相同元素
+     * 删除重复元素，核心条件是比较当前元素和下一个元素的值，因此循环条件需要写 cur.netxt!=null,需要保障下一个元素非空
+     * @param head
+     * @return
+     */
     ListNode deleteDuplicates(ListNode head) {
         if (head==null){
             return null;
@@ -101,7 +106,8 @@ public class DeleteDump {
     }
 
     /**
-     * 删除重复元素，只保留不重复的元素
+     * 删除重复元素，只保留不重复的元素:内部二次循环需要找到一个和next 元素不同的元素，然后接入到cur后面
+     * 说白了 需要站在第一个位置(cur) 比较cur.next 和cur.next.next的值是否相等，然后在循环往后找 和cur.next 值不相同的元素
      * 由于头节点可能被删除，因此需要创建一个头节点
      * 比较节点的下一个节点和下下一个节点：然后删除下一个节点
      * @param head

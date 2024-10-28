@@ -123,6 +123,11 @@ public class ReverseLinkedList {
         return res;
     }
 
+    /**
+     * 递归写法：递归的后续判断，然后在把left指针向右移动
+     * @param right
+     * @return
+     */
     private boolean traver(ListNode right) {
         if (right == null) {
             return true;
@@ -133,7 +138,11 @@ public class ReverseLinkedList {
         return res;
     }
 
-//    双指针法
+    /**
+     * 快慢指针算法：就是求中间节点，然后再把后半部分节点进行翻转，在进行比较
+     * @param head
+     * @return
+     */
     boolean isPalindrome2(ListNode head) {
 
         ListNode fast=head,slow=head;
