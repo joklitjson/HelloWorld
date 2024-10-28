@@ -105,4 +105,34 @@ public class CanPlaceFlowers {
 
         return true;
     }
+
+    /**
+     *
+     * 是否存在递增的三元组序列
+     * 上述做法的贪心思想是：为了找到递增的三元子序列，first 和 second 应该尽可能地小，此时找到递增的三元子序列的可能性更大。
+     * 方案一：定义一个左边最小值集合，右边最大值集合，然后再次遍历每个元素，看看是否存在 左边小于自己的值，并且右边大于自己的值
+     * 方案二：定义 first、second，作为左边最小、第二小的值，然后遍历数组，看看是否存在大于他俩的值，如果不存在则更新first或second额
+     * @param nums
+     * @return
+     */
+    public boolean increasingTriplet(int[] nums) {
+        int first=nums[0],second=Integer.MAX_VALUE;
+
+        /**
+         * 方案就是尽可能的让 第一个和第二个元素小
+         */
+        for (int value:nums){
+            if (value>second){
+                return true;
+            }
+            else if (value>first){
+                second=value;
+            }
+            else {
+                first=value;
+            }
+        }
+
+        return false;
+    }
 }
