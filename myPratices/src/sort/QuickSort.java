@@ -109,19 +109,27 @@ public class QuickSort {
      * @return
      */
     private  static int partition2(int [] arr,int left,int right){
+
+        //1\定标准元素
         int partionValue=arr[left];
+
         while (left<right){
+            //2、找右边小于标准的元素，然后把他移动到左边的坑位
             while (left<right&&arr[right]>partionValue){
                 right--;
             }
+            //3、填充左边的坑位
             arr[left]=arr[right];//直接先填充
 
+            //4、找左边大于标准元素的值，然后在把这个值 填充到右边的坑位
             while (left<right&&arr[left]<partionValue){
                 left++;
             }
             arr[right]=arr[left];
         }
-        //partionValue放在合适的位置
+
+        //5、最后把比较值 放在正确的位置上，此时的索引就是他的位置，他把左右两边的元素都正确分开了
+        // partionValue放在合适的位置
         arr[left]=partionValue;
         return left;
     }

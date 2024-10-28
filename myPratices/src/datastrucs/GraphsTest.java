@@ -431,6 +431,7 @@ public class GraphsTest {
 
     /**
      * 返回 可能的拓扑排序结构
+     * 步骤：使用边构建一个邻接图
      *
      * @param numCourses
      * @param prerequisites
