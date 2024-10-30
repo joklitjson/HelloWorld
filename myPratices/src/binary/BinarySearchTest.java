@@ -46,4 +46,26 @@ public class BinarySearchTest {
 
         return 0;
     }
+
+    /**
+     * 寻找峰值，可能存在多个，只需要返回一个即可
+     * 设当前分割点 mid 满足关系 num[mid]>nums[mid+1] 的话，一个很简单的想法是 num[mid] 可能为峰值，而 nums[mid+1] 必然不为峰值，
+     * 于是让 r=mid，从左半部分继续找峰值。
+
+     * @param nums
+     * @return
+     */
+    public int findPeakElement(int[] nums) {
+        int l=0,h=nums.length-1;
+        while (l<h){
+            int middl=(h-l)/2+l;
+            if (nums[middl]>nums[middl+1]){
+                h=middl;
+            }
+            else {
+                l=middl+1;
+            }
+        }
+        return h;
+    }
 }
