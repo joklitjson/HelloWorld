@@ -1,14 +1,26 @@
 package pq;
 
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 public class PrioryQueueMain {
 
     public static void main(String[] args) {
 
+        PriorityQueue<Integer> pq1 = new PriorityQueue<Integer>();
+
+        for (int i=0;i<5;i++){
+            pq1.offer(i);
+        }
+        while (!pq1.isEmpty()){
+            System.out.println(pq1.poll());
+        }
         System.out.println(magicTower(new int[]{-9635,71923,-37495,8366,54303,-86422,-48303,-47858,98424}));
         System.out.println(magicTower2(new int[]{-9635,71923,-37495,8366,54303,-86422,-48303,-47858,98424}));
+
+        System.out.println(topKFrequent(new int[]{1,1,2,2,3},2));
 //        System.out.println(magicTower2(new int[]{100,100,100,-250,-60,-140,-50,-50,100,150}));
 //
 //        PriorityQueue<Integer> pq1 = new PriorityQueue<Integer>(new Comparator<Integer>() {
@@ -262,5 +274,77 @@ public class PrioryQueueMain {
 
         return ans;
 
+    }
+
+    /**
+     * 前k个频率最高的元素
+     * 构建 优先级队列[i,feq]
+     * @param nums
+     * @param k
+     * @return
+     */
+    public  static int[] topKFrequent(int[] nums, int k) {
+
+        Map<Integer, Integer> numForFre = new HashMap<>();
+        for (int val : nums) {
+            numForFre.put(val, numForFre.getOrDefault(val, 0) + 1);
+        }
+
+        PriorityQueue<Integer[]> priorityQueue = new PriorityQueue<>(new Comparator<Integer[]>() {
+            @Override
+            public int compare(Integer[] o1, Integer[] o2) {
+                return o2[1] - o1[1];
+            }
+        });
+
+        for (Map.Entry<Integer, Integer> entry : numForFre.entrySet()) {
+            if (priorityQueue.size() == k) {
+                //需要删除部分元素
+                if (priorityQueue.peek()[1] < entry.getValue()) {
+                    priorityQueue.poll();
+                    priorityQueue.add(new Integer[]{entry.getKey(), entry.getValue()});
+                }
+            } else {
+                priorityQueue.add(new Integer[]{entry.getKey(), entry.getValue()});
+            }
+        }
+
+        int[] result = new int[k];
+        int i = 0;
+        //收集数据
+        while (!priorityQueue.isEmpty()) {
+            result[i++] = priorityQueue.poll()[0];
+        }
+        return result;
+    }
+
+
+    private PriorityQueue<Integer> heap;
+    private int k=0;
+    public void KthLargest(int k, int[] nums) {
+        heap = new PriorityQueue<>();
+        this.k = k;
+        for (int value : nums) {
+            heap.offer(value);
+            if (heap.size()>k){
+//                移除第k+1小的元素
+                heap.poll();
+            }
+        }
+    }
+
+    /**
+     * 插入元素 返回第k个元素，
+     * 方案：使用小跟堆，保存前k个元素，如果大于k个，则 比较下元素大小 在决定是否删除顶部删除
+     * 堆顶就是第k大的元素
+     * @param val
+     * @return
+     */
+    public int add(int val) {
+        heap.offer(val);
+        if (heap.size()>k){
+            heap.poll();
+        }
+        return heap.peek();
     }
 }

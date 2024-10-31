@@ -1,7 +1,9 @@
 package mydatastructs;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.StringJoiner;
 
 public class Trie {
 
@@ -55,6 +57,8 @@ public class Trie {
 //        ["cat","bat","rat"], sentence =
         List<String> dictionary= Arrays.asList("cat","bat","rat");
         System.out.println(new Trie().replaceWords(dictionary,"the cattle was rattled by the battery"));
+
+        System.out.println(new Trie().replaceWords2(dictionary,"the cattle was rattled by the battery"));
     }
     /**
      * 使用trie树
@@ -86,5 +90,30 @@ public class Trie {
             }
         }
         return stringBuilder.toString();
+    }
+
+    public String replaceWords2(List<String> dictionary, String sentence) {
+
+        String[] words = sentence.split(" ");
+
+        //先进行词根排序
+        dictionary.sort(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.length() - o2.length();
+            }
+        });
+        //遍历单词，然后在遍历 词根
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            for (String sub : dictionary) {
+                if (word.startsWith(sub)) {
+                    words[i] = sub;
+                    break;
+                }
+            }
+        }
+
+        return String.join(" ", words);
     }
 }
