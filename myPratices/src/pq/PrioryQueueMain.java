@@ -1,9 +1,6 @@
 package pq;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class PrioryQueueMain {
 
@@ -346,5 +343,55 @@ public class PrioryQueueMain {
             heap.poll();
         }
         return heap.peek();
+    }
+
+
+    /**
+     * 获取k个 元素的和最小的元素对
+     * @param nums1
+     * @param nums2
+     * @param k
+     * @return
+     */
+    public List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
+
+        List<List<Integer>> ans = new ArrayList<>();
+
+        int m = nums1.length, n = nums2.length;
+
+        //存放的是int[] index 数组，0 表示的是num1集合，1 表示的是 num2 集合的索引
+        //创建的是一个小跟堆，和最小的索引对 排在顶部
+        PriorityQueue<int[]> queue = new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                int pair1Idx0 = o1[0];
+                int pair1Idx1 = o1[1];
+                int pair2Idx0 = o2[0];
+                int pair2Idx1 = o2[1];
+                //比较两个和的大小
+                return (nums1[pair1Idx0] + nums2[pair1Idx1]) - (nums1[pair2Idx0] + nums2[pair2Idx1]);
+            }
+        });
+
+        int max = Math.max(m, k);
+        for (int idx = 0; idx < max; idx++) {
+            //把第一个数组的索引 和第二个数字的第一个元素 依次加入到队列中
+            queue.add(new int[]{idx, 0});
+        }
+
+        while (k > 0 && !queue.isEmpty()) {
+            k--;
+            int[] minPaire = queue.poll();
+            int idx0 = minPaire[0];
+            int idx1 = minPaire[1];
+            //把当前最小值的两个索引加入到队列中
+            ans.add(Arrays.asList(idx0, idx1));
+            //计算下一个最小值
+//            使用当前数组1 idx0的索引加上数组二的idx1 的下一个索引
+            if (idx1 + 1 < n) {
+                queue.offer(new int[]{idx0, idx1 + 1});
+            }
+        }
+        return ans;
     }
 }
