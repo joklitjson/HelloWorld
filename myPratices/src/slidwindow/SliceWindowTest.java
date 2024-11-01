@@ -31,6 +31,7 @@ public class SliceWindowTest {
 //        System.out.println(findMaxAverage(new int[]{-1},1));
 
 //        System.out.println(containsNearbyAlmostDuplicate(new int[]{1,5,9,1,5,9},2,3));
+        containsNearbyAlmostDuplicate(new int[]{1},1,1);
     }
 
 
@@ -497,17 +498,6 @@ public class SliceWindowTest {
         return false;
     }
 
-    /**
-     * LCR 057. 存在重复元素 III
-     * @param nums
-     * @param k
-     * @param t
-     * @return
-     */
-    public static boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
-
-        return false;
-    }
 
     /**
      *    * 219. 存在重复元素 IIv,-懵？bv-nmn?b
@@ -697,5 +687,94 @@ public class SliceWindowTest {
             }
         }
         return ans == Integer.MAX_VALUE ? 0 : ans;
+    }
+
+    /**
+     * 使用滑动窗口算法：
+     * 1、一个队列记录 某个数字x 左边的k个元素，以及能支持快速查找是否存在元素 x-t
+     * 同时队列支持 删除左侧划出窗口的元素 nums[i-k]
+     * @param nums
+     * @param k
+     * @param t
+     * @return
+     */
+    public  static boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
+//        TreeSet<Integer> set = new TreeSet<Integer>();
+
+//        for (int i=0;i<15;i+=2){
+//            set.add(i);
+//        }
+//        //方法用于返回此集合中大于或等于给定元素的最小元素，如果没有这样的元素，则返回 null。
+//        System.out.println(set.ceiling(7));
+//
+//        //返回小于等于这个元素的最大值
+//        System.out.println(set.floor(5));
+
+        TreeSet<Long> set = new TreeSet<Long>();
+        for (int i = 0; i < nums.length; i++) {
+
+//            nums[i]-nums[j]<=t --> nums[i]-t<=nums[j] 判断窗口中是否存在这样的值
+            Long miniResult = set.ceiling((long) nums[i] - (long) t);
+//           [x−t,x+t],因为是取得绝对值，因此这里还需要再判断在两者和的中间
+            if (miniResult != null && miniResult < (long) nums[i] + (long) t) {
+                return true;
+            }
+            set.add((long) nums[i]);
+            //移除左边元素
+            if (i >=k) {
+                set.remove(nums[i - k]);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 使用桶排序的方案：
+     * 把元素进行编号，然后在分配到不同的桶中
+     * @param nums
+     * @param k
+     * @param t
+     * @return
+     */
+    public  static boolean containsNearbyAlmostDuplicate2(int[] nums, int k, int t) {
+
+        int w = t + 1;//必须使用
+
+        Map<Long, Long> map = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+
+            Long butIdx = getId(nums[i], w);
+
+            if (map.containsKey(butIdx)) {
+                return true;
+            }
+            if (map.containsKey(butIdx - 1) && Math.abs(nums[i] - map.get(butIdx - 1)) <= t) {
+                return true;
+            }
+
+            if (map.containsKey(butIdx + 1) && Math.abs(nums[i] - map.get(butIdx + 1)) <= t) {
+                return true;
+            }
+            map.put(butIdx, (long) nums[i]);
+
+            //移除窗口
+            if (i >= k) {
+                map.remove(getId(nums[i - k], w));
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 计算桶的大小
+     * @param value
+     * @param w
+     * @return
+     */
+    private static Long getId(long value,long w){
+        if (value>=0){
+            return (long)value/w;
+        }
+        return (value+1)/w-1;
     }
 }
