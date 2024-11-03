@@ -353,4 +353,69 @@ public class BstTemplete {
         return successor;
     }
 
+
+    /**
+     * LCR 052. 递增顺序搜索树
+     * 把二叉搜索树 变成一个
+     * @param root
+     * @return
+     */
+    public TreeNode increasingBST(TreeNode root) {
+        middleOrder(root);
+        return newRoot;
+    }
+
+    private  TreeNode newRoot;
+    private  TreeNode pre;
+     private TreeNode middleOrder(TreeNode root) {
+         if (root == null) {
+             return null;
+         }
+
+         TreeNode tmp=  middleOrder(root.left);
+         // 在中序遍历的过程中修改节点指向
+         if (pre!=null){
+             pre.right=root;
+         }
+         root.left=null;
+         //中序遍历
+         pre=root;
+         if (newRoot==null){
+             newRoot=root;
+         }
+
+         middleOrder(root.right);
+         return pre;
+     }
+
+    /**
+     * LCR 051. 二叉树中的最大路径和
+     * 方案：使用后续遍历，计算当前节点的最大值，left+root+right
+     * @param root
+     * @return
+     */
+    public int maxPathSum(TreeNode root) {
+        afterOrder(root);
+        return max;
+    }
+
+    int max=Integer.MIN_VALUE;
+    private int afterOrder(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        //左右节点的最大贡献值
+        int leftMax = Math.max(afterOrder(root.left), 0);
+
+        int rightMax = Math.max(afterOrder(root.right), 0);
+
+        int currentMax = leftMax + rightMax + root.val;
+
+        //计算当前节点的是否是最大值
+        max = Math.max(max, currentMax);
+
+        //当前节点只能选择左边或者右边，
+        return root.val + Math.max(leftMax, rightMax);
+    }
+
 }

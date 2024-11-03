@@ -1,5 +1,8 @@
 package array;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 前缀和问题
  */
@@ -44,5 +47,31 @@ public class PreSum {
         int sum=preMatrixSum[x2+1][y2+1]-preMatrixSum[x1][y2+1]-
                 preMatrixSum[x2+1][y1]+preMatrixSum[x1][y1];
         return  sum;
+    }
+
+
+    /**
+     * 和为k的子数组
+     * 方案：使用hash化前缀和，hash+前缀和
+     * 核心方案就是 sumi -sumj=k（i>j）,
+     * @param nums
+     * @param k
+     * @return
+     */
+    public int subarraySum(int[] nums, int k) {
+
+        Map<Integer, Integer> map = new HashMap<>();
+        int ans = 0;
+        map.put(0, 1);
+        int sum = 0;
+        for (int value : nums) {
+            sum += value;
+            if (map.containsKey(sum - k)) {
+                ans += map.get(sum - k);
+            }
+            //增加和为sum的元素的个数
+            map.put(sum, map.getOrDefault(sum, 0) + 1);
+        }
+        return ans;
     }
 }
