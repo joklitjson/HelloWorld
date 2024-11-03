@@ -2,7 +2,9 @@ package tree;
 
 import datastrucs.TreeNode;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -292,6 +294,63 @@ public class BstTemplete {
             }
         }
         return result;
+    }
+
+
+    /**
+     * 查找节点p的中序后继结点:就是中序遍历的后一个节点
+     * 方案一：使用中序遍历，设变量pre，记录前一个节点的值，如果当前节点是p，则范围pre
+     * 方案二：使用二叉搜索树的性质，可以快速找到答案：
+     * @param root
+     * @param p
+     * @return
+     */
+    public TreeNode inorderSuccessor(TreeNode root, TreeNode p) {
+
+        Deque<TreeNode> queue=new ArrayDeque<>();
+        TreeNode pre=null,curr=root;
+        while (curr!=null||!queue.isEmpty()){
+            //1、先把自己放在栈中，然后把左边元素放在栈顶
+            while (curr!=null){
+                queue.push(curr);
+                curr=curr.left;
+            }
+
+            //2、访问根节点
+            curr= queue.poll();
+            //前面一个元素是p，则当前元素就是后继节点
+            if (pre==p){
+                return curr;
+            }
+
+            pre=curr;
+            //3、访问右节点
+            curr=curr.right;
+        }
+        return null;
+    }
+
+    /**
+     * 利用二叉搜索树的性质 来进行查找
+     * @param root
+     * @param p
+     * @return
+     */
+    public TreeNode inorderSuccessor2(TreeNode root, TreeNode p) {
+        TreeNode successor = null, cur = root;
+        while (cur != null) {
+            if (cur.val > p.val) {
+                //当前节点值 大于p，因此p的分布只能在 left 区间，那么后继节点也只能分布在(left，successor)中
+                successor = cur;
+                cur = cur.left;
+            } else {
+                //当前节点小于p，那么p只能分布在cur的右区间，如果等于p，则后继节点也肯定在右侧
+                cur = cur.right;
+            }
+        }
+
+        //层层 逼近cur
+        return successor;
     }
 
 }
