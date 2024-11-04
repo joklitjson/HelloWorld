@@ -228,7 +228,7 @@ public class TreeLCR {
 
     private int sumNumbersDfs(TreeNode root,int sum){
         if (root==null){
-            return sum;
+            return 0;
         }
         sum=sum*10+root.val;
         if (root.left==null&&root.getRight()==null){
