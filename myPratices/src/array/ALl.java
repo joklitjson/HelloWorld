@@ -1,6 +1,8 @@
 package array;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 public class ALl {
@@ -171,5 +173,27 @@ public class ALl {
         }
 
         return min;
+    }
+
+
+    Deque<Integer> integerDeque=new ArrayDeque<>();
+    int size=0,sum=0;
+
+//    public MovingAverage(int size) {
+//        this.size=size;
+//    }
+
+    /**
+     * 数据流中的平均数
+     * @param val
+     * @return
+     */
+    public double next(int val) {
+        if (integerDeque.size()>=size){
+            sum-=integerDeque.pollFirst();
+        }
+        integerDeque.offerLast(val);
+        sum+=val;
+        return sum*1.0/integerDeque.size();
     }
 }
