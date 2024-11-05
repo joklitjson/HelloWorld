@@ -232,4 +232,92 @@ public class Main {
         }
         return result;
     }
+
+
+    /**
+     * 异位词分组
+     * 方案一：把每个单词进行排序，然后组成新单词，在把他们分组
+     * 方案二：统计每个单词字母的词频，然后拼接成字符串 在进行插入hash
+     * @param strs
+     * @return
+     */
+    public List<List<String>> groupAnagrams(String[] strs) {
+
+        Map<String,List<String>> map=new HashMap<>();
+        for (String str:strs){
+            char[] chars= str.toCharArray();
+            Arrays.sort(chars);
+            String strNew=new String(chars);
+            List<String> list= map.get(strNew);
+            if (list==null){
+                list=new ArrayList<>();
+                map.put(strNew,list);
+            }
+            list.add(str);
+        }
+        return new ArrayList<>(map.values());
+    }
+
+    /**
+     * 判断是否是异位词
+     * @param s
+     * @param t
+     * @return
+     */
+    public boolean isAnagram(String s, String t) {
+
+        if (s.length() != t.length() || s.equals(t)) {
+            return false;
+        }
+
+        char[] sChars = s.toCharArray();
+        Arrays.sort(sChars);
+
+        char[] tChars = t.toCharArray();
+        Arrays.sort(tChars);
+
+        return Arrays.equals(sChars, tChars);
+    }
+
+    /**
+     * 逆波兰表达式，
+     * 解决方案：使用栈计算，遇到运算符 则弹出两个数字进行运算
+     * @param tokens
+     * @return
+     */
+    public int evalRPN(String[] tokens) {
+
+        Stack<String> stack = new Stack<>();
+
+        for (String str : tokens) {
+            if (isNumber(str)) {
+                stack.push(str);
+            } else {
+                int num1 = Integer.valueOf(stack.pop());
+
+                int num2 = Integer.valueOf(stack.pop());
+                switch (str) {
+                    case "+":
+                        stack.push((num2 + num1) + "");
+                        break;
+                    case "-":
+                        stack.push((num2 - num1) + "");
+                        break;
+
+                    case "*":
+                        stack.push((num2 * num1) + "");
+                        break;
+
+                    case "/":
+                        stack.push((num2 / num1) + "");
+                        break;
+                }
+            }
+        }
+        return Integer.valueOf(stack.pop());
+    }
+
+    private boolean isNumber(String str){
+        return !("+".equals(str)||"-".equals(str)||"*".equals(str)||"/".equals(str));
+    }
 }
