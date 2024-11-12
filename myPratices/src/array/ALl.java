@@ -1,9 +1,6 @@
 package array;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 public class ALl {
     public static void main(String[] args) {
@@ -35,6 +32,10 @@ public class ALl {
 //        triangle.add(Arrays.asList(4,1,8,3).iterator());
 
         System.out.println(minimumTotal(triangle));
+
+        int [] result=  spiralArray(new int[][]{{2,3}});
+//        int [] result=  spiralArray(new int[][]{{1,2,3},{4,5,6},{7,8,9},{10,11,12}});
+        System.out.println(Arrays.toString(result));
     }
 
     /**
@@ -195,5 +196,53 @@ public class ALl {
         integerDeque.offerLast(val);
         sum+=val;
         return sum*1.0/integerDeque.size();
+    }
+
+    /**
+     * 螺旋输出
+     * @param array
+     * @return
+     */
+    public  static int[] spiralArray(int[][] array) {
+        if (array.length==0){
+            return new int[0];
+        }
+        int [] result=new int[array.length*array[0].length];
+        for (int [] add:array){
+            System.out.println(Arrays.toString(add));
+        }
+        int top=0,right=array[0].length-1,bottom=array.length-1,left=0;
+        int idx=0;
+        while (top<bottom){
+            //遍历上面的边
+            for (int i=top;i<right;i++){
+                result[idx++]=array[top][i];
+            }
+            if (++top>bottom){
+                break;
+            }
+            //右侧边向下遍历
+            for (int i=top;i<bottom;i++){
+                result[idx++]=(array[i][right-1]);
+            }
+            if (--right<left){
+                break;
+            }
+            //底部从右向左遍历
+            for (int i=right-1;i>=left;i--){
+                result[idx++]=(array[bottom-1][i]);
+            }
+            if (--bottom<top){
+                break;
+            }
+
+            for (int i=bottom-1;i>=top;i--){
+                result[idx++]=(array[i][left]);
+            }
+            if (++left>right){
+                break;
+            }
+        }
+        return result;
     }
 }

@@ -1,5 +1,6 @@
 package tree;
 
+import com.sun.javafx.geom.Edge;
 import datastrucs.TreeNode;
 
 import java.util.*;
@@ -81,6 +82,14 @@ public class BFSTemplete {
 
     public static void main(String[] args) {
 
+        List<List<String>> lists=new ArrayList<>();
+        lists.add(Arrays.asList("a","b"));
+        lists.add(Arrays.asList("b","c"));
+
+        List<List<String>> query=new ArrayList<>();
+        query.add(Arrays.asList("a","c"));
+
+        calcEquation(lists,new double[]{2.0,3.0},query);
     }
     public int openLock(String[] deadends, String target){
         String start="0000";
@@ -149,5 +158,171 @@ public class BFSTemplete {
         }
 
         return new String(chars);
+    }
+
+
+    /**
+     * LCR 111. 除法求值
+     * 解决方案：先把点位进行映射，例如 a->1,b->2,
+     * 2、在构造有向 加权图
+     * 3、遍历问题：通过广度优先遍历 找到问题a->k 之间的权值
+     * @param equations
+     * @param values
+     * @param queries
+     * @return
+     */
+    public static double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
+
+        int pointIdx = 0, n = equations.size();
+        Map<String, Integer> pointMap = new HashMap<>();
+        for (List<String> edges : equations) {
+            if (!pointMap.containsKey(edges.get(0))) {
+                pointIdx++;
+                pointMap.put(edges.get(0), pointIdx);
+            }
+
+            if (!pointMap.containsKey(edges.get(1))) {
+                pointIdx++;
+                pointMap.put(edges.get(1), pointIdx);
+            }
+        }
+
+        //2构建 图
+        List<Pair>[] edges = new List[pointIdx];
+
+        for (int i = 0; i < edges.length; i++) {
+            edges[i] = new ArrayList<>();
+        }
+        for (int i = 0; i < n; i++) {
+            List<String> edge = equations.get(i);
+            Integer pointA = pointMap.get(edge.get(0));
+            Integer pointB = pointMap.get(edge.get(1));
+
+            //构建有向带权图
+            edges[pointA].add(new Pair(pointB, values[i]));
+            edges[pointB].add(new Pair(pointA, 1.0 / values[i]));
+        }
+
+        //遍历问题:
+        double[] ans = new double[queries.size()];
+
+        for (int i = 0; i < queries.size(); i++) {
+            List<String> query = queries.get(i);
+            double result = -1.0;
+            Integer pointA = pointMap.get(query.get(0));
+            Integer pointB = pointMap.get(query.get(1));
+
+            //节点不在图中
+            if (pointA==null||pointB==null){
+                ans[i] = result;
+                continue;
+            }
+            if (pointA == pointB) {
+                result = 1.0;
+            } else {
+                //使用广度优先遍历，遍历从pointA-->pointB
+                Queue<Integer> queue = new ArrayDeque<>();
+                queue.add(pointA);
+                double[] ratios = new double[pointIdx];
+                Arrays.fill(ratios, -1.0);
+                ratios[pointA] = 1.0;
+                System.out.println(pointA+"===>"+pointB);
+                while (!queue.isEmpty() && ratios[pointB] < 0) {
+                   Integer  one=  queue.poll();
+                    //遍历点的边界
+                    for (Pair pair : edges[one]) {
+                        int toPoint = pair.point;
+                        //如果当前点没进行计算，则加入进来
+                        if (ratios[toPoint] < 0) {
+                            //通过a-->k,k-->b,建立 a--b之间的权重
+                            ratios[toPoint] =ratios[one] * pair.value;
+                            queue.offer(toPoint);
+                        }
+                    }
+                }
+                //获取结算的结果
+                result = ratios[pointB];
+            }
+            ans[i] = result;
+
+        }
+        return ans;
+    }
+
+
+    /**
+     * 使用flordly 算法，提前计算好 各个顶点的距离，然后在进行多次查询
+     * @param equations
+     * @param values
+     * @param queries
+     * @return
+     */
+    public static double[] calcEquation2(List<List<String>> equations, double[] values, List<List<String>> queries) {
+
+        int pointIndex = 0;
+        Map<String, Integer> idxMap = new HashMap<>();
+
+        //映射
+        for (List<String> edge : equations) {
+            if (!idxMap.containsKey(edge.get(0))) {
+                idxMap.put(edge.get(0), pointIndex++);
+            }
+
+            if (!idxMap.containsKey(edge.get(1))) {
+                idxMap.put(edge.get(1), pointIndex++);
+            }
+        }
+
+        double[][] graph = new double[pointIndex][pointIndex];
+
+        //初始化值
+        for (int i = 0; i < pointIndex; i++) {
+            Arrays.fill(graph[i], -1);
+        }
+
+        for (int i = 0; i < equations.size(); i++) {
+            Integer pointA = idxMap.get(equations.get(i).get(0));
+            Integer pointB = idxMap.get(equations.get(i).get(1));
+            graph[pointA][pointB] = values[i];
+            graph[pointB][pointA] = 1.0 / values[i];
+        }
+
+
+        for (int k = 0; k < pointIndex; k++) {
+            for (int i = 0; i < pointIndex; i++) {
+                for (int j = 0; j < pointIndex; j++) {
+
+                    if (graph[i][k] > 0 && graph[k][j] > 0) {
+                        graph[i][j] = graph[i][k] * graph[k][j];
+                    }
+                }
+            }
+        }
+
+        double[] result = new double[queries.size()];
+
+        for (int i = 0; i < queries.size(); i++) {
+            if (!idxMap.containsKey(queries.get(i).get(0)) || !idxMap.containsKey(queries.get(i).get(1))) {
+                result[i] = -1;
+                continue;
+            }
+            Integer pointA = idxMap.get(queries.get(i).get(0));
+            Integer pointB = idxMap.get(queries.get(i).get(1));
+
+            result[i] = graph[pointA][pointB];
+        }
+
+        return result;
+    }
+   public  static class Pair {
+
+        public Pair(int point,double value){
+            this.point=point;
+            this.value=value;
+        }
+        //点位
+         int point;
+        //权重
+        double value;
     }
 }
