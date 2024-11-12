@@ -314,6 +314,52 @@ public class BFSTemplete {
 
         return result;
     }
+
+
+    /**
+     * LCR 107. 01 矩阵
+     * 计算1距离最近的0的距离
+     * 方案：使用广度优先遍历算法，优先把0加入队列，然后在向四周搜索，发现新节点则更新答案，以及在把新节点加入到队列中
+     * @param mat
+     * @return
+     */
+    public int[][] updateMatrix(int[][] mat) {
+
+        int m = mat.length, n = mat[0].length;
+        int ans[][] = new int[m][n];
+        boolean visited[][] = new boolean[m][n];
+
+        Queue<Integer[]> queue = new ArrayDeque<>();
+        int[][] dir = new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (mat[i][j] == 0) {
+                    queue.add(new Integer[]{i, j});
+                    visited[i][j] = true;
+                }
+            }
+        }
+
+        //使用队列搜索
+        while (!queue.isEmpty()) {
+            Integer[] cell = queue.poll();
+            //向四个方向进行扩散
+            for (int[] di : dir) {
+                int xx = cell[0] + di[0];
+                int yy = cell[1] + di[1];
+                //已经访问了，或者是不合法
+                if (xx < 0 || xx >= m || yy < 0 || yy >= n || visited[xx][yy]) {
+                    continue;
+                }
+                //在当前基础上递增一个长度
+                ans[xx][yy] = ans[cell[0]][cell[1]] + 1;
+                queue.offer(new Integer[]{xx, yy});
+                visited[xx][yy] = true;
+            }
+        }
+        return ans;
+    }
+
    public  static class Pair {
 
         public Pair(int point,double value){
