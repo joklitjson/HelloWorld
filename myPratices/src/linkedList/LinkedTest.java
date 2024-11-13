@@ -24,4 +24,15 @@ public class LinkedTest {
 
         list.add(head.val);
     }
+
+
+    /**
+     * LCR 028. 扁平化多级双向链表
+     * 方案一：
+     * @param head
+     * @return
+     */
+    public Node flatten(Node head) {
+        return null;
+    }
 }

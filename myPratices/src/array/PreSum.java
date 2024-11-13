@@ -74,4 +74,67 @@ public class PreSum {
         }
         return ans;
     }
+
+
+    /**
+     * LCR 012. 寻找数组的中心下标
+     * 寻找中心数组
+     * @param nums
+     * @return
+     */
+    public static int pivotIndex(int[] nums) {
+        int n = nums.length;
+        int[] preSum = new int[n + 1];
+        preSum[0] = 0;//估计多一个长度，方便存储第一个数字
+        for (int i = 1; i <= nums.length; i++) {
+//            pre[i]代表0~i-1元素之和
+            preSum[i] = preSum[i - 1] + nums[i - 1];
+        }
+
+        for (int i = 0; i < nums.length; i++) {
+            int pre = preSum[i];
+            int afterSum = preSum[n] - preSum[i+1];
+            if (pre == afterSum) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(pivotIndex(new int[]{1,7,3,6,5,6}));
+    }
+
+
+    /**
+     * LCR 011. 连续数组
+     * 思想转换：把数组中的0想象成-1,0和1的数量相等，则等价为 子数组中的元素的和是0，因此转变了了前缀和数组+hash的方式
+     * 则原问题转换成「求最长的连续子数组，其元素和为 0」。
+     * @param nums
+     * @return
+     */
+    public int findMaxLength(int[] nums) {
+        int maxLength = 0;
+        Map<Integer, Integer> numIndex = new HashMap<>();
+        int count = 0;//当前索引下的和
+        numIndex.put(count, -1);
+
+        //核心思想就是在过去的区间中查找和是否 存在和为count的下标
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == 1) {
+                count++;
+            } else {
+                count--;
+            }
+            //过去遍历的区间k中 有和为count的数字，sum(0,k)=sum(0,i)=count，因此i-k 区间可以算是一个连续子数组,他们的和是0
+            if (numIndex.containsKey(count)) {
+                int preIndex = numIndex.get(count);
+                maxLength = Math.max(maxLength, (i - preIndex));
+            } else {
+                //记录这个和的索引
+                numIndex.put(count, i);
+            }
+        }
+        return maxLength;
+    }
 }
