@@ -17,18 +17,16 @@ public class CanPartition {
         if (sum % 2 != 0) {
             return false;
         }
+        int target=sum/2;
         //1、dp[i][j] 使用前i个商品 能否正好把容量j 装包
-        boolean[][] dp = new boolean[n + 1][sum + 1];
+        boolean[][] dp = new boolean[n + 1][target + 1];
 
         //2\base case dp[i][0] 都是true，表示背包容量为0时 都能装满
-
         for (int i = 0; i < dp.length; i++) {
             dp[i][0] = true;
         }
-        //
-
-        for (int i = 0; i < dp.length; i++) {
-            for (int j = 0; j < dp[0].length; j++) {
+        for (int i = 1; i < dp.length; i++) {
+            for (int j = 1; j < dp[0].length; j++) {
                 //容量小于第i个物品的容量，因此装不下
                 if (j < nums[i - 1]) {
                     dp[i][j] = dp[i - 1][j];
@@ -40,6 +38,6 @@ public class CanPartition {
         }
 
         //计算是否满足
-        return dp[n][sum];
+        return dp[n][target];
     }
 }

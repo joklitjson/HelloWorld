@@ -113,18 +113,34 @@ public class DPMain {
 
     /**
      * 152. 乘积最大子数组
+     * 方案：此方案不能和最大子数组的和 解法一致，因为很有可能前面一个数是负数，当前值也是负数，那么他们的乘机就是整数了，因此需要维护两个dp 数据，minDp、maxDp
+     * 求最大值时 需要比较 num[i] 、minDp[i]*num[i]、maxDp[i]*num[i] 的最大值
+     * 求最小值时 需要比较 num[i] 、minDp[i]*num[i]、maxDp[i]*num[i] 的最小值
      * @param nums
      * @return
      */
     public int maxProduct(int[] nums) {
+        //构建最大最小dp数组
+        long minDp[] = new long[nums.length];
+        long maxDp[] = new long[nums.length];
+        //初始化
+        minDp[0] = nums[0];
+        maxDp[0] = nums[0];
+        for (int i = 1; i < nums.length; i++) {
 
-//        int dp[]=new int[nums.length];
-//        dp[0]=nums[0];
-//        for (int i=1;i<nums.length;i++){
-//            int tmp=dp[i-1]*nums[i];
-//            dp[i]=Math.max(tmp,nums[i]);
-//        }
+            minDp[i] = Math.min(nums[i], Math.min(minDp[i - 1] * nums[i], maxDp[i - 1] * nums[i]));
+            maxDp[i] = Math.max(nums[i], Math.max(minDp[i - 1] * nums[i], maxDp[i - 1] * nums[i]));
+            if (minDp[i] < Integer.MIN_VALUE) {
+                minDp[i] = nums[i];
+            }
+        }
 
-        return 0;
+        long max=maxDp[0];
+        for (long value:maxDp){
+            if (value>max){
+                max=value;
+            }
+        }
+        return (int)max;
     }
 }

@@ -8,6 +8,8 @@ public class BackTraceMain {
 
     public static void main(String[] args) {
         System.out.println(Arrays.toString(new BackTraceMain().restoreIpAddresses("25525511135").toArray()));
+
+        System.out.println((new BackTraceMain().findTargetSumWays(new int[]{1,1,1,1,1},3)));
     }
     List<String> ans=new ArrayList<>();
     List<String> tmpAns=new ArrayList<>();
@@ -41,5 +43,36 @@ public class BackTraceMain {
             backTrack(string, i + 1);
             tmpAns.remove(tmpAns.size() - 1);
         }
+    }
+
+    /**
+     * LCR 102. 目标和
+     * 使用回溯算法
+     * @param nums
+     * @param target
+     * @return
+     */
+    public int findTargetSumWays(int[] nums, int target) {
+
+        backtrack(0,nums,target,0);
+        return count;
+    }
+
+    int count=0;
+    private void backtrack(int idx, int[] nums, int target, int sum){
+        if (idx==nums.length) {
+            if (target == sum) {
+                count++;
+            }
+            return;
+        }
+
+        sum+=nums[idx];
+        backtrack(idx+1,nums,target,sum);
+        sum-=nums[idx];
+
+        sum-=nums[idx];
+        backtrack(idx+1,nums,target,sum);
+        sum+=nums[idx];
     }
 }
