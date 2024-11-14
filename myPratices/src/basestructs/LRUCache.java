@@ -3,6 +3,10 @@ package basestructs;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * LCR 031. LRU 缓存
+ * 定义两个子方法：moveToHead、removeNode 在插入、查询中可以复用这些代码
+ */
 class LRUCache {
 
     public static void main(String[] args) {
@@ -35,8 +39,7 @@ class LRUCache {
     public int get(int key) {
         Node node=  map.get(key);
         if (node!=null){
-            node.pre.next=node.next;
-            node.next.pre=node.pre;
+            removeNode(node);
             moveToHead(node);
             return node.value;
         }
@@ -47,10 +50,8 @@ class LRUCache {
         Node node=  map.get(key);
         if (node!=null){
             //移除
-            node.pre.next=node.next;
-            node.next.pre=node.pre;
             node.value=value;
-
+            removeNode(node);
             moveToHead(node);
         }
         else {
@@ -64,13 +65,15 @@ class LRUCache {
                 //淘汰末尾元素
                 Node pre= tail.pre;
                 map.remove(pre.key);
-                Node prePre = tail.pre.pre;
-                prePre.next = tail;
-                tail.pre = prePre;
+                removeNode(pre);
             }
         }
     }
 
+    private void removeNode(Node node){
+        node.pre.next=node.next;
+        node.next.pre=node.pre;
+    }
     private void  moveToHead( Node node){
         //获取next 元素
         Node next = head.next;
