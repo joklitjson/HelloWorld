@@ -37,6 +37,7 @@ class LRUCache {
         if (node!=null){
             node.pre.next=node.next;
             node.next.pre=node.pre;
+            moveToHead(node);
             return node.value;
         }
         return -1;
@@ -45,12 +46,21 @@ class LRUCache {
     public void put(int key, int value) {
         Node node=  map.get(key);
         if (node!=null){
+            //移除
             node.pre.next=node.next;
             node.next.pre=node.pre;
             node.value=value;
+
+            moveToHead(node);
         }
         else {
-            if (map.size() >= size) {
+            //插入到头节点
+            node = new Node(key, value);
+            map.put(key, node);
+
+            moveToHead(node);
+
+            if (map.size() >size) {
                 //淘汰末尾元素
                 Node pre= tail.pre;
                 map.remove(pre.key);
@@ -58,17 +68,17 @@ class LRUCache {
                 prePre.next = tail;
                 tail.pre = prePre;
             }
-            //插入到头节点
-            node = new Node(key, value);
-            map.put(key, node);
-
-            Node next = head.next;
-            head.next = node;
-            node.pre = head;
-
-            next.pre = node;
-            node.next = next;
         }
+    }
+
+    private void  moveToHead( Node node){
+        //获取next 元素
+        Node next = head.next;
+        head.next = node;
+        node.pre = head;
+
+        next.pre = node;
+        node.next = next;
     }
 
     static  class Node{
