@@ -93,7 +93,9 @@ public class BstTemplete {
 
 
     /**
-     * 不仅仅越少某一个节点的左右子节点，还需要约束他的子节点符合他的父节点的值
+     * 不仅仅约束某一个节点的左右子节点，还需要约束他的子节点符合他的父节点的值
+     * root 的整个左子树都要小于 root.val，整个右子树都要大于 root.val。
+     * 其实就是 当前root 需要在一个区间值[min,max]内，如果在区间外 则不合法，约束下层的做优子元素 则把区间分成了 [min,root.val]、[root.val,max]
      * @param root
      * @return
      */
