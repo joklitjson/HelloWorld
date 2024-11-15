@@ -33,7 +33,6 @@ public class ThreeNumns {
                     l++;
                     continue;
                 }
-
                 int sum = nums[l] + nums[h];
                 if (sum == target) {
                     String key = nums[i] + "," + nums[l] + "," + nums[h];

@@ -1,6 +1,7 @@
 package backtrack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -20,6 +21,7 @@ public class Permute {
 
     List<List<Integer>> permute(int[] nums) {
         res = new ArrayList<>();
+        Arrays.sort(nums);//避免重复元素出现，因此前面需要先进行排序
         backtrack(nums, new ArrayList<>(), new boolean[nums.length]);
         return res;
     }

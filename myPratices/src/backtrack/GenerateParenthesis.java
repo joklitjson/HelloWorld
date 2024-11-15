@@ -7,7 +7,7 @@ import java.util.List;
 public class GenerateParenthesis {
 
     public static void main(String[] args) {
-        List<String> tm=  new GenerateParenthesis().generateParenthesis(3);
+        List<String> tm=  new GenerateParenthesis().generateParenthesis(1);
         for (String str:tm){
             System.out.println(str);
         }
@@ -29,27 +29,27 @@ public class GenerateParenthesis {
         return result;
     }
 
-    private void backtrack(int left, int right, StringBuilder path) {
+    private void backtrack(int leftRemaining, int rightRemaining, StringBuilder path) {
         //left 剩余数量多余right
-        if (left > right) {
+        if (leftRemaining > rightRemaining) {
             return;
         }
-        if (left < 0 || right < 0) {
+        if (leftRemaining < 0 || rightRemaining < 0) {
             return;
         }
-        if (left == 0 && right == 0) {
+        if (leftRemaining == 0 && rightRemaining == 0) {
             result.add(path.toString());
             return;
         }
 
         //进行回溯
         path.append("(");
-        backtrack(left - 1, right, path);
+        backtrack(leftRemaining - 1, rightRemaining, path);
         path.deleteCharAt(path.length()-1);
 
         //进行回溯
         path.append(")");
-        backtrack(left, right-1, path);
+        backtrack(leftRemaining, rightRemaining-1, path);
         path.deleteCharAt(path.length()-1);
     }
 

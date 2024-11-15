@@ -17,6 +17,9 @@ public class TwoSumTest {
      * @return
      */
     public static int[] twoSum1(int[] numbers, int target) {
+
+        Arrays.sort(numbers);
+
         int left=0,right=numbers.length-1;
         while (left<right){
             int sum=numbers[left]+numbers[right];
@@ -24,10 +27,20 @@ public class TwoSumTest {
                 return new int[]{left,right};
             }
             else if (sum>target){
-                right--;
+                int rightValue=numbers[right];
+                //可以去除重复元素
+                while (numbers[right]==rightValue) {
+                    right--;
+                }
+
             }
             else {
-                left++;
+                //消除重复元素
+                int leftValue=numbers[left];
+                while (leftValue==numbers[left]){
+                    left++;
+                }
+
             }
         }
         return new int[]{};

@@ -7,9 +7,14 @@ import java.util.List;
 public class BackTraceMain {
 
     public static void main(String[] args) {
-        System.out.println(Arrays.toString(new BackTraceMain().restoreIpAddresses("25525511135").toArray()));
+//        System.out.println(Arrays.toString(new BackTraceMain().restoreIpAddresses("25525511135").toArray()));
+//
+//        System.out.println((new BackTraceMain().findTargetSumWays(new int[]{1,1,1,1,1},3)));
 
-        System.out.println((new BackTraceMain().findTargetSumWays(new int[]{1,1,1,1,1},3)));
+        String[][]  re= new BackTraceMain().partition("google");
+        for (String []str:re){
+            System.out.println(Arrays.toString(str));
+        }
     }
     List<String> ans=new ArrayList<>();
     List<String> tmpAns=new ArrayList<>();
@@ -74,5 +79,47 @@ public class BackTraceMain {
         sum-=nums[idx];
         backtrack(idx+1,nums,target,sum);
         sum+=nums[idx];
+    }
+
+    List<List<String>> result;
+    public String[][] partition(String s) {
+        result = new ArrayList<>();
+        backTrack(s, 0, new ArrayList<>());
+        String[][] list = new String[result.size()][s.length()];
+
+        int idx = 0;
+        for (List<String> list1 : result) {
+            list[idx++] = list1.toArray(new String[0]);
+        }
+        return list;
+    }
+
+    private void backTrack(String s,int start, List<String> path){
+        if (start>=s.length()){
+            result.add(new ArrayList<>(path));
+            return;
+        }
+
+        for (int idx=start;idx<s.length();idx++){
+            if (start==1&&idx==2){
+                System.out.println("11");
+            }
+            if (isPardom(s,start,idx)) {
+                path.add(s.substring(start, idx+1));
+                backTrack(s, idx + 1, path);
+                path.remove(path.size() - 1);
+            }
+        }
+    }
+
+    private boolean isPardom(String str,int left,int right) {
+        while (left < right) {
+            if (str.charAt(left) != str.charAt(right)) {
+                return false;
+            }
+            left++;
+            right--;
+        }
+        return true;
     }
 }
