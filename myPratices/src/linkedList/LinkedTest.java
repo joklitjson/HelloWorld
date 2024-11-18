@@ -176,4 +176,35 @@ public class LinkedTest {
         return dummyHeader.next;
     }
 
+
+    /**
+     * LCR 140. 训练计划 II
+     * 返回倒数第n个节点
+     * @param head
+     * @param cnt
+     * @return
+     */
+    ListNode ans=null;
+    int cnt=0,rankFromBottom=0;
+    public ListNode trainingPlan(ListNode head, int cnt) {
+        this.cnt=cnt;
+        dfs(head);
+        return ans;
+
+    }
+
+    /**
+     * 倒计时计算 数的排名
+     * @param head
+     */
+    private void dfs(ListNode head){
+        if (head==null){
+            return;
+        }
+        dfs(head.next);
+        rankFromBottom++;
+        if (this.cnt==rankFromBottom){
+            ans=head;
+        }
+    }
 }
