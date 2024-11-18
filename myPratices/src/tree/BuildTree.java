@@ -81,4 +81,55 @@ public class BuildTree {
     }
 
 
+    /**
+     * 翻转二叉树的左右子节点
+     * 解决方案：定义递归函数，重新设置左右子孩子节点
+     * @param root
+     * @return
+     */
+    public TreeNode flipTree(TreeNode root) {
+
+        return dfs(root);
+    }
+
+    private TreeNode dfs(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        TreeNode left = root.left;
+        TreeNode right = root.right;
+        root.left = dfs(right);
+        root.right = dfs(left);
+        return root;
+    }
+
+
+    /**
+     * LCR 145. 判断对称二叉树
+     * 方案：dfs 遍历中设置两个指针：
+     * 1、左子数的左节点 和右子数的右节点进行比较，
+     * 2、左子数的右节点和右子数的左节点进行比较
+     * @param root
+     * @return
+     */
+    public boolean isSymmetric(TreeNode root) {
+     return    check(root,root);
+    }
+
+    private boolean check(TreeNode p1,TreeNode p2) {
+        if (p1 == null && p2 == null) {
+            return true;
+        }
+        if (p1 == null && p2 != null) {
+            return false;
+        }
+        if (p2 == null && p1 != null) {
+            return false;
+        }
+
+        //判断值是否相等，以及再次检查这两个节点的子节点
+        return p1.val == p2.val && check(p1.left, p2.right) && check(p1.right, p2.left);
+    }
+
+
 }

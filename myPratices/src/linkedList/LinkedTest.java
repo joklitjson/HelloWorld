@@ -143,4 +143,37 @@ public class LinkedTest {
         System.out.println(hh);
     }
 
+
+    /**
+     * LCR 142. 训练计划 IV
+     *合并有序链表
+     * @param l1
+     * @param l2
+     * @return
+     */
+    public ListNode trainningPlan(ListNode l1, ListNode l2) {
+
+        ListNode dummyHeader = new ListNode(-1);
+        ListNode current = dummyHeader;
+        ListNode p1 = l1, p2 = l2;
+        while (p1 != null && p2 != null) {
+
+            if (p1.val < p2.val) {
+                current.next = p1;
+                p1 = p1.next;
+            } else {
+                current.next = p2;
+                p2 = p2.next;
+            }
+            current=current.next;
+        }
+        if (p1 != null) {
+            current.next = p1;
+        }
+        if (p2 != null) {
+            current.next = p2;
+        }
+        return dummyHeader.next;
+    }
+
 }
