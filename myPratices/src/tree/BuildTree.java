@@ -2,6 +2,9 @@ package tree;
 
 import datastrucs.TreeNode;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class BuildTree {
     TreeNode constructMaximumBinaryTree(int[] nums){
         if (nums==null||nums.length==0){
@@ -46,8 +49,13 @@ public class BuildTree {
      * @return
      */
     TreeNode buildTree(int[] preorder, int[] inorder){
+        for (int i=0;i<=inorder.length;i++){
+            valueToIdx.put(inorder[i],i);
+        }
        return build(preorder,0, preorder.length-1,inorder,0,inorder.length-1 );
     }
+    Map<Integer,Integer> valueToIdx=new HashMap<>();
+
     private TreeNode build(int[] preorder,int prel,int prer,int[] inorder,int inl,int inr){
 
         if (prel>prer){
@@ -57,18 +65,20 @@ public class BuildTree {
         //构造根节点
         TreeNode treeNode=new TreeNode(rootValue);
 
-        int rootIndexInOrder=0;
-        //找到根节点在 inOrder中的索引
-        for (int i=inl;i<=inr;i++){
-            if ( inorder[i]== rootValue){
-                rootIndexInOrder=i;
-                break;
-            }
-        }
+        int rootIndexInOrder=valueToIdx.get(rootValue);
+//        int rootIndexInOrder=0;
+        //找到根节点在 inOrder中的索引:使用map 进行优化
+//        for (int i=inl;i<=inr;i++){
+//            if ( inorder[i]== rootValue){
+//                rootIndexInOrder=i;
+//                break;
+//            }
+//        }
         int leftSize=rootIndexInOrder-inl;//左子数个数
         treeNode.left=build(preorder,prel+1,prel+leftSize,inorder,inl,rootIndexInOrder-1);
         treeNode.right=build(preorder,prel+leftSize+1,prer,inorder,rootIndexInOrder+1,inr);
         return treeNode;
     }
+
 
 }
