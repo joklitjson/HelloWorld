@@ -15,6 +15,7 @@ public class Permute {
 //        System.out.println(new Permute().permute(new int[]{1, 2, 2}));
 
         permutation(new int[]{1, 2, 3},0);
+        System.out.println(Arrays.toString(new Permute().countNumbers(2)));;
     }
 
     List<List<Integer>> res;
@@ -88,5 +89,48 @@ public class Permute {
             arr[start] = arr[n];
             arr[n] = tmp;
         }
+    }
+
+    /**
+     * LCR 135. 报数
+     * 其实就是考虑的排列问题，位数是cnt，每个位置上的范围是0~9，特殊点在于第一个必须是非零
+     * 因此我们一次遍历位数比如 二位数、三位数、四位数等的全排列，先把第一位数固定起来
+     * @param cnt
+     * @return
+     */
+    int ans[];
+    int count=0;
+    public int[] countNumbers(int cnt) {
+
+        ans = new int[(int) Math.pow(10, cnt)-1];
+        for (int digit = 1; digit <= cnt; digit++) {//代表位数
+            char[] nums = new char[digit];
+            for (char first = '1'; first <= '9'; first++) {
+                nums[0] = first;
+                permute(nums, 1, digit);
+            }
+        }
+        return ans;
+    }
+
+    /**
+     * 站在第idx位的角度排列，这个位置上可以存放 0~9中的任意数字
+     * @param nums
+     * @param idx
+     * @param digit
+     */
+    public void permute(  char [] nums,int idx,int digit){
+        //位数慢了
+        if (idx==digit){
+            ans[count++]=Integer.parseInt(String.valueOf(nums));
+            return;
+        }
+
+        //第n位依次放 0~9个数字
+        for (char n='0';n<='9';n++) {
+            nums[idx] = n;
+            permute(nums, idx + 1, digit);
+        }
+
     }
 }

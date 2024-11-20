@@ -215,30 +215,30 @@ public class ALl {
         }
         int top=0,right=array[0].length-1,bottom=array.length-1,left=0;
         int idx=0;
-        while (top<bottom){
+        while (true){
             //遍历上面的边
-            for (int i=top;i<right;i++){
+            for (int i=top;i<=right;i++){
                 result[idx++]=array[top][i];
             }
             if (++top>bottom){
                 break;
             }
             //右侧边向下遍历
-            for (int i=top;i<bottom;i++){
-                result[idx++]=(array[i][right-1]);
+            for (int i=top;i<=bottom;i++){
+                result[idx++]=(array[i][right]);
             }
             if (--right<left){
                 break;
             }
             //底部从右向左遍历
-            for (int i=right-1;i>=left;i--){
-                result[idx++]=(array[bottom-1][i]);
+            for (int i=right;i>=left;i--){
+                result[idx++]=(array[bottom][i]);
             }
             if (--bottom<top){
                 break;
             }
 
-            for (int i=bottom-1;i>=top;i--){
+            for (int i=bottom;i>=top;i--){
                 result[idx++]=(array[i][left]);
             }
             if (++left>right){
