@@ -18,17 +18,19 @@ public class MyQueue {
 
     /** 删除队头的元素并返回 */
     public int pop(){
-        Integer integer= peek();
+        Integer integer= peek();//目的就是为了让 inStack的元素进入到outstack 中
         return outStack.pop();
     }
 
     /** 返回队头元素 */
     public Integer peek(){
         //从出栈中移除元素
-        if (outStack.empty()){
-            while (!inStack.empty()){
-                outStack.push(inStack.pop());
-            }
+        if (!outStack.empty()) {
+            return outStack.peek();
+        }
+
+        while (!inStack.empty()){
+            outStack.push(inStack.pop());
         }
         return outStack.peek();
     }
