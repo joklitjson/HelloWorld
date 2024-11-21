@@ -4,6 +4,13 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 //使用队列模拟栈:队尾元素即是栈顶元素
+
+/**
+ *
+ * 单队列元素模拟栈：插入元素时使用变量保存栈顶元素，
+ * 2、如果弹出栈顶元素(队列中的最后一个元素)？队列的特点就是先进先出，那我们可以把队列中的前n-1个元素依次出队列，
+ *   然后在依次入队列，这样，追后插入的元素则放在了队列的头部(只保留最后2个，移动n-2个元素)
+ */
 public class MyStackWithQueue {
 
     Queue<Integer> queue=new LinkedList<>();
