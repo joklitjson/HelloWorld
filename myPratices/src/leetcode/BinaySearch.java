@@ -94,4 +94,34 @@ public class BinaySearch {
 //        }
 //        return -1;
     }
+
+
+    /**
+     * LCR 128. 库存管理 I
+     * 其实就是旋转数组：找最小值问题：旋转数组会形成两个有序数组，最小值一定在右侧的数组中
+     * 使用二分法 逐渐逼近右侧数组
+     * 如下图所示，寻找旋转数组的最小元素即为寻找 右排序数组 的首个元素 stock[x] ，称 x 为 旋转点 。
+     * @param stock
+     * @return
+     */
+    public int inventoryManagement(int[] stock) {
+        int left=0,right=stock.length-1;
+
+        while (left<right) {
+            int middle = (right - left) / 2 + left;
+
+            if (stock[middle] < stock[right]) {
+                //middle落在了右侧数组中, 旋转点则在右侧数组中，搜索右侧边界
+                right = middle;
+            } else if (stock[middle] > stock[right]) {
+//                stock[middle]>stock[right]
+                left = middle + 1;
+//                即旋转点 x 一定在 [m+1,j] 闭区间内，因此执行 i=m+1；
+            } else {
+                right--;
+            }
+        }
+
+        return  stock[left];
+    }
 }

@@ -337,4 +337,31 @@ public class Main {
         }
         return ans;
     }
+
+    /**
+     *
+     * LCR 158. 库存管理 II
+     * 计算数组中的重数：
+     * 本题常见的三种解法：
+     *
+     * 哈希表统计法： 遍历数组 stock ，用 HashMap 统计各数字的数量，即可找出 众数 。此方法时间和空间复杂度均为 O(N) 。
+     * 数组排序法： 将数组 stock 排序，数组中点的元素 一定为众数。
+     * 摩尔投票法： 核心理念为 票数正负抵消 。此方法时间和空间复杂度分别为 O(N) 和 O(1) ，为本题的最佳解法。(需要前提条件：就是重数需要站到一半以上)
+
+     * @param stock
+     * @return
+     */
+    public int inventoryManagement(int[] stock) {
+
+        int x = 0;//假设当前是重数
+        int count = 0; //票数
+
+        for (int value : stock) {
+            if (count == 0) {
+                x = value;//先假设当前是重数
+            }
+            count += (value == x) ? 1 : -1;
+        }
+        return x;
+    }
 }

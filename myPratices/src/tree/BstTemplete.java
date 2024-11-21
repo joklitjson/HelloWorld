@@ -420,4 +420,45 @@ public class BstTemplete {
         return root.val + Math.max(leftMax, rightMax);
     }
 
+
+    /**
+     * LCR 152. 验证二叉搜索树的后序遍历序列
+     * 使用分治法：
+     * 1、找到根节点，然后在数组中找打第一个大于根的元素，然后再把集合切分成左右子数，在判断右子数中是否有小于根元素的元素，在继续遍历
+     * @param postorder
+     * @return
+     */
+    public boolean verifyTreeOrder(int[] postorder) {
+        if (postorder.length<=1){
+            return true;
+        }
+        return recur(postorder,0,postorder.length-1);
+    }
+
+    private boolean recur(int[] postorder, int left,int right) {
+        if (left >= right) {
+            return true;
+        }
+
+        int root = postorder[right];
+
+        //寻找右子数 第一个元素
+        int middle = left;
+        while (postorder[middle] < root) {
+            middle++;
+        }
+        //判断右子数是否都大于根节点
+        int p=middle;
+        for (int i = middle; i < right; i++) {
+            if (postorder[i] < root) {
+                return false;
+            }
+        }
+        //再次验证子节点
+        return recur(postorder, left, middle - 1) && recur(postorder, middle, right - 1);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new BstTemplete().verifyTreeOrder(new int[]{4,6,7,5}));
+    }
 }
