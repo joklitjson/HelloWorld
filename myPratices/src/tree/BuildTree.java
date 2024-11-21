@@ -2,6 +2,9 @@ package tree;
 
 import datastrucs.TreeNode;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class BuildTree {
     TreeNode constructMaximumBinaryTree(int[] nums){
         if (nums==null||nums.length==0){
@@ -46,8 +49,13 @@ public class BuildTree {
      * @return
      */
     TreeNode buildTree(int[] preorder, int[] inorder){
+        for (int i=0;i<=inorder.length;i++){
+            valueToIdx.put(inorder[i],i);
+        }
        return build(preorder,0, preorder.length-1,inorder,0,inorder.length-1 );
     }
+    Map<Integer,Integer> valueToIdx=new HashMap<>();
+
     private TreeNode build(int[] preorder,int prel,int prer,int[] inorder,int inl,int inr){
 
         if (prel>prer){
@@ -57,18 +65,71 @@ public class BuildTree {
         //构造根节点
         TreeNode treeNode=new TreeNode(rootValue);
 
-        int rootIndexInOrder=0;
-        //找到根节点在 inOrder中的索引
-        for (int i=inl;i<=inr;i++){
-            if ( inorder[i]== rootValue){
-                rootIndexInOrder=i;
-                break;
-            }
-        }
+        int rootIndexInOrder=valueToIdx.get(rootValue);
+//        int rootIndexInOrder=0;
+        //找到根节点在 inOrder中的索引:使用map 进行优化
+//        for (int i=inl;i<=inr;i++){
+//            if ( inorder[i]== rootValue){
+//                rootIndexInOrder=i;
+//                break;
+//            }
+//        }
         int leftSize=rootIndexInOrder-inl;//左子数个数
         treeNode.left=build(preorder,prel+1,prel+leftSize,inorder,inl,rootIndexInOrder-1);
         treeNode.right=build(preorder,prel+leftSize+1,prer,inorder,rootIndexInOrder+1,inr);
         return treeNode;
     }
+
+
+    /**
+     * 翻转二叉树的左右子节点
+     * 解决方案：定义递归函数，重新设置左右子孩子节点
+     * @param root
+     * @return
+     */
+    public TreeNode flipTree(TreeNode root) {
+
+        return dfs(root);
+    }
+
+    private TreeNode dfs(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        TreeNode left = root.left;
+        TreeNode right = root.right;
+        root.left = dfs(right);
+        root.right = dfs(left);
+        return root;
+    }
+
+
+    /**
+     * LCR 145. 判断对称二叉树
+     * 方案：dfs 遍历中设置两个指针：
+     * 1、左子数的左节点 和右子数的右节点进行比较，
+     * 2、左子数的右节点和右子数的左节点进行比较
+     * @param root
+     * @return
+     */
+    public boolean isSymmetric(TreeNode root) {
+     return    check(root,root);
+    }
+
+    private boolean check(TreeNode p1,TreeNode p2) {
+        if (p1 == null && p2 == null) {
+            return true;
+        }
+        if (p1 == null && p2 != null) {
+            return false;
+        }
+        if (p2 == null && p1 != null) {
+            return false;
+        }
+
+        //判断值是否相等，以及再次检查这两个节点的子节点
+        return p1.val == p2.val && check(p1.left, p2.right) && check(p1.right, p2.left);
+    }
+
 
 }

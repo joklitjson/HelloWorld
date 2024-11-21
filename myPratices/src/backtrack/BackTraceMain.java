@@ -122,4 +122,16 @@ public class BackTraceMain {
         }
         return true;
     }
+
+    /**
+     * LCR 129. 字母迷宫
+     * 使用回溯算法：遍历各个位置
+     * @param grid
+     * @param target
+     * @return
+     */
+    public boolean wordPuzzle(char[][] grid, String target) {
+
+        return true;
+    }
 }

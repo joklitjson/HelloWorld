@@ -1,6 +1,7 @@
 package dp;
 
 import java.util.Arrays;
+import java.util.Map;
 
 public class DPMain {
 
@@ -142,5 +143,130 @@ public class DPMain {
             }
         }
         return (int)max;
+    }
+
+
+    /**
+     * LCR 126. 斐波那契数
+     * 直接使用压缩的数组，就是只保存前面两个数的值
+     * @param n
+     * @return
+     */
+    public int fib(int n) {
+        final int MOD = 1000000007;//
+        long pre = 0, current = 1;
+        if (n == 0) {
+            return (int) pre;
+        }
+        if (n == 1) {
+            return (int) current;
+        }
+        for (int i = 2; i <= n; i++) {
+            long tmp = current + pre;
+            pre = current;
+            //进行取余
+            current = tmp%MOD;
+        }
+
+        return (int) current;
+    }
+
+    /**
+     * LCR 127. 跳跃训练
+     * 其实就是菲薄切那数列
+     * @param num
+     * @return
+     */
+    public int trainWays(int num) {
+        int a=1,b=1,sum=0;
+        final int MOD = 1000000007;//
+        if (num==0||num==1){
+            return 1;
+        }
+        for (int i=2;i<=num;i++){
+            sum=(a+b)%MOD;
+            a=b;
+            b=sum;
+        }
+        return sum;
+    }
+
+    /**
+     * LCR 131. 砍竹子 I
+     *方案：对于任意长度为绳子，我们都可以把他拆分成至少两段，假设长度为i的绳子我，我们可以在j处进行分割，那么(i-j) 的长度可以进行再次分割或者不分割
+     * 不分割面积：j*(i-j)
+     * 再次分割面积:  j*dp(i-j)
+     * 比较两者的最大值即可.
+     * base case:长度是0、1时都是不可分割，面积是0
+     * @param bamboo_len
+     * @return
+     */
+    public int cuttingBamboo(int bamboo_len) {
+        int dp[] = new int[bamboo_len + 1];
+        for (int i = 2; i <= bamboo_len; i++) {
+            int max = 0;
+            for (int j = 1; j < i; j++) {
+                max = Math.max(max, Math.max(j * (i - j), j * dp[i - j]));
+            }
+            dp[i] = max;
+        }
+        return dp[bamboo_len];
+    }
+
+    /**
+     * 根据数学方式推导发现：切分长度是3的情况下长度是最大的，其次是长度是2的情况是最大的
+     * 长度小于等于3时，则返回n-1，
+     * 其次优先算下对3的余数，如果是0，则直接是 k个3的乘机
+     * x%3=2,最后若最后一段竹子长度为 2 ；则保留，不再拆为 1+1
+     * x%3=1:最差： 1 。若最后一段竹子长度为 1 ；则应把一份 3+1 替换为 2+2，因为 2×2>3×1。
+     * @param bamboo_len
+     * @return
+     */
+    public int cuttingBamboo2(int bamboo_len) {
+        if (bamboo_len <= 3) {
+            return bamboo_len - 1;
+        }
+        int a = bamboo_len / 3;
+        int b = bamboo_len % 3;
+        int p = 1000000007;
+//        if (b == 0) {
+//            return (int) (Math.pow(3, a) % p);
+//        } else if (b == 2) {
+//            return (int) (Math.pow(3, a) * 2 % p);
+//        } else {
+////            if (b==1)
+//            return (int) (Math.pow(3, a - 1) * 2 * 2 % p);
+//        }
+
+        //优化：会有溢出以及比较慢，因此我们使用快速幂进行计算
+        long ans=0;
+        if (b == 0) {
+            ans= (quickPow(3, a, p));
+        } else if (b == 2) {
+            ans= (quickPow(3, a, p) * 2);
+        } else {
+//            if (b==1)
+            ans= (quickPow(3, a - 1, p) * 4);
+        }
+        return (int) (ans%p);
+    }
+
+    /**
+     * ‌快速幂算法是一种在O(logn) 时间内计算的高效算法，与朴素的O(n) 算法相比，效率有了极大的提高‌
+     * @param a
+     * @param b
+     * @return
+     */
+     long quickPow( long a,  long b, int mod) {
+         long ans = 1;
+        a %= mod; // 如果需要取模，可以在这里进行初始化
+        while (b > 0) {//让指数不断除以2，直到为0
+            if ((b & 1)==1) { // 如果指数是奇数，则需要先消除一个指数，让剩余指数变成偶数
+                ans = (ans * a) % mod;
+            }
+            a = (a * a) % mod; // 将底数变大，然后再把指数减半，比如 2^6--> (2^2)^3
+            b >>= 1; // 将指数右移一位
+        }
+        return ans;
     }
 }

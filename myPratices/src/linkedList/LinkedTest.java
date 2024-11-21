@@ -143,4 +143,79 @@ public class LinkedTest {
         System.out.println(hh);
     }
 
+
+    /**
+     * LCR 142. 训练计划 IV
+     *合并有序链表
+     * @param l1
+     * @param l2
+     * @return
+     */
+    public ListNode trainningPlan(ListNode l1, ListNode l2) {
+
+        ListNode dummyHeader = new ListNode(-1);
+        ListNode current = dummyHeader;
+        ListNode p1 = l1, p2 = l2;
+        while (p1 != null && p2 != null) {
+
+            if (p1.val < p2.val) {
+                current.next = p1;
+                p1 = p1.next;
+            } else {
+                current.next = p2;
+                p2 = p2.next;
+            }
+            current=current.next;
+        }
+        if (p1 != null) {
+            current.next = p1;
+        }
+        if (p2 != null) {
+            current.next = p2;
+        }
+        return dummyHeader.next;
+    }
+
+
+    /**
+     * LCR 140. 训练计划 II
+     * 返回倒数第n个节点
+     * @param head
+     * @param cnt
+     * @return
+     */
+    ListNode ans=null;
+    int cnt=0,rankFromBottom=0;
+    public ListNode trainingPlan(ListNode head, int cnt) {
+        this.cnt=cnt;
+        dfs(head);
+        return ans;
+
+    }
+
+    /**
+     * 倒计时计算 数的排名
+     * @param head
+     */
+    private void dfs(ListNode head){
+        if (head==null){
+            return;
+        }
+        dfs(head.next);
+        rankFromBottom++;
+        if (this.cnt==rankFromBottom){
+            ans=head;
+        }
+    }
+
+    public ListNode trainningPlan(ListNode head) {
+        if (head==null||head.next==null){
+            return head;
+        }
+        ListNode newHead=   trainningPlan(head.next);
+
+        head.next.next=head;
+        head.next=null;
+        return newHead;
+    }
 }

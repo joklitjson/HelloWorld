@@ -1,7 +1,9 @@
 package fenzhi;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DiffWaysToCompute {
 
@@ -47,4 +49,56 @@ public class DiffWaysToCompute {
     }
 
 
+    /**
+     * LCR 121. 寻找目标值 - 二维数组
+     * 解决方案：原题从左到右是递增的，从上到下也是递增的，但是我们发现一个规律左下角和右上角：向两边的元素的规律是相反的：一个递增一个递减
+     * 于是我们从左下角开始搜索二维区间
+     * if(plant[i][j]>target) i--;
+     * if(plant[i][j])<target;j++
+     * @param plants
+     * @param target
+     * @return
+     */
+    public boolean findTargetIn2DPlants(int[][] plants, int target) {
+        int m = plants.length;
+        if (m==0){
+            return false;
+        }
+        int n=plants[0].length;
+
+        int i = plants.length - 1, j = 0;
+
+        while (i >= 0 && j < n) {
+            if (plants[i][j] < target) {
+                j++;
+            }
+            else if (plants[i][j] > target) {
+                i--;
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * LCR 120. 寻找文件副本
+     * set
+     * @param documents
+     * @return
+     */
+    public int findRepeatDocument(int[] documents) {
+
+        Set<Integer> set = new HashSet<>();
+
+        for (int val : documents) {
+            if (set.contains(val)) {
+                return val;
+            }
+            set.add(val);
+        }
+
+        return -1;
+    }
 }

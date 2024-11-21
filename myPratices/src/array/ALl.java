@@ -36,6 +36,8 @@ public class ALl {
         int [] result=  spiralArray(new int[][]{{2,3}});
 //        int [] result=  spiralArray(new int[][]{{1,2,3},{4,5,6},{7,8,9},{10,11,12}});
         System.out.println(Arrays.toString(result));
+
+        System.out.println(myPow(2.0,-2147483648));
     }
 
     /**
@@ -213,30 +215,30 @@ public class ALl {
         }
         int top=0,right=array[0].length-1,bottom=array.length-1,left=0;
         int idx=0;
-        while (top<bottom){
+        while (true){
             //遍历上面的边
-            for (int i=top;i<right;i++){
+            for (int i=top;i<=right;i++){
                 result[idx++]=array[top][i];
             }
             if (++top>bottom){
                 break;
             }
             //右侧边向下遍历
-            for (int i=top;i<bottom;i++){
-                result[idx++]=(array[i][right-1]);
+            for (int i=top;i<=bottom;i++){
+                result[idx++]=(array[i][right]);
             }
             if (--right<left){
                 break;
             }
             //底部从右向左遍历
-            for (int i=right-1;i>=left;i--){
-                result[idx++]=(array[bottom-1][i]);
+            for (int i=right;i>=left;i--){
+                result[idx++]=(array[bottom][i]);
             }
             if (--bottom<top){
                 break;
             }
 
-            for (int i=bottom-1;i>=top;i--){
+            for (int i=bottom;i>=top;i--){
                 result[idx++]=(array[i][left]);
             }
             if (++left>right){
@@ -245,4 +247,31 @@ public class ALl {
         }
         return result;
     }
+
+    /**
+     * LCR 134. Pow(x, n)
+     * 快速幂
+     * @param x
+     * @param n
+     * @return
+     */
+    public static double myPow(double x, int n) {
+
+        double ans = 1;
+        long b = n;//可能会有越界问题，因此这里需要先使用Long类型
+        if (n<0){//
+            x=1.0/x;
+            b=-b;
+        }
+        while (b > 0) {
+            if ((b & 1) == 1) {
+                ans = ans * x;
+            }
+            x = x * x;
+            b = b >> 1;
+        }
+        return ans;
+    }
+
+
 }

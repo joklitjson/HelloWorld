@@ -320,4 +320,21 @@ public class Main {
     private boolean isNumber(String str){
         return !("+".equals(str)||"-".equals(str)||"*".equals(str)||"/".equals(str));
     }
+
+
+    /**
+     * LCR 133. 位 1 的个数
+     * 计算数num 中1的个数，分别计算各个位置
+     * @param n
+     * @return
+     */
+    public int hammingWeight(int n) {
+        int ans=0;
+        for (int i=0;i<32;i++){
+            if ((n & ((1 << i)) )!= 0){
+                ans++;
+            }
+        }
+        return ans;
+    }
 }
