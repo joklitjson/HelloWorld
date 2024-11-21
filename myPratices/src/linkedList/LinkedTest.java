@@ -218,4 +218,47 @@ public class LinkedTest {
         head.next=null;
         return newHead;
     }
+
+    /**
+     * LCR 155. 将二叉搜索树转化为排序的双向链表
+     * @param root
+     * @return
+     */
+
+    Node pre=null;//前驱节点，用于链接当前节点,遍历的时候 向后滚动
+    Node head=null;//头结点：也是最小的值
+    public Node treeToDoublyList(Node root) {
+
+        if (root==null){
+            return null;
+        }
+        middler(root);
+
+        //连接首位
+        head.left=pre;
+        pre.right=head;
+
+        return head;
+    }
+
+    private void middler(Node root){
+        if (root==null){
+            return;
+        }
+        middler(root.left);
+        if (head==null){
+            pre=root;
+            head=root;
+            System.out.println(head.val);
+        }
+        else {
+            //与前面的进行连接
+            pre.right=root;
+            root.left=pre;
+        }
+        //把当前节点 设置成之前的节点
+        pre=root;
+
+        middler(root.right);
+    }
 }

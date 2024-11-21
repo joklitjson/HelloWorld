@@ -394,4 +394,31 @@ public class PrioryQueueMain {
         }
         return ans;
     }
+
+
+    /**
+     * LCR 159. 库存管理 III
+     * 选择最小的n个数：使用大根堆，优先排除堆顶的大数，保留小数
+     * @param stock
+     * @param cnt
+     * @return
+     */
+    public int[] inventoryManagement(int[] stock, int cnt) {
+
+        PriorityQueue<Integer> largetQueue = new PriorityQueue<>((a, b) -> b - a);
+
+        for (int value : stock) {
+            largetQueue.offer(value);
+            //弹出当前最大的元素
+            if (largetQueue.size() > cnt) {
+                largetQueue.poll();
+            }
+        }
+        int[] ans = new int[cnt];
+        int idx = 0;
+        while (!largetQueue.isEmpty()) {
+            ans[idx++] = largetQueue.poll();
+        }
+        return ans;
+    }
 }

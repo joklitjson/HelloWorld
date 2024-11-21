@@ -298,6 +298,10 @@ class Node {
     int val;
     Node next;
     Node random;
+
+    public Node left;
+    public Node right;
+
     public Node prev;
     public Node child;
     public Node() {}

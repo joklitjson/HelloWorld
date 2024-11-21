@@ -43,4 +43,26 @@ public class IncreaseStack {
         System.out.println(stack);
 
     }
+
+
+    /**
+     * LCR 148. 验证图书取出顺序
+     * 模拟图书入栈的顺序，然后在判断栈顶元素是否和即将要去除的元素一直，一致则可以取出，最后在判断栈是否为空
+     * @param putIn
+     * @param takeOut
+     * @return
+     */
+    public boolean validateBookSequences(int[] putIn, int[] takeOut) {
+        Stack<Integer> stack = new Stack<>();
+
+        int takeOutIdx = 0;
+        for (int value : putIn) {
+            stack.push(value);
+            while (!stack.isEmpty() && stack.peek() == takeOut[takeOutIdx]) {
+                stack.pop();
+                takeOutIdx++;
+            }
+        }
+        return stack.isEmpty();
+    }
 }

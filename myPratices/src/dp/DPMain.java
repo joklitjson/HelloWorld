@@ -269,4 +269,28 @@ public class DPMain {
         }
         return ans;
     }
+
+
+    /**
+     * LCR 161. 连续天数的最高销售额
+     * 使用动态规划，判断当前天和前面一个是否连在一起 作为最大值
+     * @param sales
+     * @return
+     */
+    public int maxSales(int[] sales) {
+        if (sales.length == 0) {
+            return 0;
+        }
+        int[] dp = new int[sales.length];
+        dp[0] = sales[0];
+        for (int i = 1; i < sales.length; i++) {
+            dp[i] = Math.max(sales[i], sales[i] + dp[i - 1]);
+        }
+        int max = dp[0];
+
+        for (int i = 1; i < dp.length; i++) {
+            max = Math.max(max, dp[i]);
+        }
+        return max;
+    }
 }
