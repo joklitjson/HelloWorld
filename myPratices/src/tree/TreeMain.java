@@ -59,4 +59,36 @@ public class TreeMain {
         dfs(root.right, res);
         path.remove(path.size()-1);
     }
+
+
+    /**
+     * LCR 143. 子结构判断
+     * @param a
+     * @param b
+     * @return
+     */
+    public boolean isSubStructure(TreeNode a, TreeNode b) {
+        return dfs(a,b);
+    }
+
+    private boolean dfs(TreeNode a, TreeNode b){
+        if (a == null || b == null) {
+            return false;
+        }
+        //把a节点当做顶点和B节点比较，或者在A的子孩子当做节点再次和B进行比较 只要右一个可以的就可以
+        return subTree(a, b) || dfs(a.right, b) || dfs(a.left, b);
+    }
+    private boolean subTree(TreeNode a, TreeNode b){
+        //说明B数已经遍历完成
+        if (b==null){
+            return true;
+        }
+
+        //如果a为空或者两者的值不同 则非子结构
+        if (a==null||a.val!=b.val){
+            return false;
+        }
+        //再去比较两者的 孩子节点
+        return subTree(a.left,b.left)&&subTree(a.right,b.right);
+    }
 }
