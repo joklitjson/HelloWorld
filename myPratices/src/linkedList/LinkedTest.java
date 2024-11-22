@@ -261,4 +261,24 @@ public class LinkedTest {
 
         middler(root.right);
     }
+
+    /**
+     * LCR 171. 训练计划 V
+     * 判断两个链表是否相交：以及焦点在哪里
+     * @param headA
+     * @param headB
+     * @return
+     */
+    ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+
+        ListNode p1 = headA, p2 = headB;
+        while (p1 != p2) {
+            p1 = p1 == null ? headB : p1.next;
+
+            p2 = p2 == null ? headA : p2.next;
+        }
+
+        return p1;
+    }
+
 }

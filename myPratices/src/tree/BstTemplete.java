@@ -458,6 +458,39 @@ public class BstTemplete {
         return recur(postorder, left, middle - 1) && recur(postorder, middle, right - 1);
     }
 
+
+    /**
+     * LCR 174. 寻找二叉搜索树中的目标节点
+     * 其实就是求第n大、或者第n小接口，我们需要使用中序遍历、中序遍历逆序
+     * 解决方案
+     * @param root
+     * @param cnt
+     * @return
+     */
+    public int findTargetNode(TreeNode root, int cnt) {
+        this.cnt=cnt;
+        this.dfs2(root);
+        return ans;
+    }
+    int ans=0;
+    int cnt=0;
+
+    /**
+     * 求最大的第n个数字，我们倒序输出
+     * @param root
+     */
+    private void dfs2(TreeNode root) {
+        if (root == null || cnt < 0) {
+            return;
+        }
+        dfs2(root.right);
+        cnt--;
+        if (cnt == 0) {
+            ans = root.val;
+        }
+        dfs2(root.left);
+    }
+
     public static void main(String[] args) {
         System.out.println(new BstTemplete().verifyTreeOrder(new int[]{4,6,7,5}));
     }

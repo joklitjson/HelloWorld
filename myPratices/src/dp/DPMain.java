@@ -1,7 +1,6 @@
 package dp;
 
 import java.util.Arrays;
-import java.util.Map;
 
 public class DPMain {
 
@@ -292,5 +291,30 @@ public class DPMain {
             max = Math.max(max, dp[i]);
         }
         return max;
+    }
+
+
+    /**
+     * LCR 166. 珠宝的最高价值
+     * 使用动态规划算法：定义dp[i,j] 为 从起到点该点的最大价值
+     * @param frame
+     * @return
+     */
+    public int jewelleryValue(int[][] frame) {
+
+        if (frame.length == 0) {
+            return 0;
+        }
+        int m = frame.length, n = frame[0].length;
+
+        int dp[][] = new int[m + 1][n + 1];//+1的长度 可以不用处理边界0，方便一些
+
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                //比较左和上两个点的最大价值，然后在加上当前点的最大价值
+                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]) + frame[i - 1][j - 1];
+            }
+        }
+        return dp[m][n];
     }
 }

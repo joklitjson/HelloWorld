@@ -1,5 +1,8 @@
 package binary;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class BinarySearchTest {
 
     /**
@@ -67,5 +70,39 @@ public class BinarySearchTest {
             }
         }
         return h;
+    }
+
+
+    /**
+     * LCR 179. 查找总价格为目标值的两个商品
+     * 数组整体升序排列，使用双指针进行查询
+     * @param price
+     * @param target
+     * @return
+     */
+    public int[] twoSum(int[] price, int target) {
+
+        int left = 0, right = price.length - 1;
+        while (left < right) {
+            int sum = price[left] + price[right];
+            if (sum > target) {
+                right--;
+            } else if (sum == target) {
+                return new int[]{price[right], price[left]};
+            } else {
+                left++;
+            }
+        }
+
+        //方案二：也可以使用hash，记录过去的值
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int value : price) {
+
+            if (map.containsKey(target - value)) {
+                return new int[]{value, map.get(target - value)};
+            }
+            map.put(value, value);
+        }
+        return new int[0];
     }
 }
