@@ -77,4 +77,21 @@ public class BitMan {
         }
         return ans;
     }
+
+    /**
+     * LCR 133. 位 1 的个数
+     * 计算数num 中1的个数，分别计算各个位置
+     *方案二：n&(n-1)每次都消灭最地位的1，因此我们判断n！=0,循环执行该指令 也可以获取到执行的次数，就是1的个数
+     * @param n
+     * @return
+     */
+    public int hammingWeight(int n) {
+        int ans=0;
+        for (int i=0;i<32;i++){
+            if ((n & ((1 << i)) )!= 0){
+                ans++;
+            }
+        }
+        return ans;
+    }
 }
