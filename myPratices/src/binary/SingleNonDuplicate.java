@@ -35,21 +35,28 @@ public class SingleNonDuplicate {
 
         while (l < r) {
             int middle = (r - l) / 2 + l;
-            if (middle % 2 == 0) {
-                //说明当前 可能在左边，因此判断下是否符合以上规律
-                if (middle + 1 < n && nums[middle] == nums[middle + 1]) {
-                    l = middle + 1;
-                } else {
-                    //
-                    r = middle;
-                }
+//            if (middle % 2 == 0) {
+//                //说明当前 可能在左边，因此判断下是否符合以上规律
+//                if (middle + 1 < n && nums[middle] == nums[middle + 1]) {
+//                    l = middle + 1;
+//                } else {
+//                    //
+//                    r = middle;
+//                }
+//            } else {
+//                //奇数位置，判断他的左边是否和他相同，如果相同，则说明当前位置符合规律一
+//                if (middle - 1 >= 0 && nums[middle] == nums[middle - 1]) {
+//                    l = middle + 1;
+//                } else {
+//                    r = middle;
+//                }
+//            }
+
+            //优化点：使用^1，则是表示把这个数字进行+1或-1，偶数情况下加一，奇数情况下减一，(与1按位亦或只影响最后一位)
+            if (nums[middle] == nums[middle ^ 1]) {
+                l = middle + 1;
             } else {
-                //奇数位置，判断他的左边是否和他相同，如果相同，则说明当前位置符合规律一
-                if (middle - 1 >= 0 && nums[middle] == nums[middle - 1]) {
-                    l = middle + 1;
-                } else {
-                    r = middle;
-                }
+                r = middle;
             }
         }
         return nums[r];

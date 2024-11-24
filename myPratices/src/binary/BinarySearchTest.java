@@ -5,6 +5,9 @@ import java.util.Map;
 
 public class BinarySearchTest {
 
+    public static void main(String[] args) {
+
+    }
     /**
      * 查找元素的位置：如果不存在则返回应该插入的位置
      * 转换成：在一个有序数组中找第一个大于等于 target 的下标
@@ -14,20 +17,25 @@ public class BinarySearchTest {
      */
     public int searchInsert(int[] nums, int target) {
 
-        int low=0,hight=nums.length-1;
-        int ans=nums.length;
-        while (low<hight){
-            int middle=(hight-low)/2+low;
+        int low = 0, hight = nums.length - 1;
+        int ans = nums.length;
+        while (low <= hight) {
+            int middle = (hight - low) / 2 + low;
             //其实就是找low_bound
-            if (target<=nums[middle]){
-                ans=middle;
-                hight=middle-1;
-            }
-            else {
-                low=middle+1;
+//            if (target<=nums[middle]){
+//                ans=middle;
+//                hight=middle-1;
+//            }
+            if (target == nums[middle]) {
+                ans = middle;
+                return ans;
+            } else if (target < nums[middle]) {
+                ans=middle;//如果元素找不到则 这里可能是插入的位置，因此可能是答案
+                hight = middle - 1;
+            } else {
+                low = middle + 1;
             }
         }
-
         return ans;
     }
 
