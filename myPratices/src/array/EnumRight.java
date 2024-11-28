@@ -306,6 +306,30 @@ public class EnumRight {
         }
         return ans;
     }
+
+
+    /**
+     * 930. 和相同的二元子数组
+     * @param nums
+     * @param goal
+     * @return
+     */
+    public int numSubarraysWithSum(int[] nums, int goal) {
+
+        Map<Integer, Integer> sumCount = new HashMap<>();
+        sumCount.put(0,1);//表示和为0的右一个
+        int sum = 0, ans = 0;
+        for (int value : nums) {
+            sum += value;
+            if (sumCount.containsKey(sum - goal)) {
+                ans += sumCount.get(sum - goal);
+            }
+            //递增一个
+            sumCount.put(sum, sumCount.getOrDefault(sum, 0) + 1);
+        }
+        return ans;
+    }
+
     public static void main(String[] args) {
 //        System.out.println(maxSum(new int[]{51,71,17,24,42}));
 //        System.out.println(maximumSum(new int[]{18,43,36,13,7}));
