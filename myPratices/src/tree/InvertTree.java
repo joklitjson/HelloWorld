@@ -1,7 +1,6 @@
 package tree;
 
-import datastrucs.TreeNode;
-import org.omg.CORBA.TRANSACTION_MODE;
+import graph.TreeNode;
 
 public class InvertTree {
 

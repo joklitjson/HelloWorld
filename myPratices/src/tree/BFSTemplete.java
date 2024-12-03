@@ -1,7 +1,6 @@
 package tree;
 
-import com.sun.javafx.geom.Edge;
-import datastrucs.TreeNode;
+import graph.TreeNode;
 
 import java.util.*;
 

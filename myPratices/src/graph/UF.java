@@ -1,4 +1,4 @@
-package datastrucs;
+package graph;
 
 /**
  * 连通图相关的用例

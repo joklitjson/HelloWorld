@@ -1,10 +1,9 @@
 package tree;
 
-import datastrucs.Node;
-import datastrucs.TreeNode;
+import graph.Node;
+import graph.TreeNode;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**

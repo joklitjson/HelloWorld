@@ -1,6 +1,6 @@
 package leetcode;
 
-import datastrucs.TreeNode;
+import graph.TreeNode;
 
 import java.util.Stack;
 

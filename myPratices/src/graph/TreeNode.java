@@ -1,18 +1,17 @@
-package datastrucs;
+package graph;
 
-public class Node {
+public class TreeNode {
 
     public int val;
     private int data;
 
-    public Node parent;
-    public Node left;
-    public Node right;
+    public  TreeNode left;
+    public  TreeNode right;
 
-    public Node(){
+    public TreeNode(){
 
     }
-    public Node(int data){
+    public TreeNode(int data){
         this.data=data;
         this.val=data;
     }
@@ -24,19 +23,19 @@ public class Node {
         this.data = data;
     }
 
-    public Node getLeft() {
+    public TreeNode getLeft() {
         return left;
     }
 
-    public void setLeft(Node left) {
+    public void setLeft(TreeNode left) {
         this.left = left;
     }
 
-    public Node getRight() {
+    public TreeNode getRight() {
         return right;
     }
 
-    public void setRight(Node right) {
+    public void setRight(TreeNode right) {
         this.right = right;
     }
 }

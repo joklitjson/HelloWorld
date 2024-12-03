@@ -1,6 +1,6 @@
 package linkedList;
 
-import datastrucs.TreeNode;
+import graph.TreeNode;
 
 import java.util.ArrayList;
 import java.util.Arrays;

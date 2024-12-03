@@ -1,6 +1,5 @@
-package datastrucs;
+package graph;
 
-import java.sql.Struct;
 import java.util.*;
 
 /**

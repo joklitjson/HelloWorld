@@ -1,6 +1,6 @@
 package tree;
 
-import datastrucs.TreeNode;
+import graph.TreeNode;
 
 public class BalanceTree {
 

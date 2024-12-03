@@ -1,6 +1,6 @@
-package datastrucs.minispantree;
+package graph.minispantree;
 
-import datastrucs.UF;
+import graph.UF;
 
 import java.util.ArrayList;
 import java.util.Arrays;

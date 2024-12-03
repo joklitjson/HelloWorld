@@ -1,6 +1,6 @@
 package tree;
 
-import datastrucs.TreeNode;
+import graph.TreeNode;
 
 /**
  * 2、如何打印出每个节点的左右子树各有多少节点？

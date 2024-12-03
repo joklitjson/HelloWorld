@@ -1,4 +1,4 @@
-package datastrucs;
+package graph;
 
 
 /**

@@ -1,4 +1,4 @@
-package datastrucs.minispantree;
+package graph.minispantree;
 
 import java.util.Arrays;
 import java.util.LinkedList;
