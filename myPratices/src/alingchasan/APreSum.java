@@ -3,6 +3,18 @@ package alingchasan;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *
+ * 性质 1：从左到右累加 d 中的元素，可以得到数组 a。
+ *
+ * 性质 2：如下两个操作是等价的。
+ *
+ * 把 a 的子数组 a[i],a[i+1],…,a[j] 都加上 x。
+ * 把 d[i] 增加 x，把 d[j+1] 减少 x。
+ * 利用性质 2，我们只需要 O(1) 的时间就可以完成对 a 的子数组的操作。最后利用性质 1 从差分数组复原出数组 a。
+ *
+ * 注：也可以这样理解，d[i] 表示把下标 ≥i 的数都加上 d[i]。
+ */
 public class APreSum {
 
     public static void main(String[] args) {
@@ -22,7 +34,7 @@ public class APreSum {
 
         // 数组 prefixCnt 的下标是前缀和（即当前奇数的个数），值是前缀和的个数。
         int[] prefixCnt = new int[nums.length + 1];
-        prefixCnt[0]=1;
+        prefixCnt[0]=1;//
         int evenCnt=0;
         int ans=0;
         for (int i=0;i<nums.length;i++){

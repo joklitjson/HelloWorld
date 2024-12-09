@@ -178,7 +178,7 @@ public class BPresumXOr {
     public int longestAwesome(String s) {
 
         Map<Integer, Integer> prefix = new HashMap<>();
-        prefix.put(0, -1);//表示亦或结果的元素最左边
+        prefix.put(0, -1);//表示亦或结果是0的元素的最左侧下标是-1
         int ans = 0;
         int sequence = 0;
         for (int i = 0; i < s.length(); i++) {
@@ -203,15 +203,16 @@ public class BPresumXOr {
     /**
      * 1915. 最美子字符串的数目
      * 如果某个字符串中 至多一个 字母出现 奇数 次，则称其为 最美 字符串。
+     * 解决方案：使用前缀和+状态压缩法：记录每种状态出现的次数
      * @param word
      * @return
      */
     public static long wonderfulSubstrings(String word) {
-        Map<Integer, Integer> prefix = new HashMap<>();//也可以使用数组
-        prefix.put(0,1);
+        Map<Integer, Integer> prefix = new HashMap<>();//记录某种状态出现的次数：也可以使用数组
+        prefix.put(0,1);//当前这个意思表示：亦或状态是0的结果有一个，类似前缀和的s[0]=0;
         long ans = 0L;
         int sum = 0;
-//        十个小写英文字母组成（'a' 到 'j'）
+//        十个小写英文字母组成（'a' 到 'j'）:需要压缩在一个数字中
         for (int i = 0; i < word.length(); i++) {
             int digit = word.charAt(i) - 'a';
             sum ^= 1 << digit;//亦或当前结果
