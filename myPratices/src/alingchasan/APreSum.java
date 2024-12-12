@@ -149,6 +149,18 @@ public class APreSum {
     /**
      * 总结：当前方法的特点是 需求是需要一遍遍历一遍更新数组中部分子数组的值，因此创建了一个临时差分数组differ
      *同时还创建了一个sum ，用于还原差分数组的值的，然后在加上原数组的值 就计算出了正确的当前值
+     *  long differ[]=new long[n+1];//使用临时数组计算对数组power的差分操作
+     *     long sum=0;//前面增加的电站:滚动的统计前面对差分数组的增减和
+     *         for (int i=0;i<n;i++){
+     *             sum+=differ[i];//计算当前电站的影响电量
+     *              if (limit>sum+power[i]){
+     *                 //更新这一段的下一个差分值
+     *                 if (i+2*r+1<n){
+     *                     differ[i+2*r+1]-=m;
+     *                 }
+     *             }
+     *         }
+     *         return true;
      * @param power
      * @param r
      * @param k
