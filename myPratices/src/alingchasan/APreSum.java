@@ -48,8 +48,13 @@ public class APreSum {
             //当前差分+前一个被还原的数字
             rawArr[i]=dd[i]+rawArr[i-1];
         }
-        System.out.println(Arrays.toString(rawArr));
+//        System.out.println(Arrays.toString(rawArr));
 
+//        System.out.println("waysToSplit==="+waysToSplit(new int[]{1,2,2,2,5,0}));
+//        System.out.println("waysToSplit==="+waysToSplit2(new int[]{1,2,2,2,5,0}));
+        System.out.println("sumOfFlooredPairs==="+sumOfFlooredPairs(new int[]{2,5,9}));
+//        System.out.println(lowerBound(new int[]{1,4,5,5,9},0,5,5));
+//        System.out.println(upperBound(new int[]{1,4,5,5,9},0,5,5));
         // 2~5+1
     }
     /**
@@ -236,5 +241,177 @@ public class APreSum {
             }
         }
         return true;
+    }
+
+
+    /**
+     * 1712. 将数组分成三个子数组的方案数
+     * 第一刀的起始位置可以是0，但是其最终的位置 不能大于sum(arr)/3，否则后面的两个数字就不可能都大于他了
+     * 第二刀的位置：起始位置是当mid的和等于left的和，终止位置是mid、right的中间位置，不能超过left右边的所有元素和的一半的位置
+     * 因此我们使用前缀和+二分法
+     * @param nums
+     * @return
+     */
+    public static int waysToSplit(int[] nums) {
+
+        int n = nums.length;
+        int[] preSum = new int[n + 1];
+        int sum = 0;
+
+        for (int i = 0; i < n; i++) {
+            sum += nums[i];
+            preSum[i + 1] = sum;
+        }
+        final int MOD = 1000000000 + 7;
+
+        if(sum == 0){  // 特判, nums中全为0的情况
+            return (int)((long)(n-1) *(n-2) / 2 % MOD);
+        }
+
+        long  ans = 0;
+        int i = 1;
+        int t=sum/3;
+        for (; i <= n && preSum[i] <= t; i++) {
+
+            //查找最左侧下标
+            int l = lowerBound(preSum, i+1, n + 1, 2 * preSum[i]);
+
+            //查找最右侧下标
+            int r = upperBound(preSum, i+1, n + 1, preSum[i]+(preSum[n] - preSum[i]) / 2);
+            //统计这个区间的个数:上面都是使用的左闭右开区间的写法，因此这里直接相减就行了
+            if (r>=l){
+                ans += r - l;
+            }
+
+        }
+
+        return (int) (ans%MOD);
+    }
+
+    /**
+     * 可以使用三指针
+     *
+     * 三指针的可行性：
+     * 三指针i,l,r定义：i 表示第一刀的位置，枚举第一刀的位置，计算第二刀的可选位置数j属于[l,r），这样三个子数组:nums left=[0,i] mid=[i,j] right=[j,n]
+     * 三指针要求：
+     * 右边大于中间 Sum(right) >= Sum(mid)， 即preSum[n] - preSum[r] >= preSum[r] - preSum[i]
+     * 中间大于左边 Sum(mid) >= Sum(left)，即preSum[l] - preSum[i] < preSum[i]
+     * 三指针单调性：根据三指针要求，我们可以看出，随着i变大，l与r一定只变大不变小，所以每次迭代i，可以从i-1对应的l,r向右查找本次的l,r，将定位l,r的时间从O(n)变成O(1)
+     * 时间复杂度分析：三指针对于preSum前缀和数组每个指针只遍历一次，所以总时间复杂度为O(n)
+     * 备注：也可以外层i,内层二分查找前缀和数组确定l,r，时间复杂度为O(nlgn)
+     s
+     * 因为整个前缀和数组是单调性的
+     * @param nums
+     * @return
+     */
+    public  static int waysToSplit2(int[] nums) {
+        int n = nums.length;
+        int[] preSum = new int[n + 1];
+        int sum = 0;
+        long  ans = 0;
+        for (int i = 0; i < n; i++) {
+            sum += nums[i];
+            preSum[i + 1] = sum;
+        }
+        final int MOD = 1000000000 + 7;
+        // |______|________|_______|________|
+        // 1      i        l       r        n
+        // i 表示第一刀的位置，枚举第一刀的位置，计算第二刀的可选位置数
+        for (int i=1,l=2,r=2;i<n;i++){
+            l=Math.max(l,i+1);
+            r=Math.max(r,i+1);
+
+            //为啥要先遍历r？原因就是遍历r的同时 不需要考虑l的位置在哪里，其实就是在找r的最右边的位置，类似二分upperBound
+            // sum(right) >= sum(mid)，r最大为n-1，right保证要有一个数
+            while (r<n&&preSum[n]-preSum[r]>=preSum[r]-preSum[i]){
+                r++;
+            }
+
+            // // sum(mid) >= sum(left)
+            while (l<n&&preSum[l]-preSum[i]<preSum[i]){
+                l++;
+            }
+            if (l<r){
+                ans+=r-l;
+            }
+        }
+
+        return (int) (ans%MOD);
+    }
+
+    private static int lowerBound( int [] arr,int left,int right,int target) {
+        while (left < right) {
+            int middle = left + (right - left) / 2;
+            if (arr[middle] == target) {
+                right = middle;
+            } else if (arr[middle] < target) {
+                left = middle + 1;
+            } else {
+                right = middle;
+            }
+        }
+        return left;
+    }
+
+    private static int upperBound( int [] arr,int left,int right,int target) {
+        while (left < right) {
+            int middle = left + (right - left) / 2;
+            if (arr[middle] == target) {
+                left = middle+1;
+            } else if (arr[middle] < target) {
+                left = middle+1;
+            } else {
+                right = middle;
+            }
+        }
+        return left;
+    }
+
+
+    /**
+     * 1862. 向下取整数对和
+     * 解决方案：创建一个 统计元素个数的 cnt，然后求最大值下标就是元素的值，value就是元素的个数
+     * @param nums
+     * @return
+     */
+    public  static int sumOfFlooredPairs(int[] nums) {
+        int mod = 1000000007;
+        int max = 0;
+        for (int value : nums) {
+            max = Math.max(max, value);
+        }
+
+        int[] cnt = new int[max+1];
+
+        for (int value : nums) {
+            cnt[value]++;
+            max = Math.max(max, value);
+        }
+
+        //计算其前缀和
+        int[] preSum = new int[max+1];//长度和数组长度一致的前缀和
+        int count = 0;//统计元素个数的前缀和
+        for (int i = 1; i < cnt.length; i++) {
+            count += cnt[i];
+            preSum[i] = preSum[i-1] +cnt[i];
+        }
+        long ans = 0;
+        //遍历元素
+
+        for (int num = 1; num <=max; num++) {
+            if (cnt[num] != 0) {
+                //表示 数字num的个数不为0，就是数组中存在这样的数字
+
+                int d = 1;//i是他的倍数，比如我们求一倍区间的元素个数idx[num,2*num] 求这个区间的元素个数，可以使用前面计算的前缀和
+                while (d*num <=max) {
+                    int left = d*num-1;//注意：前面前缀和的长度是n，因此 presum[i] 是包含第i个数字的
+                    int right = Math.min((d+1)*num-1, max);
+                    //数字 num的d倍的元素个数有 (preSum[right] - preSum[left])，因此这些数字的和除以元素商都是d，但是又有cnt[num] 个元素
+                    ans +=(long) cnt[num]*(preSum[right] - preSum[left]) * d;//
+                    d++;
+                }
+            }
+        }
+        return (int) (ans % mod);
     }
 }
