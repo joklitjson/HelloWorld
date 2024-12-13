@@ -53,6 +53,7 @@ public class APreSum {
 //        System.out.println("waysToSplit==="+waysToSplit(new int[]{1,2,2,2,5,0}));
 //        System.out.println("waysToSplit==="+waysToSplit2(new int[]{1,2,2,2,5,0}));
         System.out.println("sumOfFlooredPairs==="+sumOfFlooredPairs(new int[]{2,5,9}));
+        System.out.println("maxTrailingZeros"+maxTrailingZeros(new int[][]{{23,17,15,3,20},{8,1,20,27,11},{9,4,6,2,21},{40,9,1,10,6},{22,7,4,5,3}}));
 //        System.out.println(lowerBound(new int[]{1,4,5,5,9},0,5,5));
 //        System.out.println(upperBound(new int[]{1,4,5,5,9},0,5,5));
         // 2~5+1
@@ -413,5 +414,83 @@ public class APreSum {
             }
         }
         return (int) (ans % mod);
+    }
+
+
+    /**
+     * 2245. 转角路径的乘积中最多能有几个尾随零
+     *     想要尾0，其实就是统计2，5因数个数，​取两者最小值；
+     *枚举转角点 (i, j)，并计算转角点上、下、左、右路径所组成的转角路径（仅包含一个直角）中尾随零的数目即可。
+     * @param grid
+     * @return
+     */
+    public static int maxTrailingZeros(int[][] grid) {
+        int m = grid.length, n = grid[0].length;
+        int[] factor2 = new int[1001];//预处理 下标作为num 的数 含有因子2的个数
+        int[] factor5 = new int[1001];
+
+        //1、预处理
+        for (int i = 1; i <= 1000; i++) {
+            if (i % 2 == 0) {
+                //他是在i/2的基础上进行+1操作的
+                factor2[i] = factor2[i / 2] + 1;
+            }
+
+            if (i % 5 == 0) {
+                //他是在i/5的基础上进行+1操作的
+                factor5[i] = factor5[i / 5] + 1;
+            }
+        }
+
+        //2、统计每行中每个元素的因子2、5个数的前缀次数和
+
+        int[][] rowFactor2 = new int[m + 1][n + 1];
+        int[][] rowFactor5 = new int[m + 1][n + 1];
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                //统计当前行中 到当前点位因子2的个数
+                rowFactor2[i + 1][j + 1] = rowFactor2[i][j] + factor2[grid[i][j]];
+                rowFactor5[i + 1][j + 1] = rowFactor5[i][j] + factor5[grid[i][j]];
+            }
+        }
+
+        //3、统计每列中因子2、5的个数
+        int[][] colFactor2 = new int[n + 1][m + 1];
+        int[][] colFactor5 = new int[n + 1][m + 1];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                colFactor2[i + 1][j + 1] = colFactor2[i][j] + factor2[grid[j][i]];
+                colFactor5[i + 1][j + 1] = colFactor5[i][j] + factor5[grid[j][i]];
+            }
+        }
+
+        //4、遍历每个点位，统计转角中2、5个数的最小值
+        int ans = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+//                left->upper
+                ans = Math.max(ans,
+                        Math.min(rowFactor2[i][j] + colFactor2[j][i] + factor2[grid[i][j]],
+                                rowFactor5[i][j] + colFactor5[j][i] + factor5[grid[i][j]]));
+
+//                left--->down
+                ans = Math.max(ans,
+                        Math.min(rowFactor2[i][j] + (colFactor2[n][m] - colFactor2[j][i]),
+                                rowFactor5[i][j] + (colFactor5[n][m] - colFactor5[j][i])));
+
+                //right-->upper
+                ans = Math.max(ans,
+                        Math.min(rowFactor2[m][n] - rowFactor2[i][j] + colFactor2[j][i],
+                                colFactor5[m][n] - colFactor5[i][j] + colFactor5[j][i]));
+
+                //right-->down
+                ans = Math.max(ans,
+                        Math.min(rowFactor2[m][n] - rowFactor2[i][j] + colFactor2[m][n] - colFactor2[j][i + 1],
+                                rowFactor5[m][n] - rowFactor5[i][j] + colFactor5[m][n] - colFactor5[j][i + 1]));
+            }
+        }
+
+        return ans;
     }
 }
