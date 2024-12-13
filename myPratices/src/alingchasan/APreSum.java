@@ -401,7 +401,7 @@ public class APreSum {
         for (int num = 1; num <=max; num++) {
             if (cnt[num] != 0) {
                 //表示 数字num的个数不为0，就是数组中存在这样的数字
-
+                //[i,i*2-1]、[i*2,i*3-1]、[i*3,i*4-1]，区间内的floor函数值都一样
                 int d = 1;//i是他的倍数，比如我们求一倍区间的元素个数idx[num,2*num] 求这个区间的元素个数，可以使用前面计算的前缀和
                 while (d*num <=max) {
                     int left = d*num-1;//注意：前面前缀和的长度是n，因此 presum[i] 是包含第i个数字的
