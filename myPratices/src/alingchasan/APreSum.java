@@ -3,6 +3,7 @@ package alingchasan;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 
 /**
  *
@@ -54,6 +55,9 @@ public class APreSum {
 //        System.out.println("waysToSplit==="+waysToSplit2(new int[]{1,2,2,2,5,0}));
         System.out.println("sumOfFlooredPairs==="+sumOfFlooredPairs(new int[]{2,5,9}));
         System.out.println("maxTrailingZeros"+maxTrailingZeros(new int[][]{{23,17,15,3,20},{8,1,20,27,11},{9,4,6,2,21},{40,9,1,10,6},{22,7,4,5,3}}));
+        System.out.println("maxTrailingZeros"+maxTrailingZeros2(new int[][]{{23,17,15,3,20},{8,1,20,27,11},{9,4,6,2,21},{40,9,1,10,6},{22,7,4,5,3}}));
+
+        System.out.println("maxSumSubmatrix==========="+maxSumSubmatrix(new int[][]{{2,2,-1}},2));
 //        System.out.println(lowerBound(new int[]{1,4,5,5,9},0,5,5));
 //        System.out.println(upperBound(new int[]{1,4,5,5,9},0,5,5));
         // 2~5+1
@@ -444,31 +448,56 @@ public class APreSum {
 
         //2、统计每行中每个元素的因子2、5个数的前缀次数和
 
-        int[][] rowFactor2 = new int[m + 1][n + 1];
-        int[][] rowFactor5 = new int[m + 1][n + 1];
-
+        int[][] rowFactor2 = new int[m ][n + 1];//每行的前缀因子次数和,只需要列多一行就行了
+        int[][] rowFactor5 = new int[m ][n + 1];
+        System.out.println("**************元素组******************");
+        for (int []row:grid){
+            System.out.println(Arrays.toString(row));
+        }
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
                 //统计当前行中 到当前点位因子2的个数
-                rowFactor2[i + 1][j + 1] = rowFactor2[i][j] + factor2[grid[i][j]];
-                rowFactor5[i + 1][j + 1] = rowFactor5[i][j] + factor5[grid[i][j]];
+                rowFactor2[i ][j + 1] = rowFactor2[i][j] + factor2[grid[i][j]];
+                rowFactor5[i ][j + 1] = rowFactor5[i][j] + factor5[grid[i][j]];
             }
         }
 
+        System.out.println("**************每行2的因子个数******************");
+        for (int []row:rowFactor2){
+            System.out.println(Arrays.toString(row));
+        }
+
+        System.out.println("**************每行5的因子个数******************");
+        for (int []row:rowFactor5){
+            System.out.println(Arrays.toString(row));
+        }
+
         //3、统计每列中因子2、5的个数
-        int[][] colFactor2 = new int[n + 1][m + 1];
-        int[][] colFactor5 = new int[n + 1][m + 1];
+        int[][] colFactor2 = new int[n ][m+1 ];
+        int[][] colFactor5 = new int[n] [m +1];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                colFactor2[i + 1][j + 1] = colFactor2[i][j] + factor2[grid[j][i]];
-                colFactor5[i + 1][j + 1] = colFactor5[i][j] + factor5[grid[j][i]];
+                colFactor2[i ][j + 1] = colFactor2[i][j] + factor2[grid[j][i]];
+                colFactor5[i ][j + 1] = colFactor5[i][j] + factor5[grid[j][i]];
             }
+        }
+
+        System.out.println("**************每列2的因子个数******************");
+        for (int []column:colFactor2){
+            System.out.println(Arrays.toString(column));
+        }
+        System.out.println("**************每列5的因子个数******************");
+        for (int []column:colFactor5){
+            System.out.println(Arrays.toString(column));
         }
 
         //4、遍历每个点位，统计转角中2、5个数的最小值
         int ans = 0;
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i <m; i++) {
+            for (int j = 0; j <n; j++) {
+                if (i==3&&j==2){
+                    System.out.println("111");
+                }
 //                left->upper
                 ans = Math.max(ans,
                         Math.min(rowFactor2[i][j] + colFactor2[j][i] + factor2[grid[i][j]],
@@ -476,21 +505,188 @@ public class APreSum {
 
 //                left--->down
                 ans = Math.max(ans,
-                        Math.min(rowFactor2[i][j] + (colFactor2[n][m] - colFactor2[j][i]),
-                                rowFactor5[i][j] + (colFactor5[n][m] - colFactor5[j][i])));
+                        Math.min(rowFactor2[i][j] + (colFactor2[j][m] - colFactor2[j][i]),
+                                rowFactor5[i][j] + (colFactor5[j][m] - colFactor5[j][i])));
 
                 //right-->upper
                 ans = Math.max(ans,
-                        Math.min(rowFactor2[m][n] - rowFactor2[i][j] + colFactor2[j][i],
-                                colFactor5[m][n] - colFactor5[i][j] + colFactor5[j][i]));
+                        Math.min(rowFactor2[i][n] - rowFactor2[i][j] + colFactor2[j][i],
+                                rowFactor5[i][n] - rowFactor5[i][j] + colFactor5[j][i]));
 
                 //right-->down
                 ans = Math.max(ans,
-                        Math.min(rowFactor2[m][n] - rowFactor2[i][j] + colFactor2[m][n] - colFactor2[j][i + 1],
-                                rowFactor5[m][n] - rowFactor5[i][j] + colFactor5[m][n] - colFactor5[j][i + 1]));
+                        Math.min(rowFactor2[i][n] - rowFactor2[i][j] + colFactor2[j][m] - colFactor2[j][i + 1],
+                                rowFactor5[i][n] - rowFactor5[i][j] + colFactor5[j][m] - colFactor5[j][i + 1]));
             }
         }
 
         return ans;
     }
+
+    public static int maxTrailingZeros2(int[][] grid) {
+        int m = grid.length, n = grid[0].length;
+        int[] factor2 = new int[1001];//预处理 下标作为num 的数 含有因子2的个数
+        int[] factor5 = new int[1001];
+
+        //1、预处理
+        for (int i = 1; i <= 1000; i++) {
+            if (i % 2 == 0) {
+                //他是在i/2的基础上进行+1操作的
+                factor2[i] = factor2[i / 2] + 1;
+            }
+            if (i % 5 == 0) {
+                //他是在i/5的基础上进行+1操作的
+                factor5[i] = factor5[i / 5] + 1;
+            }
+        }
+
+        //2、统计每行中每个元素的因子2、5个数的前缀次数和
+
+        int[][] rowFactor2 = new int[m ][n + 1];//每行的前缀因子次数和,只需要列多一行就行了
+        int[][] rowFactor5 = new int[m ][n + 1];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                //统计当前行中 到当前点位因子2的个数
+                rowFactor2[i ][j + 1] = rowFactor2[i][j] + factor2[grid[i][j]];
+                rowFactor5[i ][j + 1] = rowFactor5[i][j] + factor5[grid[i][j]];
+            }
+        }
+
+        //3、统计每列中因子2、5的个数:从上到下遍历,从左到右遍历
+        int[][] colFactor2 = new int[m+1 ][n ];//因此只需要多一行就行了，也好理解
+        int[][] colFactor5 = new int[m+1] [n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                colFactor2[j + 1][i] = colFactor2[j][i] + factor2[grid[j][i]];
+                colFactor5[j + 1][i] = colFactor5[j][i] + factor5[grid[j][i]];
+            }
+        }
+
+        //4、遍历每个点位，统计转角中2、5个数的最小值
+        int ans = 0;
+        for (int i = 0; i <m; i++) {
+            for (int j = 0; j <n; j++) {
+//                left->upper
+                ans = Math.max(ans,
+                        Math.min(rowFactor2[i][j] + colFactor2[i][j] + factor2[grid[i][j]],
+                                rowFactor5[i][j] + colFactor5[i][j] + factor5[grid[i][j]]));
+
+//                left--->down
+                ans = Math.max(ans,
+                        Math.min(rowFactor2[i][j] + (colFactor2[m][j] - colFactor2[j][i]),
+                                rowFactor5[i][j] + (colFactor5[m][j] - colFactor5[j][i])));
+
+                //right-->upper
+                ans = Math.max(ans,
+                        Math.min(rowFactor2[i][n] - rowFactor2[i][j] + colFactor2[i][j],
+                                rowFactor5[i][n] - rowFactor5[i][j] + colFactor5[i][j]));
+
+                //right-->down
+                ans = Math.max(ans,
+                        Math.min(rowFactor2[i][n] - rowFactor2[i][j] + colFactor2[m][j] - colFactor2[i+1][j],
+                                rowFactor5[i][n] - rowFactor5[i][j] + colFactor5[m][j] - colFactor5[i+1][j ]));
+            }
+        }
+
+        return ans;
+    }
+
+
+    /**
+     * 363. 矩形区域不超过 K 的最大数值和
+     * 解决方案：使用降维的思想，把二维数组转换成一维数组，然后在进行遍历
+     * 二维数组前缀和的时间复杂度是n^2*m^2
+     *
+     * 优化点
+     * 1、什么时候固定列什么时候固定行？谁的长度小固定谁，就是遍历谁，然后在创建一个大的一维数组
+     *
+     * @param matrix
+     * @param k
+     * @return
+     */
+    public static int maxSumSubmatrix(int[][] matrix, int k) {
+        int m=matrix.length,n=matrix[0].length;
+
+        //我们固定列：把某几个列的元素都向左压缩到左边的一个一维数组总，然后问题转化成了：求一维数组中元素不超过k的最大值
+        int max=Integer.MIN_VALUE;
+        for (int first=0;first<n;first++){
+            int [] sum=new int[m];//
+            for (int second=first;second<n;second++){
+                for (int i=0;i<m;i++){
+                    sum[i]+=matrix[i][second];
+                }
+
+                //计算当前子数组的最大值,然后在跟进当前的最大值比较
+                max=Math.max(max,near(sum,k));
+            }
+
+        }
+
+        return max;
+    }
+
+    /**
+     * 求一维子数组 连续子数组的和不超过k的最大值
+     * 这里使用暴力算法
+     *
+     * @param sum
+     * @param k
+     * @return
+     */
+    private static int near(  int [] sum,int k) {
+        int n = sum.length;
+        int max = Integer.MIN_VALUE;
+        for (int i = 0; i < n; i++) {
+            int tmpSum = 0;
+            for (int j = i; j < n; j++) {
+                tmpSum += sum[j];
+                if (tmpSum == k) {
+                    return tmpSum;
+                } else if (tmpSum < k) {
+                    max = Math.max(max, tmpSum);
+                }
+            }
+        }
+        return max;
+    }
+
+    /**
+     * 前缀和+二分法
+     * @param matrix
+     * @param k
+     * @return
+     */
+    public static int maxSumSubmatrix2(int[][] matrix, int k) {
+        int m=matrix.length,n=matrix[0].length;
+
+        //我们固定列：把某几个列的元素都向左压缩到左边的一个一维数组总，然后问题转化成了：求一维数组中元素不超过k的最大值
+        int max=Integer.MIN_VALUE;
+        for (int first=0;first<n;first++){
+            int [] sum=new int[m];//
+            for (int second=first;second<n;second++){
+
+
+                for (int i=0;i<m;i++){
+                    sum[i]+=matrix[i][second];
+                }
+                // 使用TreeSet快速查找到离k最近的数
+                TreeSet<Integer> sumSet = new TreeSet<Integer>();
+                sumSet.add(0);
+                //二分法查找 s - k=x 查找大于等于x的最小值：其实就是二分法中的upperBound方法
+//                还是类似之前的枚举右边维护左边思想
+                int s = 0;
+                for (int v : sum) {
+                    s += v;
+                    Integer ceil = sumSet.ceiling(s - k);
+                    if (ceil != null) {
+                        max = Math.max(max, s - ceil);
+                    }
+                    sumSet.add(s);
+                }
+            }
+        }
+        return max;
+    }
+
+
 }
