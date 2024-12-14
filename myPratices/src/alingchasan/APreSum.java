@@ -1,9 +1,6 @@
 package alingchasan;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  *
@@ -58,6 +55,20 @@ public class APreSum {
         System.out.println("maxTrailingZeros"+maxTrailingZeros2(new int[][]{{23,17,15,3,20},{8,1,20,27,11},{9,4,6,2,21},{40,9,1,10,6},{22,7,4,5,3}}));
 
         System.out.println("maxSumSubmatrix==========="+maxSumSubmatrix(new int[][]{{2,2,-1}},2));
+
+//        System.out.println("matrixBlockSu======="+matrixBlockSum(new int[][]{{1,2,3},{4,5,6},{7,8,9}},1));
+        System.out.println("countSubmatrices==="+countSubmatrices(new int[][]{{7,6,3},{6,6,1}},18));
+
+//        kthLargestValue(new int[][]{{5,2},{1,6}},1);
+        System.out.println("maxSideLength========="+maxSideLength(new int[][]{{1,1,3,2,4,3,2},{1,1,3,2,4,3,2},{1,1,3,2,4,3,2}},4));
+
+        System.out.println("countSquares============"+countSquares(new int[][]{
+                {0,1,1,1},
+                {1,1,1,1},
+                {0,1,1,1}
+        }));
+
+        System.out.println("numSubmat==="+numSubmat(new int[][]{{1,0,1},{1,1,0},{1,1,0}}));
 //        System.out.println(lowerBound(new int[]{1,4,5,5,9},0,5,5));
 //        System.out.println(upperBound(new int[]{1,4,5,5,9},0,5,5));
         // 2~5+1
@@ -689,4 +700,604 @@ public class APreSum {
     }
 
 
+    /**
+     * \2281. 巫师的总力量和
+     * 方案：单调栈+前缀和的前缀和
+     * 遍历点：求每个点左边和右边的第一个比他小的元素
+     * 帮灵神补充两个类似题： 907 和 1856
+     * @param strength
+     * @return
+     */
+    public int totalStrength(int[] strength) {
+        final int mod = (int) 1e9 + 7;
+        int n=strength.length;
+        int [] left=new int[n];
+        int [] right=new int[n];
+        Arrays.fill(right,n);
+        Stack<Integer> stack=new Stack<>();
+        stack.push(-1); // 哨兵
+        //使用单调递增栈
+        for (int i=0;i<n;i++){
+//            while (!stack.isEmpty()&&strength[i]<=strength[stack.peek()]){
+            while (stack.size()>1&&strength[i]<=strength[stack.peek()]){
+                //把栈顶元素弹出了，说明i就是当前栈顶元素右边的第一个最小元素
+                right[stack.peek()]=i;
+                stack.pop();
+            }
+            //左侧元素都小于他了
+//            left[i]=stack.isEmpty()?-1:stack.peek();
+            left[i]=stack.peek();;//使用了哨兵模式
+            stack.push(i);
+        }
+
+        //求前缀和&前缀和的前缀和
+        long sum=0L;// 前缀和
+        long [] ss=new long[n+2];
+        for (int i=1;i<=n;i++){
+            sum+=strength[i-1];
+            ss[i+1]=(ss[i]+sum)%mod;
+        }
+
+        long ans=0;
+        for (int i=0;i<n;i++){
+            int l=left[i]+1;
+            int r=right[i]-1;// [l,r] 左闭右闭
+            long total=(long)((i-l+1)*(ss[r+2]-ss[i+1])- (long)(r-i+1)*(ss[i+1]-ss[l]))%mod;
+            ans=(ans+strength[i]*total)%mod;
+        }
+        return (int) ((ans+mod)%mod);//防止算出负数
+    }
+
+    /**
+     * 1314. 矩阵区域和
+     * 二维矩阵区域和 的求法:先构造前缀和，然后在求出每个点 在k的影响下的最小和最大的点，然后求着两个点区间的和
+     * 遍历每个店：
+     * @param mat
+     * @param k
+     * @return
+     */
+    public static int[][] matrixBlockSum(int[][] mat, int k) {
+
+        int m = mat.length, n = mat[0].length;
+
+        int preSum[][] = new int[m + 1][n + 1];
+        int ans[][] = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                preSum[i + 1][j + 1] = preSum[i][j + 1] + preSum[i + 1][j] - preSum[i][j] + mat[i][j];
+            }
+        }
+
+        //2、遍历点
+//        i - k <= r <= i + k,
+//                j - k <= c <= j + k 且
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                //最最大和最小的点位坐标
+                int minRow = Math.max(0, i - k);
+                int maxRow = Math.min(m-1, i + k);
+
+                int minCol = Math.max(0, j - k);
+                int maxCol = Math.min(n-1, j + k);
+//                [minRow,minCol]---[maxRow,maxCol]
+                int sum = preSum[maxRow + 1][maxCol + 1] - preSum[maxRow + 1][minCol] - preSum[minRow][maxCol + 1] + preSum[minRow][minCol];
+                ans[i][j] = sum;
+            }
+        }
+//        for (int[] row:ans){
+//            System.out.println(Arrays.toString(row));
+//        }
+        return ans;
+    }
+
+
+    /**
+     * 3070. 元素和小于等于 k 的子矩阵的数目
+     * 给你一个下标从 0 开始的整数矩阵 grid 和一个整数 k。
+     *
+     * 返回包含 grid 左上角元素、元素和小于或等于 k 的
+     * 子矩阵
+     * 的数目。
+     * @param grid
+     * @param k
+     * @return
+     */
+    public static int countSubmatrices(int[][] grid, int k) {
+
+        int m=grid.length,n=grid[0].length;
+        int preSum[][]=new int[m+1][n+1];
+        int ans=0;
+        for (int i=0;i<m;i++){
+            for (int j=0;j<n;j++) {
+                preSum[i + 1][j + 1] = preSum[i][j + 1] + preSum[i + 1][j] - preSum[i][j] + grid[i][j];
+                //当前点的和小于等于k 则增加计数
+                if (preSum[i + 1][j + 1] <= k) {
+                    ans++;
+                }
+            }
+        }
+        return ans;
+    }
+
+    /**
+     * 方案二：降维处理；把二维的和降到一维，遍历每一行，把每一行的数字压缩到 一个列长的数组中，然后在遍历的同时计算当前的总和是否小于k，
+     * 如果小于+1，否则退出，因为都是正数，所以和会越来越大，后面的就没必要遍历了
+     * @param grid
+     * @param k
+     * @return
+     */
+    public int countSubmatrices2(int[][] grid, int k) {
+
+        int m=grid.length,n=grid[0].length;
+
+        int columnSum[]=new int[n];//列长度的和，主要存储把每一行的数字加到对应的列中，类似压缩的效果，这样就能起到了 累加
+        int ans=0;
+        for (int row[]:grid){
+            int sum=0;
+            //遍历row[] 变量中的每一个值
+            for (int j=0;j<n;j++){
+                columnSum[j]+=row[j];
+                sum+=columnSum[j];//累加当前列 到所有和中
+                if (sum>k){
+                    //后面的都不满足了，不需要在遍历
+                    break;
+                }
+                ans++;
+            }
+        }
+        return ans;
+    }
+
+    /**
+     * 1738. 找出第 K 大的异或坐标值
+     * 方案一：使用二维数组前缀亦或
+     * 方案二：使用列前缀亦或，降维处理
+     * @param matrix
+     * @param k
+     * @return
+     */
+    public static int kthLargestValue(int[][] matrix, int k) {
+
+        int m=matrix.length,n=matrix[0].length;
+        int [][] preXOrSum=new int[m+1][n+1];
+        List<Integer> list=new ArrayList<>();
+        int idx=0;
+        int [] arr=new int[m*n];
+        for (int i=0;i<m;i++){
+            for (int j=0;j<n;j++){
+                preXOrSum[i+1][j+1]=preXOrSum[i][j+1]^preXOrSum[i+1][j]^preXOrSum[i][j]^matrix[i][j];
+                list.add(preXOrSum[i+1][j+1]);
+                arr[idx++]=preXOrSum[i+1][j+1];
+            }
+        }
+        Collections.sort(list);
+        Arrays.sort(arr);
+        System.out.println(Arrays.toString(arr));
+        System.out.println(Arrays.toString(list.toArray()));
+        System.out.println(list.get(list.size()-k)+"========"+arr[k-1]);
+        return list.get(list.size()-k);
+    }
+
+    /**
+     * 使用列的亦或计算
+     * @param matrix
+     * @param k
+     * @return
+     */
+    public static int kthLargestValue2(int[][] matrix, int k) {
+
+        int m = matrix.length, n = matrix[0].length;
+        int[] xOrSum = new int[n];
+        List<Integer> list = new ArrayList<>(m * n);
+        for (int row[] : matrix) {
+            int tmpXor = 0;
+            for (int j = 0; j < n; j++) {
+                xOrSum[j] ^= row[j];
+                tmpXor ^= xOrSum[j];//累加当前列
+
+                list.add(tmpXor);
+            }
+        }
+
+        Collections.sort(list);
+        return list.get(list.size() - k);
+    }
+
+    /**
+     * 3212. 统计 X 和 Y 频数相等的子矩阵数量
+     * 方案一：使用二维前缀和 统计 x、y的个数，每次在进行判断
+     * 方案二：使用列的方式统计前缀次数
+     * @param grid
+     * @return
+     */
+    public int numberOfSubmatrices(char[][] grid) {
+
+        int m = grid.length, n = grid[0].length;
+        //可以使用三维：第三个维度长度是2，代表x、y元素的个数
+        int preCnt[][][] = new int[m + 1][n + 1][2];
+        int ans = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                //分别计算x、y个数的前缀次数
+                preCnt[i + 1][j + 1][0] = preCnt[i + 1][j][0] + preCnt[i][j + 1][0] - preCnt[i][j][0] + (grid[i][j] == 'X' ? 1 : 0);
+
+                preCnt[i + 1][j + 1][1] = preCnt[i + 1][j][1] + preCnt[i][j + 1][1] - preCnt[i][j][1] + (grid[i][j] == 'Y' ? 1 : 0);
+
+                if (preCnt[i + 1][j + 1][0] > 0 && preCnt[i + 1][j + 1][0] == preCnt[i + 1][j + 1][1]) {
+                    ans++;
+                }
+            }
+        }
+        return ans;
+    }
+
+    /**
+     * 列示计算
+     * @param grid
+     * @return
+     */
+    public int numberOfSubmatrices2(char[][] grid) {
+
+        int m = grid.length, n = grid[0].length;
+        //可以使用三维：第三个维度长度是2，代表x、y元素的个数
+        int preCnt[][]= new int[n ][2];
+        int ans = 0;
+        for (char[] row:grid) {
+            int cntX=0,cntY=0;
+            for (int j=0;j<n;j++){
+                preCnt[j][0]+=row[j]=='X'?1:0;
+                cntX+= preCnt[j][0];
+
+                preCnt[j][1]+=row[j]=='Y'?1:0;
+                cntY+= preCnt[j][1];
+                if (cntX>0&&cntX==cntY){
+                    ans++;
+                }
+            }
+        }
+        return ans;
+    }
+
+
+    /**
+     * 1292. 元素和小于等于阈值的正方形的最大边长
+     * 还是二维前缀和问题,先求前缀和，在倒序遍历min(m,n)，如果某个子矩阵的和小于法治，则返回当前的最大边长
+     * @param mat
+     * @param threshold
+     * @return
+     */
+    public  static int maxSideLength(int[][] mat, int threshold) {
+
+        int m = mat.length, n = mat[0].length;
+
+        int[][] preSum = new int[m + 1][n + 1];
+        int ans = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                preSum[i + 1][j + 1] = preSum[i + 1][j] + preSum[i][j + 1] - preSum[i][j] + mat[i][j];
+            }
+        }
+
+        //方案一：枚举最大的边，然后在枚举左上角顶点 时间复杂度是m*n*Min(m,n)
+//        for (int edge = Math.min(m, n); edge >= 1; edge--) {
+//            for (int i = 0; i < m; i++) {
+//                for (int j = 0; j < n; j++) {
+//                    //把当前点当做正方形的左上角，然后在求正方形的最大面积
+//                    int xx = i + edge - 1, yy = j + edge - 1;
+//
+//                    //越界处理
+//                    if (xx >= m || yy >= n) {
+//                        continue;
+//                    }
+//                    //
+//                    int sumArea = preSum[xx + 1][yy + 1] - preSum[xx + 1][j] - preSum[i][yy + 1] + preSum[i][j];
+//                    if (sumArea <= threshold) {
+//                        return edge;
+//                    }
+//                }
+//            }
+//        }
+
+//        方案二:使用二分法 处理最大边长 时间复杂度：O(MN∗logmin(M,N))
+//        int l = 1, r = Math.min(m, n);
+//        while (l <= r) {
+//            int middleEdge = l + (r - l) / 2;
+//            boolean find = false;
+//            for (int i = 0; !find && i < m; i++) {
+//                for (int j = 0; j < n; j++) {
+//                    //把当前点当做正方形的左上角，然后在求正方形的最大面积
+//                    int xx = i + middleEdge - 1, yy = j + middleEdge - 1;
+//                    //越界处理
+//                    if (xx >= m || yy >= n) {
+//                        continue;
+//                    }
+//                    //
+//                    int sumArea = preSum[xx + 1][yy + 1] - preSum[xx + 1][j] - preSum[i][yy + 1] + preSum[i][j];
+//                    if (sumArea <= threshold) {
+//                        find = true;
+//                        break;
+//                    }
+//                }
+//            }
+//            if (find) {
+//                ans = middleEdge;
+//                l = middleEdge + 1;
+//            } else {
+//                r = middleEdge - 1;
+//            }
+//        }
+        //方案三:外侧遍历顶点坐标，然后内部第三次循环遍历边长，但是有个优化：内部的边长 要在上一次的边长基础上进行+1遍历的，二不是从0开始遍历
+        //因为整个矩阵都是正数，因此他们的和从左上角到右下角都是递增的，因此，如果
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                //在上一次的基础上递增
+                for (int edge = ans + 1; edge <= Math.min(m, n); edge++) {
+                    //把当前点当做正方形的左上角，然后在求正方形的最大面积
+                    int xx = i + edge - 1, yy = j + edge - 1;
+                    //越界处理
+                    if (xx >= m || yy >= n) {
+                        continue;
+                    }
+                    int sumArea = preSum[xx + 1][yy + 1] - preSum[xx + 1][j] - preSum[i][yy + 1] + preSum[i][j];
+                    if (sumArea <= threshold) {
+                        ans = edge;
+                    }
+                    else {
+                        //因为当前边都不满足了，更何况更大的边呢
+                        break;
+                    }
+                }
+            }
+        }
+        return ans;
+    }
+
+
+    /**
+     * 方案一：可以使用动态规划：
+     * 方案二：使用二维前缀和+二分边长法
+     * @param matrix
+     * @return
+     */
+    public int maximalSquare(char[][] matrix) {
+
+        int m = matrix.length, n = matrix[0].length;
+
+        int preSum[][] = new int[m + 1][n + 1];
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                preSum[i + 1][j + 1] = preSum[i + 1][j] + preSum[i][j + 1] - preSum[i][j] + (matrix[i][j]=='1'?1:0);
+            }
+        }
+
+        int l = 0, r = Math.min(m, n), ans = 0;
+
+        while (l <= r) {
+            //二分判断中间 边长
+            int middle = l + (r - l) / 2;
+            boolean find = false;
+            for (int i = 0; !find && i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    int xx = i + middle - 1, yy = j + middle - 1;
+                    if (xx >= m || yy >= n) {
+                        continue;
+                    }
+                    int area = preSum[xx + 1][yy + 1] - preSum[xx + 1][j] - preSum[i][yy + 1] + preSum[i][j];
+                    if (area == middle * middle) {
+                        find = true;
+                        break;
+                    }
+                }
+            }
+            if (find) {
+                ans = middle;
+                l = middle + 1;
+            } else {
+                r = middle - 1;
+            }
+        }
+
+        return ans*ans;
+    }
+
+    /**
+     * 1277. 统计全为 1 的正方形子矩阵
+     * 根之前的题目一样：先计算二维前缀和，然后再遍历顶点，把顶点当做子矩阵的左上角，然后在二分查找子矩阵的最大边长
+     * 比如二分最大变成为5，则以这个点为子矩阵的 矩阵有5个，因为：最大变成为5说明 长宽为5的矩阵中全部都是1，那么以[i,j]为顶点的矩阵的 其他边长还可以是
+     * 5-1、5-2、5-3等子矩阵。这样计算出来的就没有重叠问题了
+     * @param matrix
+     * @return
+     */
+    public static int countSquares(int[][] matrix) {
+
+        int m = matrix.length, n = matrix[0].length;
+        int[][] preSum = new int[m + 1][n + 1];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                preSum[i + 1][j + 1] = preSum[i + 1][j] + preSum[i][j + 1] - preSum[i][j] + matrix[i][j];
+            }
+        }
+
+        int ans = 0;
+        //其实问题转化成了以顶点（i,j）为左上角顶点的最大正方形边长问题
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                //这个顶点都不是1，肯定不行
+                if (matrix[i][j] == 0) {
+                    continue;
+                }
+                //二分求最大边长问题：
+                int l = 1, r = Math.min(m - i, n - j), maxEdge = 0;
+                while (l <= r) {
+                    int midEdge = l + (r - l) / 2;
+                    //计算右下角的订单
+                    int xx = i + midEdge - 1, yy = j + midEdge - 1;
+                    int area = preSum[xx + 1][yy + 1] - preSum[xx + 1][j] - preSum[i][yy + 1] + preSum[i][j];
+                    if (area == midEdge * midEdge) {
+                        maxEdge = Math.max(maxEdge, midEdge);
+                        l = midEdge + 1;
+                    } else {
+                        r = midEdge - 1;
+                    }
+                }
+                ans += maxEdge;
+            }
+        }
+        return ans;
+    }
+
+
+    /**1504. 统计全 1 子矩形
+
+     * 子矩阵的个数
+     * 预处理前缀和，然后在遍历4个点，再次计算
+     * @param mat
+     * @return
+     */
+    public static int numSubmat(int[][] mat) {
+        int m=mat.length,n=mat[0].length;
+        int preSum[][]=new int[m+1][n+1];
+        for (int i=0;i<m;i++){
+            for (int j=0;j<n;j++){
+                preSum[i+1][j+1]=preSum[i+1][j]+preSum[i][j+1]-preSum[i][j]+mat[i][j];
+            }
+        }
+
+        //此种方法的时间复杂度太高M^2*n^2
+        int ans=0;
+//        for (int i=0;i<m;i++){
+//            for (int j=0;j<n;j++){
+//                if (mat[i][j]==0){
+//                    continue;
+//                }
+//                for (int p=i;p<m;p++){
+//                    for (int q=j;q<n;q++){
+//                        if (mat[p][q]==0){
+//                            continue;
+//                        }
+//                        //求矩阵的和
+//                        int area=preSum[p+1][q+1]-preSum[p+1][j]-preSum[i][q+1]+preSum[i][j];
+//                        if (area==(p-i+1)*(q-j+1)){
+//                            ans++;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+        //方案二：优化：我们固定了三个点之后，使用二分法 求最大的另一个点，然后他们之前的区域全是1 子矩阵的个数就是
+        for (int i=0;i<m;i++){
+            for (int j=0;j<n;j++){
+                if (mat[i][j]==0){
+                    continue;
+                }
+                for (int p=i;p<m;p++){
+                    if (mat[p][j]==0){
+                        continue;
+                    }
+                    //使用二分法来进行 求q的最大值
+                    int left=j,right=n-1;
+                    while (left<=right) {
+                        int middle = left + (right - left) / 2;
+                        //求矩阵的和
+                        int area = preSum[p + 1][middle + 1] - preSum[p + 1][j] - preSum[i][middle + 1] + preSum[i][j];
+                        if (area == (p - i + 1) * (middle - j + 1)) {
+                            left = middle + 1;
+                        } else {
+                            right = middle - 1;
+                        }
+                    }
+                    //
+                    ans+=left-j;
+                }
+            }
+        }
+        return ans;
+    }
+
+
+    /**
+     * 1074. 元素和为目标值的子矩阵数量
+     * 方案一：前缀和+枚举4个点:可以枚举右下角的点，然后在这个子矩阵中查找
+     * 方案二：枚举三个点， 然后使用map 维护左边遍历过的前缀和次数，然后在获取当前面积，到过去的map中查找 k-area 的次数
+     * @param matrix
+     * @param target
+     * @return
+     */
+    public int numSubmatrixSumTarget(int[][] matrix, int target) {
+
+        int m = matrix.length, n = matrix[0].length;
+//        int preSum[][] = new int[m + 1][n + 1];
+//        for (int i = 0; i < m; i++) {
+//            for (int j = 0; j < n; j++) {
+//                preSum[i + 1][j + 1] = preSum[i + 1][j] + preSum[i][j + 1] - preSum[i][j] + matrix[i][j];
+//            }
+//        }
+
+        int ans = 0;
+        // 方案一： 左上角的点
+//        for (int i = 0; i < m; i++) {
+//            for (int j = 0; j < n; j++) {
+//
+//                //右下角的点
+//                for (int p = i; p < m; p++) {
+//                    for (int q = j; q < n; q++) {
+//                        int area = preSum[p + 1][q + 1] - preSum[p + 1][j] - preSum[i][q + 1] + preSum[i][j];
+//                        if (area == target) {
+//                            ans++;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+//        方案二：枚举右下角的点，然后在枚举左上角的点
+//        for (int i = 0; i < m; i++) {
+//            for (int j = 0; j < n; j++) {
+//
+//                //右下角的点
+//                for (int p = 0; p <= i; p++) {
+//                    for (int q = 0; q <= j; q++) {
+//                        int area = preSum[i + 1][j + 1] - preSum[i + 1][q] - preSum[p][j + 1] + preSum[p][q];
+//                        if (area == target) {
+//                            ans++;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+        //方案三：使用枚举三条边+hash的方式
+        int [][] preSum=new int[m+1][n];//创建列的前缀和
+
+        for (int i=0;i<m;i++){
+            for (int j=0;j<n;j++){
+                preSum[i+1][j]=preSum[i][j]+matrix[i][j];
+            }
+        }
+
+        for (int first=0;first<m;first++){
+            for (int second=first;second<m;second++){
+                Map<Integer,Integer> numCounts=new HashMap<>();
+
+                numCounts.put(0,1);//表示和为0个的元素右一个：就是处理前缀preSum[0]=0;的问题
+                int sum=0;
+                //遍历列
+                for (int j=0;j<n;j++){
+                    int tmpSum=preSum[second+1][j]-preSum[first][j];
+                    sum+=tmpSum;
+                    //判断左边数组中是否存在这样的和
+                    if (numCounts.containsKey(sum-target)){
+                        ans+=numCounts.get(sum-target);
+                    }
+                    //维护左边已经遍历过的和的个数
+                    numCounts.put(sum,numCounts.getOrDefault(sum,0)+1);
+                }
+            }
+        }
+        return ans;
+    }
 }
+
+
