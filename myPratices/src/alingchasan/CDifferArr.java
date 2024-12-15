@@ -43,6 +43,7 @@ public class CDifferArr {
         ));
 
         System.out.println(splitPainting(new int[][]{{1,4,5},{1,4,7},{4,7,1},{4,7,11}}));
+        System.out.println(minimumOperations(new int[]{5,9,2,2},new int[]{7,9,3,8}));
 //        System.out.println(Arrays.toString(rawArr));
         // 2~5+1
     }
@@ -674,6 +675,47 @@ public class CDifferArr {
             diff[i + k] += current;//后一个数进行+1;
         }
         return true;
+    }
+
+    /**
+     * 3229. 使数组等于目标数组所需的最少操作次数
+     *总结:
+     *     1.前后元素数字符号不相同的时候
+     *            当前后元素数字符号不同的时候，前后计算毫无关联，下一元素所的变动的次数为该元素的绝对值
+     *      2.前后元素数字符号相同的时候（使用^结果>=判断是否符号相同）
+     *             a.当前元素的绝对值>前一个元素的绝对值:
+     *                 需要变化的次数 =  当前元素的绝对值 - 前一个元素的绝对值:
+     *             b.当前元素的绝对值<=前一个元素的绝对值:
+     *                 需要变化的次数 = 0
+     * @param nums
+     * @param target
+     * @return
+     */
+    public static long minimumOperations(int[] nums, int[] target) {
+        int n = nums.length;
+        int[] diff = new int[n];
+        //使用目标数组减去 之前的数组，计算差值
+        diff[0] = target[0] - nums[0];
+        long cnt = Math.abs(diff[0]);
+        for (int i = 1; i < n; i++) {
+            diff[i] = target[i] - nums[i];
+            if ((diff[i] ^ diff[i - 1]) >= 0) {
+                //两者是同符号的符号
+                if (diff[i]==1){
+                    System.out.println();
+                }
+                System.out.println(diff[i]+";;;"+diff[i-1]);
+                if (Math.abs(diff[i]) >= Math.abs(diff[i - 1])) {
+                    //当前元素比之前元素高，因此需要多几个操作，让他变成0
+                    cnt += Math.abs(diff[i]) - Math.abs(diff[i - 1]);
+                } else {
+                    //当前元素没有之前元素高，因此修改前面的元素的同时 可以把他顺便修改了
+                }
+            } else {
+                cnt += Math.abs(diff[i]);
+            }
+        }
+        return cnt;
     }
     /**
      * 731. 我的日程安排表 II
