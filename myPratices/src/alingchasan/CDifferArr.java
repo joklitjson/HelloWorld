@@ -646,6 +646,36 @@ public class CDifferArr {
 
 
     /**
+     * 2772. 使数组中的所有元素都等于零
+     * 先求差分数组，如果差分数组的元素大于0，则进行 -t操作，并更新i+k的差分值+t，
+     * 如果某个值已经被操作小于0了或者长度不足k了在，则返回false
+     * @param nums
+     * @param k
+     * @return
+     */
+    public boolean checkArray(int[] nums, int k) {
+
+        int n = nums.length;
+        int diff[] = new int[n+1];
+        int sum = 0;
+        for (int i = 0; i < n; i++) {
+            sum += diff[i];//统计差分值
+            int current=sum + nums[i];
+            //不需要计算
+            if (current == 0) {
+                continue;
+            }
+            //当前值都是负数了，或者当前i 后的k个长度已经超过了数组长度，因此不能继续操作l
+            if (current< 0 || i + k > n) {
+                return false;
+            }
+            sum -=  (current);//需要再第i个位置上减去 sum+nums[i] 个数字
+            sum=sum+ 0-current;
+            diff[i + k] += current;//后一个数进行+1;
+        }
+        return true;
+    }
+    /**
      * 731. 我的日程安排表 II
      */
     class MyCalendarTwo {
