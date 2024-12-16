@@ -671,7 +671,6 @@ public class CDifferArr {
                 return false;
             }
             sum -=  (current);//需要再第i个位置上减去 sum+nums[i] 个数字
-            sum=sum+ 0-current;
             diff[i + k] += current;//后一个数进行+1;
         }
         return true;
