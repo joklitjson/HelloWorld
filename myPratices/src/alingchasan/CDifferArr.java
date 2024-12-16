@@ -4,6 +4,7 @@ import java.util.*;
 
 /**
  * 差分数组
+ * 一般都使用数组作为differ，但如果区间的范围较大，可以使用有序的map(treemap),然后在从头遍历 map 进行统计
  */
 public class CDifferArr {
 
@@ -700,10 +701,6 @@ public class CDifferArr {
             diff[i] = target[i] - nums[i];
             if ((diff[i] ^ diff[i - 1]) >= 0) {
                 //两者是同符号的符号
-                if (diff[i]==1){
-                    System.out.println();
-                }
-                System.out.println(diff[i]+";;;"+diff[i-1]);
                 if (Math.abs(diff[i]) >= Math.abs(diff[i - 1])) {
                     //当前元素比之前元素高，因此需要多几个操作，让他变成0
                     cnt += Math.abs(diff[i]) - Math.abs(diff[i - 1]);
