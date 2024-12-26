@@ -1,5 +1,7 @@
 package alingchasan;
 
+import org.omg.CORBA.INTERNAL;
+
 import java.util.*;
 
 /**
@@ -45,6 +47,9 @@ public class CDifferArr {
 
         System.out.println(splitPainting(new int[][]{{1,4,5},{1,4,7},{4,7,1},{4,7,11}}));
         System.out.println(minimumOperations(new int[]{5,9,2,2},new int[]{7,9,3,8}));
+
+        System.out.println("maxFrequency==="+maxFrequency(new int[]{5,11,20,20},5,1));
+        System.out.println("maxFrequency==="+maxFrequency(new int[]{5,64},42,2));
 //        System.out.println(Arrays.toString(rawArr));
         // 2~5+1
     }
@@ -713,6 +718,119 @@ public class CDifferArr {
         }
         return cnt;
     }
+
+
+    /**
+     * 3347. 执行操作后元素的最高频率 II
+     * 方案：先进行排序，然后在遍历，把遍历中的每个数字当做 频率最高的来计算，然后统计 区间 [target-k,target+k] 的元素数量，这个可能就是最大的频率了
+     *
+     * @param nums
+     * @param k
+     * @param numOperations
+     * @return
+     */
+    public static int maxFrequency(int[] nums, int k, int numOperations) {
+        int n = nums.length;
+        Arrays.sort(nums);
+        Map<Integer, Integer> numCntMap = new HashMap<>();
+        int min=nums[0]-k;
+        int max=nums[n-1]+k;
+        for (int val : nums) {
+            //统计他们的频率
+            numCntMap.merge(val, 1, Integer::sum);
+        }
+
+        int maxFre = 0;
+//        方案一：当前方法只能找到频率是在数组中的元素
+//        for (int i = 0; i < n; i++) {
+//            //查找 value=i-k的最左侧的值， 查找i+k最右侧的值
+//            int target = nums[i];
+//            int left = lowerBound(nums, target-k);
+//            int right = upperBound(nums, target+k);
+//            int numFre = numCntMap.get(target);
+//            maxFre = Math.max(maxFre, Math.min(numOperations, (right - left - numFre)) + numFre);
+//        }
+
+        //方案二:还可以找到频率不是在数组中的元素
+        for (int val = min; val<=max; val++) {
+            //查找 value=i-k的最左侧的值， 查找i+k最右侧的值
+            int target = val;
+            int left = lowerBound(nums, target-k);
+            int right = upperBound(nums, target+k);
+            int numFre = numCntMap.getOrDefault(target,0);
+            maxFre = Math.max(maxFre, Math.min(numOperations, (right - left - numFre)) + numFre);
+        }
+        return maxFre;
+    }
+
+
+    /**
+     * 798. 得分最高的最小轮调
+     * 方案“：计算每个数 可以得分的最小和最大 论调次数，然后加入到差分数组中，然后统计差分数组中的最高得分的频率
+     * @param nums
+     * @return
+     */
+    public int bestRotation(int[] nums) {
+
+        int n=nums.length;
+        int [] diff=new int[n+1];
+
+        for (int i=0;i<n;i++){
+            int min=(i+1)%n;//最小论调次数
+            int max=(i+n-nums[i]+1)%n;//最大论调次数
+
+            diff[min]++;
+            diff[max]--;
+
+            //夸0 区间了
+            if (min>=max){
+                diff[0]++;
+            }
+        }
+
+        int maxScore=0;
+        int currentScore=0;
+        int bastIndex=0;
+        //还原数组，然后统计最大的得分
+        for (int i=0;i<n;i++){
+            currentScore+=diff[i];
+            //需要选择最小的论调次数
+            if (currentScore>maxScore){
+                bastIndex=i;
+                maxScore=currentScore;
+            }
+        }
+        return bastIndex;
+    }
+
+    private static int lowerBound(int[] nums,int target) {
+        int left = 0, right = nums.length;
+
+        while (left < right) {
+            int middle = left + (right - left) / 2;
+            if (target <= nums[middle]) {
+                right = middle;
+            } else {
+                left = middle + 1;
+            }
+        }
+        return left;
+    }
+
+    private static int  upperBound(int[] nums,int target) {
+        int left = 0, right = nums.length;
+
+        while (left < right) {
+            int middle = left + (right - left) / 2;
+            if (target >= nums[middle]) {
+                left = middle+1;
+            } else {
+                right = middle;
+            }
+        }
+        return left;
+    }
+
     /**
      * 731. 我的日程安排表 II
      */
