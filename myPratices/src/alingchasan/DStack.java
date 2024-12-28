@@ -418,6 +418,65 @@ public class DStack {
     }
 
     /**
+     * 2589. 完成所有任务的最少时间
+     * 贪心+排序
+     * 方案：先按照end 进行排序，然后遍历每个task，在统计 每个task 窗口能已经运行的程序数量，如果不足，则从右相左的时间执行程序
+     * 为啥设置从右相左？因为后面的任务 可能利用最右侧的时间任务
+     * @param tasks
+     * @return
+     */
+    public int findMinimumTime(int[][] tasks) {
+
+        Arrays.sort(tasks,(a,b)->a[1]-b[1]);
+        int taskExe[]=new int[2001];//创建一个时间轴：记录某个时间是否有任务执行
+        int ans=0;//执行任务需要的时间
+        for (int [] task:tasks){
+
+            int start=task[0];
+            int end=task[1];
+            int duration=task[2];
+            for (int i=start;i<=end;i++){
+                // 如果当前位置有任务执行，则可以把一个任务量放在这个时间执行
+                duration-=taskExe[i];
+            }
+            //如果还有剩余任务，则优先放在右侧执行
+            for (int i=end;i>=start&&duration>0;i--){
+                //表示没任务执行:在次数放置一个任务
+                if (taskExe[i]==0){
+                    taskExe[i]=1;
+                    duration--;
+                    ans++;
+                }
+            }
+        }
+        return ans;
+    }
+
+
+    /**
+     * 2696. 删除子串后的字符串最小长度
+     * 临项消除：
+     * @param s
+     * @return
+     */
+    public int minLength(String s) {
+        Stack<Character> stack=new Stack<>();
+        for (int i=0;i<s.length();i++){
+            if (stack.isEmpty()){
+                stack.push(s.charAt(i));
+            }
+            else {
+                if ((stack.peek()=='A'&&s.charAt(i)=='B')||(stack.peek()=='C'&&s.charAt(i)=='D')){
+                    stack.pop();
+                }
+                else {
+                    stack.push(s.charAt(i));
+                }
+            }
+        }
+        return stack.size();
+    }
+    /**
      * 1172. 餐盘栈
      * 解决方案：记录pop的下标，在记录左侧非空栈的下标，
      */
