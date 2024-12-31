@@ -1,11 +1,11 @@
 package alingchasan;
 
-import org.omg.CORBA.INTERNAL;
-
 import java.util.*;
 
 /**
  * 栈题目：可以使用栈进行模拟、也可以使用数组、StringBuilder进行模拟
+ *
+ * 判断括号的有效性：可以使用 计数法、模拟栈
  */
 public class DStack {
 
@@ -53,8 +53,13 @@ public class DStack {
         System.out.println(removeDuplicates("deeedbbcccbdaa",3));
         System.out.println("countCollisions=="+countCollisions("SSRSSRLLRSLLRSRSSRLRRRRLLRRLSSRR"));
 
-        System.out.println("asteroidCollision=="+Arrays.toString(asteroidCollision(new int[]{10,2,-5})));
+//        System.out.println("asteroidCollision=="+Arrays.toString(asteroidCollision(new int[]{10,2,-5})));
+
+//        System.out.println("survivedRobotsHealths"+Arrays.toString(survivedRobotsHealths(new int[]{3,5,2,6},new int[]{10,10,15,12},"RLRL").toArray())) ;
+
+        System.out.println(scoreOfParentheses("(()(()))"));
     }
+
 
 
     /**
@@ -778,6 +783,296 @@ public class DStack {
     public int minDeletion(int[] nums) {
         return 0;
     }
+
+
+    /**
+     * 2751. 机器人碰撞
+     *
+     * 先按位置进行排序，然后在使用模拟栈的方式：让每个机器人进栈后的情况
+     * @param positions
+     * @param healths
+     * @param directions
+     * @return
+     */
+    public static List<Integer> survivedRobotsHealths(int[] positions, int[] healths, String directions) {
+
+        int [][] robots=new int[positions.length][4];//构造一个4元组：机器人id、位置、健康度、方向
+        for (int i=1;i<=positions.length;i++){
+            robots[i-1]=new int[]{i,positions[i-1],healths[i-1],directions.charAt(i-1)=='R'?1:-1};
+        }
+        //然后在按照位置排序
+        Arrays.sort(robots,(a,b)->a[1]-b[1]);
+
+        Stack<int[]> stack=new Stack<>();
+
+        //这里类似星球碰撞
+        for (int[] robot:robots){
+            //判断是否需要添加
+            boolean needAdd=true;
+            while (needAdd&&!stack.isEmpty()&&stack.peek()[3]>0&&robot[3]<0){
+                if (stack.peek()[2]==robot[2]){
+                    //健康度相同则进行都移除
+                    stack.pop();
+                    needAdd=false;
+                    break;
+                }
+                else  if (stack.peek()[2]<robot[2]){
+                    //当前健康度比较大
+                    stack.pop();
+                    robot[2]=robot[2]-1;
+                }
+                else {
+                    //当前健康度比较小
+                    stack.peek()[2]--;
+                    needAdd=false;
+                    break;
+                }
+            }
+           if (needAdd){
+               stack.push(robot);
+           }
+        }
+
+        int [][]result=new int[stack.size()][4];
+        int i=0;
+        while (!stack.isEmpty()){
+            result[i++]=stack.pop();
+        }
+        //按编号排序
+        Arrays.sort(result,(a,b)->a[0]-b[0]);
+        List<Integer> ans=new ArrayList<>();
+        for (int [] robot:result) {
+            ans.add(robot[2]);
+        }
+
+        return ans;
+    }
+
+
+    /**
+     * 921. 使括号有效的最少添加
+     * 将[有效括号] 转换成 [分值有效性]的数学判定,遇到 ( +1, ) -1,遍历过程中  如果小于零 则需要补充 abs(score) 个左括号
+     * 遍历结束：还需要再补充 score个右括号(以上过程一直在补左括号，因此肯定是左括号要大于右括号的)
+     * @param s
+     * @return
+     */
+    public int minAddToMakeValid(String s) {
+        int score = 0;
+        int ans = 0;
+        //
+        for (int i = 0; i < s.length(); i++) {
+
+            score += s.charAt(i) == '(' ? 1 : -1;
+
+            if (score < 0) {
+                //补充 左括号
+                ans += Math.abs(score);
+            }
+        }
+        //补充右括号
+        ans += score;
+        return ans;
+    }
+
+    /**
+     * 1614. 括号的最大嵌套深度
+     * 使用分数法：遇到（ +1，遇到 ） -1,遍历过程 中 求最大值
+     * @param s
+     * @return
+     */
+    public int maxDepth(String s) {
+        int score = 0, maxDep = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '(') {
+                score++;
+            } else if (s.charAt(i) == ')') {
+                score--;
+            }
+            maxDep = Math.max(maxDep, score);
+        }
+        return maxDep;
+    }
+
+    /**
+     * 1190. 反转每对括号间的子串
+     * 解决方案：遇到（ 需要把临时字符串 插入栈中，遇到 ），则翻转临时字符串中的字符，然后再把栈顶元素弹出 拼接到字符串头部
+     * @param s
+     * @return
+     */
+    public String reverseParentheses(String s) {
+        StringBuilder stringBuilder = new StringBuilder();
+        Stack<String> stack = new Stack<>();
+
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '(') {
+                //把字符 暂存在栈中
+                stack.push(stringBuilder.toString());
+                stringBuilder.setLength(0);
+            } else if (c == ')') {
+                //翻转当前端的字符
+                stringBuilder.reverse();
+                //把之前暂存的字符放在当前字符头部? 这样做的目的主要是为了下次遇到 )字符进行再次翻转
+                stringBuilder.insert(0, stack.pop());
+            } else {
+                //存在临时字符中
+                stringBuilder.append(c);
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+
+
+
+    /**
+     * 1190. 反转每对括号间的子串
+     * 先预处理 左右括号的对应位置，然后在进行遍历，以及遇到括号进行方向遍历翻转
+     * @param s
+     * @return
+     */
+    public String reverseParentheses2(String s) {
+
+        int[] pair = new int[s.length()];//记录每个括号的对应 括号的位置
+        Stack<Integer> stack = new Stack<Integer>();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '(') {
+                stack.push(i);
+            } else if (c == ')') {
+                int j = stack.pop();
+                //记录对应位置
+                pair[i] = j;
+                pair[j] = i;
+            }
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        //进行遍历
+        int idx = 0;
+        int step = 1;//步长的正负 代表了遍历的方向
+        while (idx < s.length()) {
+            char c = s.charAt(idx);
+            if (c == '(' || c == ')') {
+                idx = pair[idx];//
+                step = -step;//翻转方向
+            } else {
+                stringBuilder.append(c);
+            }
+            //增加步长
+            idx += step;
+        }
+        return stringBuilder.toString();
+    }
+
+
+    /**
+     * 856. 括号的分数
+     * 方案：每次遇到 ( 增加一个0进去，遇到 ) 在看栈顶的元素是否是0，如果是0，则是 ()形式，如果不是零 ，则是(A)形式 需要2*A,最后在累加就行
+     * 简单的栈应用不简单，利用先进后出的性质，可以让栈中永远多一个元素，用来存储最后的答案，
+     * 栈顶记录答案，实时修改。更像是个数学问题，栈顶记录的是层数，遇到第一个反括号的时候，表示来到了最里面一层。
+     * @param s
+     * @return
+     */
+    public static int scoreOfParentheses(String s) {
+        Stack<Integer> stack=new Stack<>();
+        stack.push(0);//添加一个0
+        for (int i=0;i<s.length();i++){
+            if (s.charAt(i)=='('){
+                stack.push(0);
+            }
+            else {
+                if (stack.peek()==0){
+                    stack.pop();//弹出之前的(
+                    stack.push(stack.pop()+1);
+                }
+                else {
+                    //乘以两倍
+                    int result=stack.pop()*2;
+//                    将其新得分累加到栈顶元素上
+                    stack.push(stack.pop()+result);//同时进行累加之前的结果
+                }
+            }
+        }
+        return stack.peek();
+    }
+
+
+    /**
+     * 1249. 移除无效的括号
+     * 方案一：使用模拟栈，匹配括号，把匹配的括号直接弹出，然后栈中剩下的就是 未匹配的括号 则可以移除
+     * 方案二：使用计数器代替栈，遍历途中发现 balance 小于0，则抛弃当前的 ),结束后 如果balance 不等于0，则倒序删除多余(
+     * @param s
+     * @return
+     */
+    public String minRemoveToMakeValid(String s) {
+//        Stack<Integer> stack = new Stack<>();
+//        for (int i = 0; i < s.length(); i++) {
+//            char c = s.charAt(i);
+//            if (c == '(' || c == ')') {
+//                if (stack.isEmpty()) {
+//                    stack.push(i);
+//                } else {
+//                    if (s.charAt(stack.peek()) == '(' && c == ')') {
+//                        stack.pop();
+//                    } else {
+//                        stack.push(i);
+//                    }
+//                }
+//            }
+//        }
+//        //记录需要删除的索引id
+//        Set<Integer> removeIdx = new HashSet<>();
+//        while (!stack.isEmpty()) {
+//            removeIdx.add(stack.pop());
+//        }
+//        //遍历元素
+//        StringBuilder stringBuilder = new StringBuilder();
+//        for (int i = 0; i < s.length(); i++) {
+//            if (!removeIdx.contains(i)) {
+//                stringBuilder.append(s.charAt(i));
+//            }
+//        }
+//        return stringBuilder.toString();
+
+
+        int balance=0;
+        StringBuilder stringBuilder=new StringBuilder();
+        for (int i=0;i<s.length();i++){
+            char c=s.charAt(i);
+            if (c=='('){
+                balance++;
+                stringBuilder.append(c);
+            }
+            else if (c==')'){
+                balance--;
+                if (balance<0){
+//                    )字符太多了 ，需要删除
+                    balance=0;
+                }
+                else {
+                    stringBuilder.append(c);
+                }
+            }
+            else {
+                //正常的字符
+                stringBuilder.append(c);
+            }
+        }
+
+        int idx=stringBuilder.length()-1;
+        //删除多余的 (
+        while (balance!=0){
+            //需要倒序删除
+            if (stringBuilder.charAt(idx)=='('){
+                balance--;
+                stringBuilder.deleteCharAt(idx);
+            }
+            idx--;
+        }
+        return stringBuilder.toString();
+    }
+
 
     /**
      * 1172. 餐盘栈
