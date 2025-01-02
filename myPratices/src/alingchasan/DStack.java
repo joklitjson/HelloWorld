@@ -1,7 +1,5 @@
 package alingchasan;
 
-import org.omg.CORBA.INTERNAL;
-
 import java.util.*;
 
 /**
@@ -59,7 +57,12 @@ public class DStack {
 
 //        System.out.println("survivedRobotsHealths"+Arrays.toString(survivedRobotsHealths(new int[]{3,5,2,6},new int[]{10,10,15,12},"RLRL").toArray())) ;
 
-        System.out.println(scoreOfParentheses("(()(()))"));
+//        System.out.println(scoreOfParentheses("(()(()))"));
+        System.out.println(clumsy(4));
+        System.out.println(clumsy2(4));
+
+//        System.out.println(new DStack().calculate("(31+11*23)"));
+        System.out.println(new DStack().calculate("2-4-(8+2-6+(8+4-(1)+8-10))"));
     }
 
 
@@ -1190,6 +1193,212 @@ public class DStack {
 
 
     /**
+     * 1006. 笨阶乘
+     * 解决方案：优先计算乘除，然后在加减。如果是乘除 则弹出栈顶元素和当前元素计算，然后在入栈，如果是减则，弹出栈顶元素在取反，在入栈。最后把占中所有的元素进行累加
+     *
+     * @param n
+     * @return
+     */
+    public static int clumsy(int n) {
+        Stack<Integer> stack = new Stack<>();
+        stack.push(n);
+        n--;
+        int operator = 0;//代表* / + -
+        while (n > 0) {
+            if (operator == 0) {
+                stack.push(stack.pop() * n);
+            } else if (operator == 1) {
+                stack.push(stack.pop() / n);
+            } else if (operator == 2) {
+                stack.push(n);
+            } else if (operator == 3) {
+                stack.push(-n);
+            }
+            n--;
+            //在进行循环
+            operator = ++operator % 4;
+        }
+        int sum = 0;
+        while (!stack.isEmpty()) {
+            sum += stack.pop();
+        }
+        return sum;
+    }
+
+
+    /**
+     * 使用通用模板：双栈的结构，一个存数字 一个存运算符号,【只有「栈内运算符」比「当前运算符」优先级高/同等，才进行运算】
+     * https://leetcode.cn/problems/clumsy-factorial/solutions/693194/gong-shui-san-xie-tong-yong-biao-da-shi-nngfp/
+     * @param n
+     * @return
+     */
+    public static int clumsy2(int n) {
+
+        char opts[] = new char[]{'*', '/', '+', '-'};
+        Stack<Integer> numberStack = new Stack<>();
+        Stack<Character> optStack = new Stack<>();
+
+        //定义运算法优先级
+        Map<Character, Integer> map = new HashMap<>();
+        map.put('*', 2);
+        map.put('/', 2);
+        map.put('+', 1);
+        map.put('-', 1);
+
+        for (int i = n, j = 0; i > 0; i--, j++) {
+            numberStack.push(i);
+            char op = opts[j%4];
+            //栈内运算法 大于后面的运算法
+            while (!optStack.isEmpty() && map.get(optStack.peek()) >= map.get(op)) {
+                calc(numberStack, optStack);
+            }
+            if (i != 1) {
+                optStack.push(op);
+            }
+        }
+
+        //如果栈内还有元素 没算完 继续算
+        while (!optStack.isEmpty()) {
+            calc(numberStack, optStack);
+        }
+        return numberStack.peek();
+    }
+
+    private static void  calc(  Stack<Integer> numberStack,Stack<Character> optStack){
+        int b=numberStack.pop();
+        int a=numberStack.pop();
+        Character character=  optStack.pop();
+        if (character.equals('*')){
+            numberStack.push(a*b);
+        }
+        else if (character.equals('/')){
+            numberStack.push(a/b);
+        }
+        else if (character.equals('+')){
+            numberStack.push(a+b);
+        }
+        else if (character.equals('-')){
+            numberStack.push(a-b);
+        }
+    }
+
+
+    /**
+     * 224. 基本计算器
+     * 可以使用双栈，然后把数字和运算法分别统计在两个栈中，类似逆波兰计算法
+     * @param s
+     * @return
+     */
+    public int calculate(String s) {
+
+        //定义优先级
+        Map<Character, Integer> map = new HashMap(){{
+            put('-', 1);
+            put('+', 1);
+            put('*', 2);
+            put('/', 2);
+            put('%', 2);
+            put('^', 3);
+        }};
+
+        s=s.replace(" ","");
+        Stack<Integer> numberStack=new Stack<>();
+
+        // 例如 -1 + 2 情况
+        numberStack.push(0);//防止第一个是-号或者其他符号位
+        Stack<Character> optStack=new Stack<>();
+
+        int n=s.length();
+        for (int i=0;i<n;i++){
+            char c=s.charAt(i);
+            if (c=='('){
+                optStack.push(c);
+            }
+            else if (Character.isDigit(c)){
+                //是数字
+                int j=i;
+                //获取完整的数字
+                int num=0;
+                while (j<n&&Character.isDigit(s.charAt(j))){
+                    num=num*10+(s.charAt(j)-'0');
+                    j++;
+                }
+                numberStack.push(num);
+                i=j-1;//需要返回到最后一个数字的位置
+
+            }
+            else if (c==')'){
+                while (!optStack.isEmpty()){
+                    if (optStack.peek()=='('){
+                        //弹出这个 (括号
+                        optStack.pop();
+                        break;
+                    }
+                    else {
+                        calc2(numberStack,optStack);
+                    }
+                }
+            }
+            else {
+                // 为防止 () 内出现的首个字符为运算符，将 (- 替换为 (0-，(+ 替换为 (0+
+                if (i>0&&(s.charAt(i-1)=='('||s.charAt(i-1)=='+'||s.charAt(i-1)=='-')){
+                    numberStack.push(0);
+                }
+
+                //如果当前栈顶优先级高于当前优先级 则可以进行计算
+                while (!optStack.isEmpty()&&optStack.peek()!='('){
+                    char preOpt=optStack.peek();
+                    if (map.get(preOpt)>=map.get(c)){
+                        calc2(numberStack,optStack);
+                    }
+                    else {
+                        break;
+                    }
+                }
+                //把当前符号进入
+                optStack.push(c);
+
+            }
+        }
+
+        //还有多余的运算符
+        while (!optStack.isEmpty()){
+            calc2(numberStack,optStack);
+        }
+        return numberStack.peek();
+    }
+
+    private void  calc2( Stack<Integer> numberStack, Stack<Character> optStack){
+        if (numberStack.size()<2||optStack.isEmpty()){
+            return;
+        }
+        int b=numberStack.pop();
+        int a=numberStack.pop();
+        Character opt=optStack.pop();
+
+        int result=0;
+        if (opt=='*'){
+            result=a*b;
+        }
+        else if (opt=='/'){
+            result=a/b;
+        }
+        else if (opt=='%'){
+            result=a%b;
+        }
+        else if (opt=='^'){
+            result= (int) Math.pow(a,b);
+        }
+        else if (opt=='+'){
+            result=a+b;
+        }
+        else if (opt=='-'){
+            result=a-b;
+        }
+        numberStack.push(result);
+
+    }
+    /**
      * 1172. 餐盘栈
      * 解决方案：记录pop的下标，在记录左侧非空栈的下标，
      */
@@ -1267,3 +1476,4 @@ public class DStack {
         }
     }
 }
+
