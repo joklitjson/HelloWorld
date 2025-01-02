@@ -7,7 +7,7 @@ import java.util.PriorityQueue;
 
 public class Prim {
 
-    //优先级队列 sanyuanzu from to weight
+    //优先级队列 三元组 from to weight
     PriorityQueue<Integer[]> priorityQueue;
 
     boolean inSmt[];

@@ -1,5 +1,7 @@
 package alingchasan;
 
+import org.omg.CORBA.INTERNAL;
+
 import java.util.*;
 
 /**
@@ -861,12 +863,11 @@ public class DStack {
         int ans = 0;
         //
         for (int i = 0; i < s.length(); i++) {
-
             score += s.charAt(i) == '(' ? 1 : -1;
-
             if (score < 0) {
                 //补充 左括号
                 ans += Math.abs(score);
+                score=0;
             }
         }
         //补充右括号
@@ -922,7 +923,121 @@ public class DStack {
         return stringBuilder.toString();
     }
 
+    /**
+     * 1963. 使字符串平衡的最小交换次数
+     * 使用贪心的思想：题目中 [ 、]数量相等，因此我们可以使用计数的方式 计算，如果 遇到)时 cnt==0，则说明此事需要和后面的一个]进行交换
+     * @param s
+     * @return
+     */
+    public int minSwaps(String s) {
 
+        int balance = 0, ans = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '[') {
+                balance++;
+            } else if (c == ']') {
+                if (balance > 0) {
+                    balance--;
+                } else {
+//                    此时balance==0，这里需要进行和后面的]进行一次交换
+                    balance++;
+                    ans++;
+
+                }
+            }
+        }
+        //类似这段代码
+//        Deque<Character> stack = new ArrayDeque<>();
+//        for (char c : chars) {
+//            if (c == '[') {
+//                stack.push(c);
+//            } else {
+//                if (stack.isEmpty()) {
+//                    res++;
+//                    stack.push('[');
+//                } else {
+//                    stack.pop();
+//                }
+//            }
+//        }
+        return ans;
+    }
+
+
+    /**
+     * 678. 有效的括号字符串
+     * 方案：使用两个栈，第一个栈存储左括号的下表，第二个存储*的下表，遍历中间在进行对冲
+     * 遍历结束后，判断他们两个是否有值，总之就是需要把stack栈的元素消耗完成
+     * @param s
+     * @return
+     */
+    public boolean checkValidString(String s) {
+        Stack<Integer> stack1 = new Stack<>();
+        Stack<Integer> stack2 = new Stack<>();
+
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '(') {
+                stack1.push(i);
+            }
+           else if (c == '*') {
+                stack2.push(i);
+            }
+            else if (c == ')') {
+                if (stack1.isEmpty()) {
+                    if (!stack2.isEmpty()) {
+                        //使用一个*当做 (,对冲 当前的 )
+                        stack2.pop();
+                    } else {
+                        //已经不平衡了
+                        return false;
+                    }
+                } else {
+                    stack1.pop();
+                }
+            }
+        }
+        while (!stack1.isEmpty() && !stack2.isEmpty()) {
+            int leftIdx = stack1.pop();
+            int startIdx = stack2.pop();
+            //*号在 （的左边，因此不能进行对冲，所以返回false
+            if (startIdx < leftIdx) {
+                return false;
+            }
+        }
+        // *浩已经对冲完了，再看看(是否为空
+        return stack1.isEmpty();
+    }
+
+
+    /**
+     * 32. 最长有效括号
+     * 我们始终保持栈底元素为当前已经遍历过的元素中「最后一个没有被匹配的右括号的下标」，这样的做法主要是考虑了边界条件的处理，栈里其他元素维护左括号的下标：
+     * 因此遇到 (时需要向栈中加入当前的 索引，遇到)时判断当前栈是否为空，如果是空 则新开辟一个新的开始，否则就是拿当前的i减去栈顶的元素：计算当前最大长度
+     * @param s
+     * @return
+     */
+    public int longestValidParentheses(String s) {
+
+        int max = 0;
+        Stack<Integer> stack = new Stack<>();
+        stack.push(-1);//表示左边不匹配的 ）的索引是-1位
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '(') {
+                stack.push(i);
+            } else {
+                stack.pop();
+                if (stack.isEmpty()) {
+                    stack.push(i);//开启新的开始
+                } else {
+                    max = Math.max(max, i - stack.peek());
+                }
+            }
+        }
+        return max;
+    }
 
 
     /**
@@ -1047,7 +1162,7 @@ public class DStack {
             else if (c==')'){
                 balance--;
                 if (balance<0){
-//                    )字符太多了 ，需要删除
+//                    )字符太多了 ，需要删除,因此当前的 )就不需要再加入到答案中了
                     balance=0;
                 }
                 else {
