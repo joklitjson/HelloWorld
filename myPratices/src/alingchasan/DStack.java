@@ -62,7 +62,12 @@ public class DStack {
         System.out.println(clumsy2(4));
 
 //        System.out.println(new DStack().calculate("(31+11*23)"));
-        System.out.println(new DStack().calculate("2-4-(8+2-6+(8+4-(1)+8-10))"));
+//        System.out.println(new DStack().calculate("2-4-(8+2-6+(8+4-(1)+8-10))"));
+
+//        System.out.println(new DStack().countOfAtoms("Be32"));
+
+        System.out.println(parseBoolExpr("!(&(f,t))"));
+
     }
 
 
@@ -1341,6 +1346,7 @@ public class DStack {
             }
             else {
                 // 为防止 () 内出现的首个字符为运算符，将 (- 替换为 (0-，(+ 替换为 (0+
+//                防止连续两个运算符号比如：(-  -(  *(
                 if (i>0&&(s.charAt(i-1)=='('||s.charAt(i-1)=='+'||s.charAt(i-1)=='-')){
                     numberStack.push(0);
                 }
@@ -1397,6 +1403,145 @@ public class DStack {
         }
         numberStack.push(result);
 
+    }
+
+
+    /**
+     * 726. 原子的数量
+     * 理清楚概念：什么是原子？一个大写字母后面跟着n个小写字符。
+     * 在遍历字符串：解析原子符号，并且记录原子字符串的数量。同时在结合 （）运算，因此使用栈和hash的方式
+     * @param formula
+     * @return
+     */
+    public String countOfAtoms(String formula) {
+
+
+
+        Stack<Map<String, Integer>> stack = new Stack<>();
+        stack.push(new HashMap<>());
+        int i = 0, n = formula.length();
+        while (i < n) {
+            char c = formula.charAt(i);
+            if (c == '(') {
+                stack.push(new HashMap<>());
+                i++;
+            } else if (c == ')') {
+                //结束符合
+
+                //读取数字
+                int num = 0;
+                if (i + 1 < n && Character.isDigit(formula.charAt(i+1))) {
+                    i++;
+                    while (i < n && Character.isDigit(formula.charAt(i))) {
+                        num = num * 10 + (formula.charAt(i++) - '0');
+                    }
+                } else {
+                    num = 1;
+                    i++;
+                }
+                Map<String, Integer> popedMap = stack.pop();
+                Map<String, Integer> toMap = stack.peek();
+
+                //把当前结果加入到之前的结果中
+                for (Map.Entry<String, Integer> entry : popedMap.entrySet()) {
+                    String atom = entry.getKey();
+                    toMap.put(atom, toMap.getOrDefault(atom, 0) + entry.getValue() * num);
+                }
+
+            } else {
+                //是字符
+                //读取完整字符
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(c);
+                i++;
+                while (i < n && Character.isLowerCase(formula.charAt(i))) {
+                    stringBuilder.append(formula.charAt(i++));
+                }
+
+                //读取数字
+                int num = 0;
+                if (i<n&&Character.isDigit(formula.charAt(i))) {
+                    while (i < n && Character.isDigit(formula.charAt(i))) {
+                        num = num * 10 + (formula.charAt(i++) - '0');
+                    }
+                } else {
+                    num = 1;
+                }
+
+                //计算个数
+                Map<String, Integer> cuurentMap = stack.peek();
+                cuurentMap.put(stringBuilder.toString(), cuurentMap.getOrDefault(stringBuilder.toString(), 0) + num);
+            }
+        }
+
+        //在进行字典序输出
+
+        TreeMap<String, Integer> treeMap = new TreeMap(stack.peek());
+
+        StringBuilder ans = new StringBuilder();
+        for (Map.Entry<String, Integer> entry : treeMap.entrySet()) {
+            String atom = entry.getKey();
+            ans.append(atom);
+            if (entry.getValue() > 1) {
+                ans.append(entry.getValue());
+            }
+        }
+        return ans.toString();
+    }
+
+
+    /**
+     * 1106. 解析布尔表达式
+     * 我们依旧使用双栈解决：把 t、f当做数字，& | ！当做运算符
+     * @param expression
+     * @return
+     */
+    public static boolean parseBoolExpr(String expression) {
+
+        Stack<Character> numStack = new Stack<>();
+
+        Stack<Character> opttack = new Stack<>();
+        int n = expression.length();
+        for (int i = 0; i < n; i++) {
+            char c = expression.charAt(i);
+
+            if (c == 't' || c == 'f') {
+                numStack.push(c);
+            } else if (c == '|' || c == '&' || c == '!') {
+                opttack.add(c);
+            } else if (c == ',') {
+                continue;
+            } else if (c == '(') {
+                numStack.push('(');
+            } else if (c == ')') {
+                //需要计算子结果
+
+                //括号外的运算符
+                char currentOp = opttack.pop();
+                char curr = ' ';//假设是当前元素
+                while (!numStack.isEmpty() && numStack.peek() != '(') {
+                    char top = numStack.pop();
+                    //这个意思就是 当括号内只有一个元素时，结果是当前元素或者是内部括号已经计算出了结果
+                    curr = curr == ' ' ? top : calc(curr, top, currentOp);
+                }
+                numStack.pop();//弹出 （
+                if (currentOp == '!') {
+                    //进行取反运算
+                    numStack.push(curr == 't' ? 'f' : 't');
+                } else {
+                    //直接入到数字坑里
+                    numStack.push(curr);
+                }
+            }
+        }
+
+        return numStack.peek() == 't';
+    }
+    private  static char calc(char a,char b,char opt) {
+        boolean x = a == 't';
+        boolean y = b == 't';
+        boolean result = opt == '|' ? x | y : x & y;
+        return result ? 't' : 'f';
     }
     /**
      * 1172. 餐盘栈
