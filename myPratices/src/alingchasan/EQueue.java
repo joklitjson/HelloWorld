@@ -19,6 +19,8 @@ public class EQueue {
         System.out.println(longestSubarray(new int[]{4,2,2,2,4,4,2,2},0));
         System.out.println(continuousSubarrays(new int[]{1,2,3}));
         System.out.println(maximumRobots(new int[]{3,6,1,3,4},new int[]{2,1,3,4,5},25));
+
+        System.out.println(maxResult(new int[]{1,-1,-2,4,-7,3},2));
     }
     /**
      * 2810. 故障键盘
@@ -345,7 +347,9 @@ public class EQueue {
 
         Arrays.sort(tasks);
         Arrays.sort(workers);
-        int left = 0, right = Math.min(tasks.length, workers.length);
+
+        //不包含右边
+        int left = 0, right = Math.min(tasks.length, workers.length)+1;
 
         int ans=0;
         //不包含右边
@@ -444,6 +448,266 @@ public class EQueue {
             }
             return value;
         }
+    }
+
+
+    /**
+     * 1696. 跳跃游戏 VI
+     * 动态规划+单调队列
+     * 状态定义： dp[i]表示从起点跳到i的最大得分，在这个定义下，dp[n−1]就是答案。
+     *
+     * 位置i 可以跳跃到的位置是 [i+1,i+k},反过来思考就是 哪些位置可以跳跃到i？ [i-k,i-1]，因此跳跃到i的最大得分就是 max(dp[i-k],dp[i-1])+num[i]
+     * 因此就是转换成了 求 区间最大值的问题：可以使用单调队列
+     * @param nums
+     * @param k
+     * @return
+     */
+    public static int maxResult(int[] nums, int k) {
+
+        int n = nums.length;
+        int[] dp = new int[n];
+        dp[0]=nums[0];//第一个最大得分就是他自己
+        Deque<Integer> monontQueue = new ArrayDeque<>();
+        monontQueue.offerLast(0);
+        for (int i = 1; i < n; i++) {
+
+            //弹：判断队列中的 索引是否在区间 [i-k,i-1] 范围内
+            while (!monontQueue.isEmpty() && monontQueue.peekFirst() < i - k) {
+                monontQueue.pollFirst();
+            }
+            //取：
+            dp[i] =dp[monontQueue.peekFirst()] + nums[i];
+
+            //入：弹出之前小于他的
+            while (!monontQueue.isEmpty() && dp[monontQueue.peekLast()] <= dp[i]) {
+                monontQueue.pollLast();
+            }
+            monontQueue.offerLast(i);
+        }
+
+        //获取值
+        return dp[n - 1];
+    }
+
+
+    /**
+     * 1425. 带限制的子序列和
+     *动态规划+单调队列
+     * 首先 每个i 只能跟他之前的[i-k,i]的索引组成子序列，因此 我们想让以i结尾的下表组层的子序列的和最大，则需要再【i-k,i-1】 区间选择一个最大的值
+     * 这就可以使用到了单调队列了。然后在遍历的过程中求 某个子序列的最大值
+     *
+     * @param nums
+     * @param k
+     * @return
+     */
+    public int constrainedSubsetSum(int[] nums, int k) {
+
+        int n=nums.length;
+        int maxScore=nums[0];
+        //定义以i结尾的元素 组成的最大的子序列的和
+        int dp[]=new int[n];
+        Deque<Integer> monotQueue=new ArrayDeque<>();
+        dp[0]=nums[0];
+        monotQueue.offerLast(0);
+
+        for (int i=1;i<n;i++) {
+
+            //弹：弹出左侧不在 下表范围内的元素
+            while (!monotQueue.isEmpty() && monotQueue.peekFirst() < i - k) {
+                monotQueue.pollFirst();
+            }
+
+            //计算dp[i]最大值，如果前面都是负数的，则他可以自己开头层位一个子序列
+            dp[i] = Math.max(dp[monotQueue.peekFirst()], 0) + nums[i];
+
+            maxScore = Math.max(maxScore, dp[i]);
+
+            //:入队列，为下一个元素做准备：新员工可能挤兑老员工
+            while (!monotQueue.isEmpty() && dp[monotQueue.peekLast()] <= dp[i]) {
+                monotQueue.pollLast();
+            }
+            monotQueue.offerLast(i);
+        }
+
+        return maxScore;
+    }
+
+    /**
+     * 1046. 最后一块石头的重量
+     * 使用大根堆：获取两个元素 在进行比较
+     * @param stones
+     * @return
+     */
+    public int lastStoneWeight(int[] stones) {
+
+        //创建大根堆
+        PriorityQueue<Integer> priorityQueue = new PriorityQueue<>((a, b) -> b - a);
+
+        for (int value : stones) {
+            priorityQueue.offer(value);
+        }
+
+        //循环取出石头进行碰撞
+        while (priorityQueue.size() > 1) {
+            int a = priorityQueue.poll();
+            int b = priorityQueue.poll();
+            if (a > b) {
+                priorityQueue.offer(a - b);
+            }
+        }
+
+        return priorityQueue.isEmpty() ? 0 : priorityQueue.peek();
+    }
+
+
+    /**
+     * 3264. K 次乘运算后的最终数组
+     * 使用小跟堆存储 数组的下表
+     * @param nums
+     * @param k
+     * @param multiplier
+     * @return
+     */
+    public int[] getFinalState(int[] nums, int k, int multiplier) {
+
+        int n = nums.length;
+        PriorityQueue<Integer> queue = new PriorityQueue<Integer>((a, b) -> {
+            //小跟堆，值相同的情况下，优先索引小的
+            if (nums[a] == nums[b]) {
+                return a - b;
+            }
+            return nums[a] - nums[b];
+        });
+
+        for (int i = 0; i < n; i++) {
+            queue.offer(i);
+        }
+
+        for (int i = 0; i < k; i++) {
+            int minIdx = queue.poll();
+            int value = nums[minIdx] * multiplier;
+            nums[minIdx] = value;
+            queue.offer(minIdx);
+        }
+        return nums;
+    }
+
+
+    /**
+     * 2558. 从数量最多的堆取走礼物
+     * 每次取最多的礼物，然后在剩下一半
+     * @param gifts
+     * @param k
+     * @return
+     */
+    public long pickGifts(int[] gifts, int k) {
+        PriorityQueue<Integer> priorityQueue = new PriorityQueue<>((a, b) -> b - a);
+        for (int value : gifts) {
+            priorityQueue.offer(value);
+        }
+        while (k > 0) {
+            int val = priorityQueue.poll();
+            priorityQueue.offer((int) Math.sqrt(val));
+            k--;
+        }
+        long sum = 0;
+        while (!priorityQueue.isEmpty()) {
+            sum += priorityQueue.poll();
+        }
+        return sum;
+    }
+
+    /**
+     * 2336. 无限集中的最小数字
+     */
+    class SmallestInfiniteSet {
+
+        TreeSet<Integer> avalibe=new TreeSet<>();
+        int idx=1;
+        /**
+         * 使用 优先级队列收集 已经释放的数字，然后在使用一个变量 表示最小的数字的索引，可以一直往后滚动
+         */
+        public SmallestInfiniteSet() {
+
+        }
+
+        /**
+         * 弹出最小数字
+         * @return
+         */
+        public int popSmallest() {
+            if (!avalibe.isEmpty()){
+                return avalibe.pollFirst();
+            }
+            else {
+                return idx++;
+            }
+        }
+
+        //释放最小数字
+        public void addBack(int num) {
+            //后面的数字还未使用，所以不用管
+            if (num>=idx){
+                return;
+            }
+
+            avalibe.add(num);
+        }
+    }
+
+
+    /**
+     * 2530. 执行 K 次操作后的最大分数
+     * k次操作，每次都选择最大的加入到分数中
+     * @param nums
+     * @param k
+     * @return
+     */
+    public long maxKelements(int[] nums, int k) {
+
+        long maxScore = 0;
+        //创建一个大根堆
+        PriorityQueue<Integer> priorityQueue = new PriorityQueue<>((a,b)->b-a);
+        for (int val : nums) {
+            priorityQueue.offer(val);
+        }
+        while (k > 0) {
+            int val = priorityQueue.poll();
+            maxScore += val;
+            //把这个数字变为  ceil(nums[i] / 3)
+            priorityQueue.offer((val + 2) / 3);
+            k--;
+        }
+        return maxScore;
+    }
+
+
+    /**
+     * 3066. 超过阈值的最少操作数 II
+     * 小跟堆，计算最小的两个数
+     * 选择 nums 中最小的两个整数 x 和 y 。
+     * 将 x 和 y 从 nums 中删除。
+     * 将 min(x, y) * 2 + max(x, y) 添加到数组中的任意位置。
+     * @param nums
+     * @param k
+     * @return
+     */
+    public int minOperations(int[] nums, int k) {
+
+        int cnt=0;
+        PriorityQueue<Long> queue=new PriorityQueue<>();
+        for (int val:nums){
+            queue.offer((long) val);
+        }
+        while (queue.size()>1&&queue.peek()<k){
+            Long a=queue.poll();
+            Long b=queue.poll();
+//            queue.offer(Math.min(a,b)*2+Math.max(a,b));
+            queue.offer(a*2+b);
+            cnt++;
+        }
+
+        return cnt;
     }
 }
 
