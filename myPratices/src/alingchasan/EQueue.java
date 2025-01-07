@@ -21,6 +21,9 @@ public class EQueue {
         System.out.println(maximumRobots(new int[]{3,6,1,3,4},new int[]{2,1,3,4,5},25));
 
         System.out.println(maxResult(new int[]{1,-1,-2,4,-7,3},2));
+
+        System.out.println(smallestChair(new int[][]{{7,10},{6,7},{1,3},{2,7},{4,5}}
+        ,0));
     }
     /**
      * 2810. 故障键盘
@@ -708,6 +711,321 @@ public class EQueue {
         }
 
         return cnt;
+    }
+
+    /**
+     * 1962. 移除石子使总数最小
+     * 大根堆+贪心:优先对折石子多的
+     * @param piles
+     * @param k
+     * @return
+     */
+    public int minStoneSum(int[] piles, int k) {
+        int sum = 0;
+        PriorityQueue<Integer> queue = new PriorityQueue<>((a, b) -> b - a);
+
+        for (int val : piles) {
+            queue.add(val);
+        }
+
+        while (k > 0) {
+            //对折
+            int value = queue.poll();
+            queue.offer(value - value / 2);
+            k--;
+        }
+
+        //统计
+        while (!queue.isEmpty()) {
+            sum += queue.poll();
+        }
+        return sum;
+    }
+
+    /**
+     * 703. 数据流中的第 K 大元素
+     * 使用小跟堆，只保存k个元素，多余的元素弹出，这样就能保证堆顶 是第k个大的元素
+     */
+    class KthLargest {
+
+        int limit=0;
+        //小跟堆
+        PriorityQueue<Integer> priorityQueue=new PriorityQueue();
+        public KthLargest(int k, int[] nums) {
+            this.limit=k;
+            for (int val:nums){
+                priorityQueue.offer(val);
+                //超过数量 就弹出
+                if (priorityQueue.size()>k){
+                    priorityQueue.poll();
+                }
+            }
+        }
+
+        public int add(int val) {
+            priorityQueue.offer(val);
+            if (priorityQueue.size() > limit) {
+                priorityQueue.poll();
+            }
+            return priorityQueue.peek();
+        }
+    }
+
+
+    /**
+     * 3275. 第 K 近障碍物查询
+     * 使用大根堆：堆顶就是第k小的元素
+     * @param queries
+     * @param k
+     * @return
+     */
+    public int[] resultsArray(int[][] queries, int k) {
+        int n = queries.length;
+        int[] result = new int[n];
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>((a,b)->b-a);
+        for (int i = 0; i < n; i++) {
+            int distance = Math.abs(queries[i][0]) + Math.abs(queries[i][1]);
+            minHeap.offer(distance);
+            if (minHeap.size() < k) {
+                result[i] = -1;
+                continue;
+            } else if (minHeap.size() > k) {
+                minHeap.poll();
+            }
+            result[i] = minHeap.peek();
+        }
+        return result;
+    }
+
+
+    /**
+     * 1845. 座位预约管理系统
+     * 每次选择最小的
+     */
+    class SeatManager {
+
+        int seatIdx;
+        int max;
+        TreeSet<Integer> avaliableSeats=new TreeSet<>();
+        public SeatManager(int n) {
+            this.seatIdx=1;
+            this.max=n;
+        }
+
+        public int reserve() {
+            if (!avaliableSeats.isEmpty()){
+                return avaliableSeats.pollFirst();
+            }
+            return seatIdx++;
+        }
+
+        public void unreserve(int seatNumber) {
+            avaliableSeats.add(seatNumber);
+        }
+    }
+
+    /**
+     * 2208. 将数组和减半的最少操作次数
+     * 请你返回将 nums 数组和 至少 减少一半的 最少 操作数。
+     * @param nums
+     * @return
+     */
+    public int halveArray(int[] nums) {
+
+        PriorityQueue<Double> bigHeap = new PriorityQueue<Double>((a, b) -> b.compareTo(a));
+        double sum = 0;
+        for (int val : nums) {
+            bigHeap.offer((double) val);
+            sum += val;
+        }
+        double sum2 = 0;//减少的量
+        int cnt = 0;
+        while (sum2 < sum / 2) {
+            double val = bigHeap.poll();
+            sum2 += val / 2.0;
+            //重新入队列
+            bigHeap.offer(val / 2.0);
+            cnt++;
+        }
+        return cnt;
+    }
+
+
+    /**
+     * 2233. K 次增加后的最大乘积
+     * 每次选择最小的进行增大
+     * @param nums
+     * @param k
+     * @return
+     */
+    public int maximumProduct(int[] nums, int k) {
+        int mod = (int) (Math.pow(10, 9) + 7);
+        PriorityQueue<Long> minHeap = new PriorityQueue<>();
+
+        for (int val : nums) {
+            minHeap.offer((long) val);
+        }
+
+        while (k > 0) {
+            minHeap.offer(minHeap.poll() + 1);
+            k--;
+        }
+
+        long ans = 1;
+        while (!minHeap.isEmpty()) {
+            ans = (ans * minHeap.poll() % mod);
+        }
+
+        return (int) (ans%mod);
+    }
+
+
+    /**
+     * 1942. 最小未被占据椅子的编号
+     * @param times
+     * @param targetFriend
+     * @return
+     */
+    public static int smallestChair(int[][] times, int targetFriend) {
+
+        int[][] timeLines = new int[times.length * 2][3];
+        int id = 0, friedsIdx = 0;
+        for (int[] time : times) {
+            //进入
+            timeLines[id][0] = time[0];
+            timeLines[id][1] = 1;//进入类型
+            timeLines[id][2] = friedsIdx;
+            id++;
+
+            timeLines[id][0] = time[1];
+            timeLines[id][1] = 0;
+            timeLines[id][2] = friedsIdx;
+            id++;
+            //朋友id
+            friedsIdx++;
+        }
+        //按时间节点进行排序
+        Arrays.sort(timeLines, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                if ( o1[0] == o2[0]){
+                    //同时刻：优先归还
+                    return o1[1]-o2[1];
+                }
+                else {
+                    return o1[0] - o2[0];
+                }
+            }
+        });
+
+        TreeSet<Integer> avaliabe = new TreeSet<>();
+        Map<Integer, Integer> seatMap = new HashMap<>();
+        int seatIdx = 0;
+        int tarResult = 0;
+        for (int i = 0; i < timeLines.length; i++) {
+            int[] time = timeLines[i];
+            int friendId = time[2];
+            if (time[1] == 1) {
+                //进入
+                if (!avaliabe.isEmpty()) {
+                    seatMap.put(friendId, avaliabe.pollFirst());
+                } else {
+                    //从
+                    seatMap.put(friendId, seatIdx++);
+                }
+                if (friendId == targetFriend) {
+                    tarResult = seatMap.get(friendId);
+                    break;
+                }
+
+//                System.out.println(String.format("朋友%s,在时间 %s到达，占据%s座位",friendId,time[0],seatMap.get(friendId)));
+
+            } else {
+                //离开
+                avaliabe.add(seatMap.get(friendId));
+//                System.out.println(String.format("朋友%s,在时间 %s离开，归还%s座位",friendId,time[0],seatMap.get(friendId)));
+                //不需要从map中移除，因为后面不会在进入
+            }
+        }
+        return tarResult;
+    }
+
+
+    /**
+     * 1801. 积压订单中的订单总数
+     * 解决方案：使用两个优先级队列：
+     * 销售单队列使用小跟堆，最小的价格在最上面‘，方便采购人员 查看是否有低于采购价格的订单
+     * 采购单使用大根堆：价格最高的放在最上面，方便销售单能快速查询是否有大于当前价格的采购
+     * @param orders
+     * @return
+     */
+    public int getNumberOfBacklogOrders(int[][] orders) {
+        // 价格、数量、类型(0、采购 1、销售)
+        int mod= (int) (Math.pow(10,9)+7);
+        //int[] 价格、数量.按价格小跟堆
+        PriorityQueue<Integer[]> sellMinHeap = new PriorityQueue<Integer[]>((a, b) -> {
+            return a[0] - b[0];
+        });
+
+
+        //购买 大根堆
+        PriorityQueue<Integer[]> buyBigHeap = new PriorityQueue<Integer[]>((a, b) -> {
+            return b[0] - a[0];
+        });
+
+        for (int[] order : orders) {
+            int price = order[0];
+            int quality = order[1];
+            int type = order[2];
+            if (type == 1) {
+                //销售
+                while (!buyBigHeap.isEmpty() && buyBigHeap.peek()[0] >= price && quality > 0) {
+                    //可以使用采购单
+                    if (quality >= buyBigHeap.peek()[1]) {
+                        //使用当前的全部
+                        quality -= buyBigHeap.poll()[1];
+                    } else {
+                        //当前订单已经销售完成
+                        buyBigHeap.peek()[1] = buyBigHeap.peek()[1] - quality;
+                        quality = 0;
+                    }
+                }
+
+                if (quality > 0) {
+                    //剩余的继续卖
+                    sellMinHeap.offer(new Integer[]{price, quality});
+                }
+            } else {
+                //采购://最低价格小于采购价格
+                while (!sellMinHeap.isEmpty() && sellMinHeap.peek()[0] <= price && quality > 0) {
+
+                    if (quality < sellMinHeap.peek()[1]) {
+                        sellMinHeap.peek()[1] = sellMinHeap.peek()[1] - quality;
+                        quality = 0;
+                    } else {
+                        //采购的数量多余销售的
+                        quality -= sellMinHeap.poll()[1];
+                    }
+                }
+                //有剩余的采购单
+                if (quality > 0) {
+                    buyBigHeap.offer(new Integer[]{price, quality});
+                }
+            }
+        }
+
+        long ans = 0;
+
+        while (!buyBigHeap.isEmpty()) {
+            ans += buyBigHeap.poll()[1];
+            ans=ans%mod;
+        }
+
+        while (!sellMinHeap.isEmpty()) {
+            ans += sellMinHeap.poll()[1];
+            ans=ans%mod;
+        }
+        return (int) ans;
     }
 }
 
