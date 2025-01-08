@@ -1,5 +1,6 @@
 package alingchasan;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -24,6 +25,8 @@ public class EQueue {
 
         System.out.println(smallestChair(new int[][]{{7,10},{6,7},{1,3},{2,7},{4,5}}
         ,0));
+
+        System.out.println(Arrays.toString(getOrder(new int[][]{{7,10},{7,12},{7,5},{7,4},{7,2}})));
     }
     /**
      * 2810. 故障键盘
@@ -952,13 +955,64 @@ public class EQueue {
 
 
     /**
-     * 1801. 积压订单中的订单总数
-     * 解决方案：使用两个优先级队列：
-     * 销售单队列使用小跟堆，最小的价格在最上面‘，方便采购人员 查看是否有低于采购价格的订单
-     * 采购单使用大根堆：价格最高的放在最上面，方便销售单能快速查询是否有大于当前价格的采购
-     * @param orders
+     * 1942. 最小未被占据椅子的编号
+     * 使用小跟堆 leaveTimes 记录 即将离开人的座位编号和离开时间，然后按时间先后线进行遍历，如果leaveTimes 的顶部(最小离开时间)小于当前遍历元素的进入时间，则回收此离开人的座位号
+     * @param times
+     * @param targetFriend
      * @return
      */
+    public int smallestChair2(int[][] times, int targetFriend) {
+        int targetFriendComingTime = times[targetFriend][0];//目标朋友的进入时间
+
+        Arrays.sort(times, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[0] - o2[0];//根据进入时间进行排序：模拟时间线
+            }
+        });
+
+
+        //保留时间线 已经遍历过的人 的离开时间和座位号
+        PriorityQueue<int[]> leavingTimes = new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[1]-o2[1];
+            }
+        });
+
+        //回收的可以再次使用的座位号
+        PriorityQueue<Integer> avaliabeSeats = new PriorityQueue<>();
+
+        int seatNumber = 0;//座位号开始编号
+        for (int[] time : times) {
+
+            //当前 最先离开的人的时间小于当前进入人的时间，因此这个人的座位号可以进行回收
+            while (!leavingTimes.isEmpty() && time[0] >= leavingTimes.peek()[1]) {
+                avaliabeSeats.offer(leavingTimes.poll()[0]);
+            }
+
+            //为当前人分配座位号
+            int currentSeat = avaliabeSeats.isEmpty() ? seatNumber++ : avaliabeSeats.poll();
+
+            //命中目标时间
+            if (targetFriendComingTime == time[0]) {
+                return currentSeat;
+            }
+            //记录当前人的离开时间
+            leavingTimes.offer(new int[]{currentSeat, time[1]});
+        }
+
+        return -1;
+    }
+
+        /**
+         * 1801. 积压订单中的订单总数
+         * 解决方案：使用两个优先级队列：
+         * 销售单队列使用小跟堆，最小的价格在最上面‘，方便采购人员 查看是否有低于采购价格的订单
+         * 采购单使用大根堆：价格最高的放在最上面，方便销售单能快速查询是否有大于当前价格的采购
+         * @param orders
+         * @return
+         */
     public int getNumberOfBacklogOrders(int[][] orders) {
         // 价格、数量、类型(0、采购 1、销售)
         int mod= (int) (Math.pow(10,9)+7);
@@ -1026,6 +1080,328 @@ public class EQueue {
             ans=ans%mod;
         }
         return (int) ans;
+    }
+
+
+    /**
+     * 2462. 雇佣 K 位工人的总代价
+     * 维护 小跟堆：前K个+后k个元素，然后在定义左边的边界和右边k个元素的边界，如果边界没有超过限制，则表示还有两个端，如果超过了限制 ，就
+     * @param costs
+     * @param k
+     * @param candidates
+     * @return
+     */
+    public long totalCost(int[] costs, int k, int candidates) {
+
+        PriorityQueue<int[]> minHeap=new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                //先按成本优先级，在按下标优先级
+                if (o1[0]!=o2[0]){
+                    return o1[0]-o2[0];
+                }
+                return o1[1]-o2[1];
+            }
+        });
+
+        long cost=0;
+
+        int n=costs.length;
+        int left=candidates-1,right=n-candidates;
+
+        if (left+1<right){
+            for (int i=0;i<candidates;i++){
+                //成本和下标
+                minHeap.offer(new int[]{costs[i],i});
+            }
+
+            for (int i=right;i<n;i++){
+                //成本和下标
+                minHeap.offer(new int[]{costs[i],i});
+            }
+        }
+        else {
+
+            //优化：--有交集，直接取前k个
+            Arrays.sort(costs);
+            for(int i=0; i<k; i++){
+                cost += costs[i];
+            }
+            return cost;
+
+//            for (int i=0;i<n;i++){
+//                //成本和下标
+//                minHeap.offer(new int[]{costs[i],i});
+//            }
+        }
+
+
+        //选择k位工人
+        for (int i=0;i<k;i++){
+            int []  ca= minHeap.poll();
+            cost+=ca[0];
+
+            int idx=ca[1];
+            if (left+1<right){
+                //说明刚才得元素来自左边，因此需要左边在填充一个元素
+                if (idx<=left){
+                    left++;
+                    minHeap.offer(new int[]{costs[left],left});
+                }
+                else {
+                    right--;
+                    minHeap.offer(new int[]{costs[right],right});
+                }
+            }
+        }
+
+        return cost;
+    }
+
+    /**
+     * 1834. 单线程 CPU
+     *  设计一个带有优先级的等待队列，等待中的人物可以先放在等待队列中
+     * @param tasks
+     * @return
+     */
+    public  static int[] getOrder(int[][] tasks) {
+        //把任务变成3元组，携带任务的编号
+        int[][] tasksWithId = new int[tasks.length][3];
+        for (int i = 0; i < tasks.length; i++) {
+            tasksWithId[i][0] = tasks[i][0];
+            tasksWithId[i][1] = tasks[i][1];
+            tasksWithId[i][2] = i;
+        }
+
+        //按开始时间排序
+        Arrays.sort(tasksWithId, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] a, int[] b) {
+                return a[0] - b[0];
+            }
+        });
+
+        int n = tasks.length;
+        PriorityQueue<int[]> waitQueue = new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] a, int[] b) {
+                //先按运行时长排序，在按任务索引排序
+                if (a[1] != b[1]) {
+                    return a[1] - b[1];
+                }
+                return a[2] - b[2];
+            }
+        });
+
+        int[] ans = new int[n];
+        int idx = 0;
+        //按时间先后顺序排序
+        for (int endTime = 1, i = 0; idx< n;) {
+            //当前任务的开始时间 小于上一个任务的结束时间。因此可以加入队列
+            while (i < n && tasksWithId[i][0] <= endTime) {
+                //当前任务加入队列
+                waitQueue.offer(tasksWithId[i++]);
+            }
+
+            if (waitQueue.isEmpty()) {
+                //如果当前等待队列没任务，直接跳转到下一个任务的入队时间
+                endTime = tasksWithId[i][0];
+            } else {
+                //取出一个任务进行执行
+                int[] task = waitQueue.poll();
+                ans[idx++] = task[2];
+                endTime = endTime + task[1];//加上本任务的运行周期
+            }
+        }
+        return ans;
+    }
+
+    /**
+     * 1792. 最大平均通过率
+     * 要想增加最大通过率，则需要 比较 +1情况下每个班级的通过率的增量，增量大的才需要进行加，增量下的就不加
+     * 使用大根堆，比较通过率的增量
+     * @param classes
+     * @param extraStudents
+     * @return
+     */
+    public double maxAverageRatio(int[][] classes, int extraStudents) {
+        PriorityQueue<int[]> priorityQueue = new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] a, int[] b) {
+                //大根堆 增量=(1+c)/(c+d) -c/d
+                double increasea=incr(a);
+                double increaseb=incr(b);
+                double result = increaseb - increasea;
+
+                return  result>0?-1:1;
+            }
+        });
+
+        for (int[] clazz : classes) {
+            priorityQueue.offer(clazz);
+        }
+
+        while (extraStudents > 0) {
+            int[] clazz = priorityQueue.poll();
+            //增加1 在进入进去
+            priorityQueue.offer(new int[]{clazz[0] + 1, clazz[1] + 1});
+            extraStudents--;
+        }
+
+        //统计平均通过率
+
+        double sumRat = 0;
+        while (!priorityQueue.isEmpty()) {
+            int[] clazz = priorityQueue.poll();
+            sumRat += 1.0 * clazz[0] / clazz[1];
+        }
+
+        //在进行平均
+        return sumRat / classes.length;
+    }
+
+    private double incr(int[] o) {
+        return (o[1] - o[0]) / ((double) o[1] * (o[1] + 1));
+    }
+
+
+    /**
+     * 1882. 使用服务器处理任务
+     * 使用双堆
+     * 空闲服务器：按权重和索引下标排序
+     * 忙碌的服务器：按任务的结束时间进行排序
+     * 线性模拟 任务的执行，然后从空闲服务器中获取任务：如果空闲服务器没有了，则向 忙碌的服务器 获取最先结束的那个机器执行任务
+     * @param servers
+     * @param tasks
+     * @return
+     */
+    public int[] assignTasks(int[] servers, int[] tasks) {
+
+        //int[]：权重、机器编号、结束时间
+        PriorityQueue<int[]> idelQueue = new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] a, int[] b) {
+                //按权重、机器编号进行升序排列
+                if (a[0] != b[0]) {
+                    return a[0] - b[0];
+                }
+                return a[1] - b[1];
+            }
+        });
+
+        //加入空闲机器
+        for (int i = 0; i < servers.length; i++) {
+            idelQueue.offer(new int[]{servers[i], i, 0});
+        }
+        //权重、机器编号、结束时间
+        PriorityQueue<int[]> buys = new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] a, int[] b) {
+                if (a[2] != b[2]) {
+                    return a[2] - b[2];
+                } else {
+                    if (a[0] != b[0]) {
+                        return a[0] - b[0];
+                    } else {
+                        return a[1] - b[1];
+                    }
+                }
+            }
+        });
+
+        int ans[] = new int[tasks.length];
+        for (int i = 0; i < tasks.length; i++) {
+            //当前运行的人物的结束时间 小于等于当前时间 因此当前任务结束了
+            while (!buys.isEmpty() && buys.peek()[2] <= i) {
+                idelQueue.offer(buys.poll());
+            }
+
+            if (!idelQueue.isEmpty()) {
+                //
+                int[] server = idelQueue.poll();
+                ans[i] = server[1];
+                server[2] = i + tasks[i];//计算结束时间：当前时刻 加上运行时间
+                buys.offer(server);
+            } else {
+                //选择一个最先结束的忙碌任务
+                int[] server = buys.poll();
+                ans[i] = server[1];
+                server[2] += tasks[i];//计算结束时间：当前时刻 加上运行时间
+                buys.offer(server);
+            }
+        }
+
+        return ans;
+    }
+
+
+    /**
+     * 2402. 会议室 III
+     * 解决方案：使用空闲的集合存储空闲的会议室，按id 递增排列
+     * 使用忙碌的会议号 集合，使用结束时间、会议号进行递增 排序
+     * 类似上面的服务器处理时间
+     * @param n
+     * @param meetings
+     * @return
+     */
+    public int mostBooked(int n, int[][] meetings) {
+
+        PriorityQueue<Integer> idleQueue = new PriorityQueue<>();
+        for (int i = 0; i < n; i++) {
+            idleQueue.offer(i);
+        }
+
+        //结束时间：会议室编号
+//        为啥使用long ？防止有溢出
+        PriorityQueue<long[]> busyQueue = new PriorityQueue<>(new Comparator<long[]>() {
+            @Override
+            public int compare(long[] a, long[] b) {
+                if (a[0] != b[0]) {
+                    return (int) (a[0]- b[0]);
+                }
+                return (int) (a[1] - b[1]);
+            }
+        });
+
+        Arrays.sort(meetings, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[0] - o2[0];
+            }
+        });
+
+        int cnt[] = new int[n];
+
+        for (int[] meet : meetings) {
+
+            //释放当前已经结束的会议室号
+            while (!busyQueue.isEmpty() && busyQueue.peek()[0] <= meet[0]) {
+                idleQueue.offer((int) busyQueue.poll()[1]);
+            }
+
+            //从空闲中获取会议室
+            if (!idleQueue.isEmpty()) {
+                int meetingId = idleQueue.poll();
+                cnt[meetingId]++;
+                //进入忙碌时刻
+                busyQueue.offer(new long[]{meet[1], meetingId});
+            } else {
+                //从最先结束的会议室 获取当前会议需要的会议室
+                long[] bb = busyQueue.poll();
+                cnt[(int) bb[1]]++;
+//                bb[0]-meet[0];// 等待时间,等待bb这个任务完成的时间,然后在加上当前任务的结束时间，就是当前任务的最终结束时间
+                bb[0] = meet[1]+(bb[0]-meet[0]);
+                busyQueue.offer(bb);
+            }
+        }
+
+        int maxFreIdx = 0;
+        for (int i=0;i<n;i++) {
+            if (cnt[i]>cnt[maxFreIdx]){
+                maxFreIdx=i;
+            }
+        }
+        return maxFreIdx;
     }
 }
 
