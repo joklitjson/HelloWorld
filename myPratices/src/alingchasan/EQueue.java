@@ -1326,7 +1326,7 @@ public class EQueue {
                 //选择一个最先结束的忙碌任务
                 int[] server = buys.poll();
                 ans[i] = server[1];
-                server[2] += tasks[i];//计算结束时间：当前时刻 加上运行时间
+                server[2] += tasks[i];//计算结束时间：上一个任务结束时间 加上运行时间
                 buys.offer(server);
             }
         }
