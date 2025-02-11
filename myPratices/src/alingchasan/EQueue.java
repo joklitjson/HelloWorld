@@ -1,5 +1,8 @@
 package alingchasan;
 
+import linkedList.ListNode;
+import sort.HeapSort;
+
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -27,6 +30,8 @@ public class EQueue {
         ,0));
 
         System.out.println(Arrays.toString(getOrder(new int[][]{{7,10},{7,12},{7,5},{7,4},{7,2}})));
+
+        findMaximizedCapital(2,0,new int[]{1,2,3},new int[]{0,1,1});
     }
     /**
      * 2810. 故障键盘
@@ -1402,6 +1407,348 @@ public class EQueue {
             }
         }
         return maxFreIdx;
+    }
+
+    /**
+     * 23. 合并 K 个升序链表
+     * 方案1：使用优先级队列：每次选择一个最小的数然后合并到目标队列中，同时使用哨兵模式
+     * 方案二：使用分治方法：两两进行合并，任何在合并到一起。类似分治排序
+     * @param lists
+     * @return
+     */
+    public ListNode mergeKLists(ListNode[] lists) {
+
+        PriorityQueue<ListNode> minQueue=new PriorityQueue<>(new Comparator<ListNode>() {
+            @Override
+            public int compare(ListNode o1, ListNode o2) {
+                return o1.val-o2.val;
+            }
+        });
+
+        for (ListNode node:lists){
+            if (node!=null){
+                minQueue.offer(node);
+            }
+        }
+
+        ListNode node=new ListNode();
+        ListNode cursor=node;
+        //使用优先级队列 每次取出最小值
+        while (!minQueue.isEmpty()){
+            ListNode tmp= minQueue.poll();
+            cursor.next=tmp;
+            cursor=cursor.next;
+            if (tmp.next!=null){
+                minQueue.offer(tmp.next);
+            }
+            //断开链接
+            tmp.next=null;
+        }
+        return node.next;
+    }
+
+    public ListNode mergeKLists2(ListNode[] lists) {
+        if (lists.length==0){
+            return null;
+        }
+        return merge(lists, 0, lists.length - 1);
+    }
+
+    private ListNode merge(ListNode[] lists,int start,int end){
+
+        int  len=end-start;
+        if (len==0){
+            return lists[start];
+        }
+        if (len<0){
+            return null;
+        }
+
+        ListNode left=merge(lists,start,start+len/2);
+        ListNode right=merge(lists,start+len/2+1,end);
+        return merge(left,right);
+    }
+
+    /**
+     * 合并两个链表
+     * @param left
+     * @param right
+     * @return
+     */
+    private ListNode merge(ListNode left,ListNode right) {
+        if (left == null) {
+            return right;
+        }
+        if (right == null) {
+            return left;
+        }
+        ListNode head = new ListNode();
+        ListNode dummy = head;
+        while (left != null && right != null) {
+            if (left.val < right.val) {
+                dummy.next = left;
+                dummy = dummy.next;
+                left = left.next;
+            } else {
+                dummy.next = right;
+                dummy = dummy.next;
+                right = right.next;
+            }
+        }
+
+        if (left != null) {
+            dummy.next = left;
+        }
+        if (right != null) {
+            dummy.next = right;
+        }
+
+        return head.next;
+
+    }
+
+
+    /**
+     * 355. 设计推特
+     * 1、使用hash 维护每个人关注的用户
+     * 2、使用一个 TwitterNode 记录每个人的发帖情况。然后在使用hash记录每个人的最近的帖子
+     * 3、获取最近的10条数据时：需要把当前用户、关注这的推特帖子加入到优先级队列中 在进行筛选，类似合并k个链表
+     */
+    class Twitter {
+
+        //保存每个人的关注
+        Map<Integer,Set<Integer>> followers=new HashMap<>();;
+        //记录人的发帖情况
+        Map<Integer,TwitterNode> userTwitter=new HashMap<>();
+
+        int timestamp=0;
+        PriorityQueue<TwitterNode> Heap=new PriorityQueue<>(new Comparator<TwitterNode>() {
+            @Override
+            public int compare(TwitterNode o1, TwitterNode o2) {
+                //倒序排列
+                return o2.timestamp-o1.timestamp;
+            }
+        });
+        public Twitter() {
+
+        }
+
+        public void postTweet(int userId, int tweetId) {
+            TwitterNode oldTwitter= userTwitter.get(userId);
+            TwitterNode newTwitter=new TwitterNode();
+            newTwitter.timestamp=timestamp++;
+            newTwitter.tweetId=tweetId;
+            newTwitter.next=oldTwitter;
+            //插入新的推文
+            userTwitter.put(userId,newTwitter);
+        }
+
+        public List<Integer> getNewsFeed(int userId) {
+            Heap.clear();
+            //加入自己发送的推文
+            if (userTwitter.containsKey(userId)) {
+                Heap.offer(userTwitter.get(userId));
+            }
+            if (followers.containsKey(userId)) {
+                for (int follow : followers.get(userId)) {
+                    //获取关注者 发生的推文
+                    if (userTwitter.containsKey(follow)) {
+                        Heap.offer(userTwitter.get(follow));
+                    }
+                }
+            }
+            List<Integer> ans = new ArrayList<>();
+
+            //获取前10条数据
+            while (!Heap.isEmpty() && ans.size() < 10) {
+                TwitterNode twitterNode = Heap.poll();
+                ans.add(twitterNode.tweetId);
+                if (twitterNode.next != null) {
+                    Heap.offer(twitterNode.next);
+                }
+            }
+            return ans;
+        }
+
+        public void follow(int followerId, int followeeId) {
+            if (followeeId==followerId){
+                return;
+            }
+            if (!followers.containsKey(followerId)){
+                followers.put(followerId,new HashSet<>());
+            }
+
+            //加入关注
+            followers.get(followerId).add(followeeId);
+        }
+
+        public void unfollow(int followerId, int followeeId) {
+            if (followeeId==followerId){
+                return;
+            }
+            if (!followers.containsKey(followerId)){
+              return;
+            }
+
+            followers.get(followerId).remove(followeeId);
+        }
+
+        class TwitterNode{
+            public int tweetId;
+            public int timestamp;
+
+            /**
+             * 下一个帖子
+             */
+            public TwitterNode next;
+        }
+    }
+
+
+    /**
+     * 502. IPO
+     * 贪心+双堆
+     * 使用贪心的思想：优先启动 达到门槛的项目中 利润最大的项目。每次获得利润之后再 把之前不能启动的项目check下是否能达到门槛
+     * @param k
+     * @param w
+     * @param profits
+     * @param capital
+     * @return
+     */
+    public  static int findMaximizedCapital(int k, int w, int[] profits, int[] capital) {
+
+//        int[] 三yuanzu id,利润，门槛
+        //可以投资的项目：按利润的到底进行排序
+        PriorityQueue<int[]> canUsed = new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o2[1] - o1[1];
+            }
+        });
+
+        //不可以投资的项目：按门槛进行排序
+        PriorityQueue<int[]> canNotUsed = new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[2] - o2[2];
+            }
+        });
+
+        for (int i = 0; i < capital.length; i++) {
+            if (w >= capital[i]) {
+                canUsed.offer(new int[]{i, profits[i], capital[i]});
+            } else {
+                canNotUsed.offer(new int[]{i, profits[i], capital[i]});
+            }
+        }
+
+        int maxProfit = w;
+
+        while (k>0) {
+            while (!canNotUsed.isEmpty() && canNotUsed.peek()[2] <= maxProfit) {
+                canUsed.offer(canNotUsed.poll());
+            }
+
+            //执行了一个项目
+            if (!canUsed.isEmpty()) {
+                int[] item = canUsed.poll();
+                maxProfit += item[1];
+                k--;
+            }
+            else {
+                //没有了可以执行的项目了，因此可以关闭了
+                break;
+            }
+        }
+        return maxProfit;
+    }
+
+    public static final int[][] DIRECTIONS = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+    /**
+     * 778. 水位上升的泳池中游泳（所有的值都不相同）
+     * 解决方案1、二分法，每次探测 一个高度，从顶部在向下部搜索，使用一个 visited[][]数组 记录遍历过的路径，遍历结束，查看底部节点是否被遍历到了
+     * 方案二：  使用并查集，时间一点点的增加，然后把小于等于当前时间的点位进行联通，然后在看看第一个点位和最后一个点位是否联通【比二分法要好一些】
+     * @param grid
+     * @return
+     */
+    public int swimInWater(int[][] grid) {
+        int n = grid.length;
+        int len = n * n;
+
+        int[] index = new int[len];
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                //记录每个高度对应的索引
+                //表格中的数据全部不同，因此：不存在覆盖问题
+                index[grid[i][j]] = i * n + j;
+            }
+        }
+        UnionFind unionFind = new UnionFind(len);
+        for (int i = 0; i < len; i++) {
+            //遍历高度,合并不大于高度的方块
+
+            //求出这个高度对应的坐标，然后在这个坐标的周围查找点
+            int x = index[i] / n;
+            int y = index[i] % n;
+
+            for (int[] dir : DIRECTIONS) {
+                int xx = dir[0] + x;
+                int yy = dir[1] + y;
+                if (inArea(xx, yy, n) && grid[xx][yy] <= i) {
+                    //合并这两个点
+                    unionFind.union(index[i], xx * n + yy);
+                }
+            }
+            //判断是否已经连接
+            if (unionFind.isConnected(0, len - 1)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private boolean inArea( int xx,int yy,int n) {
+        return xx >= 0 && xx < n && yy >= 0 && yy < n;
+    }
+    class UnionFind{
+        int [] parent;
+
+        public UnionFind(int n){
+            parent=new int[n];
+            //自己指向自己
+            for (int i=0;i<n;i++){
+                parent[i]=i;
+            }
+        }
+        public void union(int a,int b){
+          int p1=  find(a);
+          int p2=find(b);
+          if (p1!=p2){
+              //链接起来
+              parent[p1]=p2;
+          }
+        }
+
+        /**
+         * 判断是否联通
+         * @param a
+         * @param b
+         * @return
+         */
+        public boolean isConnected(int a,int b){
+            return find(a)==find(b);
+        }
+
+        public int find(int a) {
+            //寻找父节点
+            while (a != parent[a]) {
+                parent[a]=parent[parent[a]];//优化处理的
+                a = parent[a];
+            }
+            return a;
+        }
     }
 }
 
