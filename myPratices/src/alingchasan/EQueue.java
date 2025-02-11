@@ -1667,7 +1667,8 @@ public class EQueue {
 
     /**
      * 778. 水位上升的泳池中游泳（所有的值都不相同）
-     * 解决方案1、二分法，每次探测 一个高度，从顶部在向下部搜索，使用一个 visited[][]数组 记录遍历过的路径，遍历结束，查看底部节点是否被遍历到了
+     * 方案一：使用优先级队列，每次都选择 可选择的节点中的最小值，然后在把他周围的值加入进来，然后在向外扩散，类似广度搜索的思想.
+     * 解决方案二、二分法，每次探测 一个高度，从顶部在向下部搜索，使用一个 visited[][]数组 记录遍历过的路径，遍历结束，查看底部节点是否被遍历到了
      * 方案二：  使用并查集，时间一点点的增加，然后把小于等于当前时间的点位进行联通，然后在看看第一个点位和最后一个点位是否联通【比二分法要好一些】
      * @param grid
      * @return
@@ -1707,6 +1708,42 @@ public class EQueue {
             }
         }
         return -1;
+    }
+
+    public int swimInWater2(int[][] grid) {
+        int n = grid.length;
+        //记录可以使用的节点，按节点的值 升序排列(小的高度在上面)
+        PriorityQueue<int[]> canUsedQueue = new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return grid[o1[0]][o1[1]] - grid[o2[0]][o2[1]];
+            }
+        });
+
+        boolean[][] used = new boolean[grid.length][grid[0].length];
+        canUsedQueue.offer(new int[]{0, 0});
+        used[0][0] = true;
+        int ans = 0;
+        while (!canUsedQueue.isEmpty()) {
+            int[] pp = canUsedQueue.poll();
+            ans = Math.max(ans, grid[pp[0]][pp[1]]);//记录最大的高度
+            if (pp[0] == n - 1 && pp[1] == n - 1) {
+                return ans;
+            }
+
+            //加入他的周围节点
+            for (int dir[] : DIRECTIONS) {
+                int xx = dir[0] + pp[0];
+                int yy = dir[1] + pp[1];
+                //周围的这个点 没有被访问过，则加入进来
+                if (xx >= 0 && xx < n && yy >= 0 && yy < n && !used[xx][yy]) {
+                    canUsedQueue.offer(new int[]{xx, yy});
+                    used[xx][yy] = true;
+                }
+            }
+        }
+
+        return ans;
     }
 
     private boolean inArea( int xx,int yy,int n) {
