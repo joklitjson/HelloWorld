@@ -1,5 +1,6 @@
 package alingchasan;
 
+import com.sun.javafx.geom.Edge;
 import linkedList.ListNode;
 import sort.HeapSort;
 
@@ -32,6 +33,14 @@ public class EQueue {
         System.out.println(Arrays.toString(getOrder(new int[][]{{7,10},{7,12},{7,5},{7,4},{7,2}})));
 
         findMaximizedCapital(2,0,new int[]{1,2,3},new int[]{0,1,1});
+
+//        [[4,10,15,24,26],[0,9,12,20],[5,18,22,30]]
+
+        List<List<Integer>> lists=new ArrayList<>();
+        lists.add(Arrays.asList(4,10,15,24,26));
+        lists.add(Arrays.asList(0,9,12,20));
+        lists.add(Arrays.asList(5,18,22,30));
+        System.out.println("1111111"+Arrays.toString(smallestRange2(lists)));
     }
     /**
      * 2810. 故障键盘
@@ -1746,9 +1755,307 @@ public class EQueue {
         return ans;
     }
 
+    /**
+     * 使用二分法
+     * @param grid
+     * @return
+     */
+    public int swimInWater3(int[][] grid) {
+        int n=grid.length;
+        int left=grid[0][0],right=n*n;
+        int ans=-1;
+        while (left<=right){
+            int middle=left+(right-left)/2;
+            //探测当前时间是否可行
+            if (check(grid,middle)){
+                ans=middle;
+                right=middle-1;
+            }
+            else {
+                left=middle+1;
+            }
+        }
+
+        return ans;
+    }
+
+    /**
+     * 使用广度优先遍历 表格：判断最底部的 表格是否被访问了
+     * @param grid
+     * @param height
+     * @return
+     */
+    private boolean check(int[][] grid,int height) {
+        int n = grid.length;
+        boolean[][] visited = new boolean[n][n];
+
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{0, 0});
+        visited[0][0] = true;
+
+        while (!queue.isEmpty()) {
+            int[] p = queue.poll();
+
+            for (int dir[] : DIRECTIONS) {
+                int xx = p[0] + dir[0];
+                int yy = p[1] + dir[1];
+                if (xx >= 0 && xx < n && yy >= 0 && yy < n && !visited[xx][yy]&&grid[xx][yy]<=height) {
+                    queue.offer(new int[]{xx, yy});
+                    visited[xx][yy] = true;
+                }
+            }
+        }
+
+        return visited[n - 1][n - 1];
+    }
     private boolean inArea( int xx,int yy,int n) {
         return xx >= 0 && xx < n && yy >= 0 && yy < n;
     }
+
+
+    /**
+     * 1353. 最多可以参加的会议数目
+     * 其实就是模拟一个人一天天的开会的过程，贪心思想是优先参加先结束的会议，所以需要维护一个小根堆存放会议的结束时间。
+     * 把可以参加的会议 先挑选出来，然后从这中间优先选择 先结束的会议。同时还要剔除已经过期的会议
+     * @param events
+     * @return
+     */
+    public int maxEvents(int[][] events) {
+
+        //把会议按 开始时间升序排列
+        Arrays.sort(events, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[0] - o2[0];
+            }
+        });
+
+        int n = events.length;
+        int currentDay = 1;//表示第一个开始
+        int ans = 0;//已经参与的会议
+
+        //使用小跟堆，使用结束时间进行排序
+        PriorityQueue<Integer> queue = new PriorityQueue<>();
+        int i = 0;
+        while (i < n || !queue.isEmpty()) {
+            //选择满足条件的数据
+            while (i < n && events[i][0] <= currentDay) {
+                //把当前会议的结束时间加入到队列中
+                queue.offer(events[i][1]);
+                i++;
+            }
+
+            // 剔除过期的:结束时间小于当前天
+            while (!queue.isEmpty() && queue.peek() < currentDay) {
+                queue.poll();
+            }
+            //选择一个最先结束的会议
+            if (!queue.isEmpty()) {
+                queue.poll();
+                ans++;
+            }
+            // 当前的天往前走一天，开始看下下一天能不能参加会议
+            currentDay++;
+        }
+        return ans;
+    }
+
+    /**
+     * 1631. 最小体力消耗路径
+     * 方案一：使用二分法，探测每个体力值，然后使用广度优先遍历(体力消耗小于当前值的才加入到队列) 从顶部到底部，看看是否能到达
+     * 方案二：使用并查集：计算出每个相邻点的体力消耗，然后在进行排序，依次把最小体力中的两个点进行链接，然后在看看顶部和底部的两个点十分能联通
+     *  需要把二维数组的点 转换成一维数组，然后在计算他们的联通性
+     * @param heights
+     * @return
+     */
+    public int minimumEffortPath(int[][] heights) {
+        int m=heights.length,n=heights[0].length;
+        int left=0,right= (int) (Math.pow(10,6)-1);
+        int ans=0;
+
+        while (left<=right){
+            int middle=left+(right-left)/2;
+            if (checkConnected(heights,middle)){
+                ans=middle;
+                right=middle-1;
+            }
+            else {
+                left=middle+1;
+            }
+        }
+        return ans;
+    }
+
+    public int minimumEffortPath2(int[][] heights) {
+        int m=heights.length,n=heights[0].length;
+
+        //转换成 具有权重的边：int[] ：p1,p2 weight 两个点的id 以及权重
+        List<int[]> edges=new ArrayList<>();
+
+        for (int i=0;i<m;i++){
+            for (int j=0;j<n;j++){
+                int id=i*n+j;
+                if (i>0){
+                    //当前点 到 向上的一个点位之间的边
+                    edges.add(new int[]{id-n,id,Math.abs(heights[i][j]-heights[i-1][j])});
+                }
+                if (j>0){
+                    //当前点 与 前一个点的边
+                    edges.add(new int[]{id-1,id,Math.abs(heights[i][j]-heights[i][j-1])});
+                }
+            }
+        }
+
+        Collections.sort(edges, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[2]-o2[2];
+            }
+        });
+
+        int ans=0;
+        UnionFind unionFind=new UnionFind(m*n);
+        //遍历边
+        for (int[] edge: edges){
+            int p1=edge[0],p2=edge[1],v=edge[2];
+            unionFind.union(p1,p2);
+            //如果这两点顶点链接，则是联通的
+            if (unionFind.isConnected(0,m*n-1)){
+                ans=v;
+                break;
+            }
+        }
+        return ans;
+    }
+
+
+    /**
+     * 632. 最小区间
+     * 方案一：堆，每次取左侧的最小值，然后在取左边的最大值，这是一对答案，然后在把最小值弹出，插入最小值后面的一个元素，在计算最小值 和最大值，又得到一对答案，
+     * 然后在计较这两个答案的区间的长度，取最优，当一个数组没有的 下一个元素，则循环中断。因为剩下的区间 不可能包含全部数组的值了
+     *
+     * 方案二：滑动窗口: 把全部的数 放在一起，变成一个二元的 元素[值，数组id],，然后在进行排序，在使用滑动窗口进行判断 某个区间的值 是否包含全部的元素
+     * @param nums
+     * @return
+     */
+    public int[] smallestRange(List<List<Integer>> nums) {
+
+        //三元组：值,下标,数组下标
+        PriorityQueue<int[]> queue = new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[0] - o2[0];
+            }
+        });
+
+        int left = 0, right = Integer.MIN_VALUE;
+
+        //把每一个集合的第一个元素加入到集合中
+        for (int i = 0; i < nums.size(); i++) {
+            queue.offer(new int[]{nums.get(i).get(0), 0, i});
+            right = Math.max(right, nums.get(i).get(0));
+        }
+        //第一对答案
+        int ansL = queue.peek()[0];
+        int ansR = right;//
+        //是否有下一个元素
+        while (queue.peek()[1] + 1 < nums.get(queue.peek()[2]).size()) {
+            int[] top = queue.poll();
+            int nextValue = nums.get(top[2]).get(++top[1]);
+            //判断加入当前这个元素之后的最大值
+            right = Math.max(right, nextValue);
+            top[0] = nextValue;
+            queue.offer(top);//加入进来
+            left = queue.peek()[0];//获取最小值
+
+            //更新答案
+            if (right - left < ansR - ansL) {
+                ansL = left;
+                ansR = right;
+            }
+        }
+        return new int[]{ansL, ansR};
+    }
+
+    public static int[] smallestRange2(List<List<Integer>> nums) {
+
+        int n = nums.size();
+        List<int[]> list = new ArrayList<>();
+        for (int i = 0; i < nums.size(); i++) {
+            for (int v : nums.get(i)) {
+                list.add(new int[]{v, i});
+            }
+        }
+
+        Collections.sort(list, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[0] - o2[0];
+            }
+        });
+
+        int listSize=list.size();
+
+        //使用滑动窗口：记录元素的种类和个数
+        Map<Integer, Integer> cntMap = new HashMap<>();
+
+        int ansL = list.get(0)[0], ansR = list.get(list.size() - 1)[0];
+        int left = 0, right = 0;
+        while (right < list.size()) {
+            while (right<listSize&&cntMap.size() < n) {
+                int[] vv = list.get(right);
+                int cnt = cntMap.getOrDefault(vv[1], 0);
+                cntMap.put(vv[1], cnt + 1);
+                right++;
+            }
+            //缩短边界
+            while (left<listSize&&cntMap.size() == n) {
+                int[] vv = list.get(left);
+                int cnt = cntMap.get(vv[1]);
+                if (cnt == 1) {
+                    cntMap.remove(vv[1]);
+                } else {
+                    cntMap.put(vv[1], cnt - 1);
+                }
+                left++;
+            }
+            //获取值在进行比较
+            if (list.get(right-1)[0] - list.get(left - 1)[0] < ansR - ansL) {
+                ansL = list.get(left - 1)[0];
+                ansR = list.get(right-1)[0];
+            }
+        }
+        return new int[]{ansL, ansR};
+    }
+    private boolean checkConnected(int[][] heights,int effort) {
+        int m = heights.length, n = heights[0].length;
+
+        boolean[][] visited = new boolean[m][n];
+        Queue<int[]> queue = new LinkedList<>();
+
+        //把起点加入进来
+        queue.offer(new int[]{0, 0});
+        visited[0][0] = true;
+        while (!queue.isEmpty()) {
+            int p[] = queue.poll();
+
+            for (int dir[] : DIRECTIONS) {
+                int xx = p[0] + dir[0];
+                int yy = p[1] + dir[1];
+                //当前节点没有被访问过，而且他和之前的节点的差的绝对值 小于当前的体力消耗
+                if (xx >= 0 && xx < m && yy >= 0 && yy < n && !visited[xx][yy] && Math.abs(heights[p[0]][p[1]] - heights[xx][yy]) <= effort) {
+                    queue.offer(new int[]{xx, yy});
+                    visited[xx][yy] = true;
+                }
+                //判断是否已经满足条件
+                if (visited[m - 1][n - 1]) {
+                    return true;
+                }
+            }
+        }
+        return visited[m - 1][n - 1];
+    }
+
     class UnionFind{
         int [] parent;
 
