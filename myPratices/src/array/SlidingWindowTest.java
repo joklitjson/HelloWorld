@@ -7,7 +7,18 @@ import java.util.Map;
 
 public class SlidingWindowTest {
 
-    //    给你一个字符串 s 、一个字符串 t 。返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 "" 。
+    /**
+     * 76. 最小覆盖子串： 给你一个字符串 s 、一个字符串 t 。返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 "" 。
+     * 方案一：使用两个map 统计 目标字符串的种类和个数，然后在根据s字符串，统计当前窗口内的字符种类和个数。如果两个集合中的个数一致，则匹配到了一个答案
+     * 核心原理 就是统计元素种类，以及个数。
+     * 方案二：优化：使用一个 cnt[] 数组 统计元素对应的种类和个数，然后在使用 一个变量：less 表示s中出现的字符种类小于t中的字符种类的个数。
+     * 两次遍历都less进行增减。当less=0时 表明两个字符串中的种类相同了，是一个合理答案
+     *
+     *
+     * @param s
+     * @param t
+     * @return
+     */
     public static String minWindow(String s, String t) {
         Map<Character, Integer> need = new HashMap<>();
         Map<Character, Integer> window = new HashMap<>();
@@ -56,9 +67,58 @@ public class SlidingWindowTest {
 
         }
 
+
+
         return start != null ? s.substring(start, max_len+start) : "";
     }
 
+    public static String minWindow2(String s, String t) {
+        int m = s.length();
+        int[] cnt = new int[128];
+
+        int less = 0;//s中字符的种类小于t的个数种类的个数
+
+        for (char c : t.toCharArray()) {
+            if (cnt[c] == 0) {
+                less++;
+            }
+            cnt[c]++;
+        }
+
+        int ansL = -1, ansR = m;
+        int left = 0, right = 0;
+
+        while (right < m) {
+            //向右滑动窗口
+            while (right < m && less > 0) {
+                cnt[s.charAt(right)]--;
+                if (cnt[s.charAt(right)] == 0) {
+                    less--;
+                }
+                right++;
+            }
+
+            //收缩左边界
+            while (left < m && less == 0) {
+
+                //记录当前答案
+                if (right - left < ansR - ansL) {
+                    ansL = left;
+                    ansR = right;
+                }
+
+                //
+                if (cnt[s.charAt(left)] == 0) {
+                    less++;
+                }
+                cnt[s.charAt(left)]++;
+                left++;
+            }
+        }
+
+        //判断答案
+        return ansL < 0 ? "" : s.substring(ansL, ansR);
+    }
     public  static boolean checkInclusion(String s1, String s2) {
 
         Map<Character, Integer> need = new HashMap<>();
