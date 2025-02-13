@@ -2056,6 +2056,59 @@ public class EQueue {
         return visited[m - 1][n - 1];
     }
 
+
+    /**
+     * 2542. 最大子序列的分数
+     * 最大分数shi 两个数的乘机组成 sum(,1,2,3,3)*min(4,6,8)，因此我们需要想办法 把其中一个按大小进行枚举，然后在比较他们的 乘机大小
+     * 把num2 按中的id 按降序排列
+     * 此类题都是有多因素组成：因为我们需要先把某一个因素进行排序，然后在按排序后的枚举，在另一个数组中在去找最小的一些数字(借助堆)，实现选择最优值
+     * @param nums1
+     * @param nums2
+     * @param k
+     * @return
+     */
+    public long maxScore(int[] nums1, int[] nums2, int k) {
+
+        int m = nums1.length, n = nums2.length;
+
+        Integer[] ids = new Integer[n];
+        //记录id的集合，排序id,已达到排序数组的原理
+        for (int i = 0; i < n; i++) {
+            ids[i] = i;
+        }
+        Arrays.sort(ids, new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return nums2[o2] - nums2[o1];
+            }
+        });
+
+
+        long sum = 0;
+        PriorityQueue<Integer> queue = new PriorityQueue<>();
+
+        //
+        for (int i = 0; i < k; i++) {
+            int idx = ids[i];
+            queue.offer(nums1[idx]);
+            sum += nums1[idx];
+        }
+
+        long max = sum * nums2[ids[k - 1]];//前k个元素的最大值
+
+        for (int i = k; i < n; i++) {
+            int idx = ids[i];
+            //如果下一个 下标对应的数组1中的值 大于堆顶元素，则 score 有可能大于之前的
+            if (nums1[idx] > queue.peek()) {
+                sum += nums1[idx] - queue.peek();
+                queue.poll();//弹出堆顶最小值
+                queue.offer(nums1[idx]);
+                max = Math.max(max, sum * nums2[idx]);
+            }
+        }
+
+        return max;
+    }
     class UnionFind{
         int [] parent;
 
