@@ -1,10 +1,7 @@
 package alingchasan;
 
-import com.sun.javafx.geom.Edge;
 import linkedList.ListNode;
-import sort.HeapSort;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -41,6 +38,8 @@ public class EQueue {
         lists.add(Arrays.asList(0,9,12,20));
         lists.add(Arrays.asList(5,18,22,30));
         System.out.println("1111111"+Arrays.toString(smallestRange2(lists)));
+        EQueue queue=new EQueue();
+        queue.maxPoints(new int[][]{{1,2,3},{2,5,7},{3,5,1}},new int[]{5,6,2});
     }
     /**
      * 2810. 故障键盘
@@ -2099,6 +2098,7 @@ public class EQueue {
         for (int i = k; i < n; i++) {
             int idx = ids[i];
             //如果下一个 下标对应的数组1中的值 大于堆顶元素，则 score 有可能大于之前的
+            //可以使堆中元素之和更大
             if (nums1[idx] > queue.peek()) {
                 sum += nums1[idx] - queue.peek();
                 queue.poll();//弹出堆顶最小值
@@ -2109,6 +2109,243 @@ public class EQueue {
 
         return max;
     }
+
+    /**
+     * 1383. 最大的团队表现值
+     * 「动一个，定一个」的策略——即我们可以枚举效率的最小值 min
+     * 团队表现值 的定义为：一个团队中「所有工程师速度的和」乘以他们「效率值中的最小值」。
+     * 分析：涉及两个因素求最大值问题，我们需要按其中一个因素递减的遍历，然后在求另一个因素的最大值，这样结果就是最大的了
+     * 方案：按效率递减排序，然后统计窗口内(k)的和，遍历的过程中在进行比较他们的乘的最大值
+     * @param n
+     * @param speed
+     * @param efficiency
+     * @param k
+     * @return
+     */
+    public int maxPerformance(int n, int[] speed, int[] efficiency, int k) {
+
+        int mod= (int) (Math.pow(10,9)+7);
+        long ans = 0;
+        //两元组：记录工程师的速度和效率
+        Integer[][] users = new Integer[n][2];
+        //使用小跟堆：按speed 进行排序
+        PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return o1 - o2;
+            }
+        });
+        for (int i = 0; i < n; i++) {
+            users[i] = new Integer[]{speed[i], efficiency[i]};
+        }
+        //按效率递减排序
+        Arrays.sort(users, (i, j) -> j[1] - i[1]);
+        long sum = 0;
+        for (int i = 0; i < n; i++) {
+            int sp = users[i][0];
+            int ef = users[i][1];//当前的最小效率
+            sum += sp;
+            ans=Math.max(ans,sum*ef);
+            priorityQueue.offer(sp);
+            //让队列永远保持k-1个
+            if (priorityQueue.size()==k) {
+                sum -= priorityQueue.poll();
+            }
+        }
+        return (int) (ans%mod);
+    }
+
+    //定义并查集、以及每个节点的孩子节点的个数
+    int [] parent, parentChildSize;
+    /**
+     * 2503. 矩阵查询可获得的最大分数
+     * 技巧：二维数组一维话
+     * 方案一：使用并查集，让grid中的数字进行排序，然后在使用并查集进行合并，最后查询左上角合并的个数
+     * 同时 queiry 也进行排序，在询问。这样可以利用上一次的询问 对并查集的影响结果
+     * 方案二：使用堆+广度遍历表格,把小于当前表格的点 加入到队列中
+     * @param grid
+     * @param queries
+     * @return
+     */
+    public  int[] maxPoints(int[][] grid, int[] queries) {
+        int m=grid.length,n=grid[0].length,k=queries.length;
+        parent =new  int[m*n];
+        parentChildSize =new int[m*n];
+        for (int i=0;i<m*n;i++){
+            parent[i]=i;
+        }
+        Arrays.fill(parentChildSize,1);//每个节点都有一个孩纸
+
+        Integer queryIds[]=new  Integer[k];
+        for (int i=0;i<k;i++){
+            queryIds[i]=i;
+        }
+        //按id进行排序
+        Arrays.sort(queryIds,(i,j)->queries[i]-queries[j]);
+
+        //把二维数组 转换成一维的数字:
+        int [][] nums=new int[m*n][3];
+        for (int i=0;i<m;i++){
+            for (int j=0;j<n;j++){
+                int id=i*n+j;
+                nums[id]=new int[]{grid[i][j],i,j};
+            }
+        }
+        Arrays.sort(nums,(p,q)->p[0]-q[0]);
+
+        int ans[]=new int[k];
+        int j = 0;
+        for (int i=0;i<k;i++) {
+            int queryVal = queries[queryIds[i]];
+            //表格的数字 需要小于询问的值，然后在把这个点 向四周扩散，在进行合并
+            for (; j < m * n && nums[j][0] < queryVal; j++) {
+                int x=nums[j][1];
+                int y=nums[j][2];
+
+                for (int[] dir:DIRECTIONS){
+                    int xx=x+dir[0];
+                    int yy=y+dir[1];
+
+                    if (xx>=0&&xx<m&&yy>=0&&yy<n&&grid[xx][yy]<queryVal) {
+                        //合并则会两个点
+                        System.out.println(String.format("节点 a=%s,b=%s, 开始合并:节点个数==%s",x * n + y, xx * n + yy,Arrays.toString(parentChildSize)));
+                        merge(x * n + y, xx * n + yy);
+                        System.out.println(String.format("节点 a=%s,b=%s, 合并完成:节点个数==%s",x * n + y, xx * n + yy,Arrays.toString(parentChildSize)));
+                    }
+                }
+            }
+
+            if (grid[0][0] <=queryVal) {
+                ans[queryIds[i]] = parentChildSize[find(0)];
+            }
+
+        }
+
+        return ans;
+    }
+
+    /**
+     *
+     * @param grid
+     * @param queries
+     * @return
+     */
+    public int[] maxPoints2(int[][] grid, int[] queries) {
+
+        int m=grid.length,n=grid[0].length, k=queries.length;
+        Integer [] queryIds=new Integer[k];
+        for (int i=0;i<k;i++){
+            queryIds[i]=i;
+        }
+        //升序排列
+        Arrays.sort(queryIds,(i,j)->queries[i]-queries[j]);
+        int ans[]=new int[k];
+        PriorityQueue<int[]> queue=new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[0]-o2[0];
+            }
+        });
+        queue.offer(new int[]{grid[0][0], 0,0});
+        grid[0][0]=0;//把grid当做visited 数组，==0表示已经访问过了
+
+        int cnt=0;
+        for (int i=0;i<k;i++){
+            int queryValue=queries[queryIds[i]];
+            //最小值需要小于要询问的值
+            while (!queue.isEmpty()&&queue.peek()[0]<queryValue){
+                cnt++;
+                int []p= queue.poll();
+                for (int [] dir:DIRECTIONS){
+                    int x=dir[0]+p[1];
+                    int y=dir[1]+p[2];
+                    //判断他的周围节点没有被访问
+                    if (x>=0&&x<m&&y>=0&&y<n&&grid[x][y]>0){
+                        queue.offer(new int[]{grid[x][y],x,y});
+                        grid[x][y]=0;//表示已经被访问过了
+                    }
+                }
+            }
+
+            //设置个数
+            ans[queryIds[i]]=cnt;
+
+        }
+        return ans;
+    }
+
+    private int find(int a){
+        while (parent[a]!=a){
+            parent[a]= parent[parent[a]];
+            a= parent[a];
+        }
+        return parent[a];
+    }
+
+    private void merge(int a,int b){
+        int p1=find(a);
+        int p2=find(b);
+        if (p1!=p2){
+            //这两种写法都行
+//            parent[p1]=p2;//p1指向了p2
+//            parentChildSize[p2]+=parentChildSize[p1];
+            parent[p2]=p1;//p1指向了p2
+            parentChildSize[p1]+=parentChildSize[p2];
+        }
+    }
+
+
+    /**
+     * 2163. 删除元素后和的最小差值
+     * 方案：让前面的和最小，使用大根堆，优先删除大数，保留小数[0,2n]
+     * 后面的数的和最大，使用小跟堆，保留大数，删除小数
+     * @param nums
+     * @return
+     */
+    public long minimumDifference(int[] nums) {
+        int m=nums.length;
+        int n=m/3;
+
+        PriorityQueue<Integer> maxQueue=new PriorityQueue<>((a,b)->b-a);
+
+        long sum1=0;
+        for (int i=0;i<n;i++){
+            maxQueue.offer(nums[i]);
+            sum1+=nums[i];
+        }
+        //记录第一部分 每一部的最小值
+        long [] part1=new long[n+1];
+        part1[0]=sum1;
+
+        for (int i=n;i<2*n;i++){
+            maxQueue.offer(nums[i]);
+            sum1+=nums[i];
+            //淘汰大数
+            sum1-=maxQueue.poll();
+            part1[i-n+1]=sum1;
+        }
+
+        long sum2=0;
+        PriorityQueue<Integer> mimQueue=new PriorityQueue<>();
+        for (int i=m-1;i>=2*n;i--){
+            mimQueue.offer(nums[i]);
+            sum2+=nums[i];
+        }
+
+        long ans=part1[n]-sum2;//默认值
+        for (int i=2*n-1;i>=n;i--){
+            mimQueue.offer(nums[i]);
+            sum2+=nums[i];
+            //淘汰小数
+            sum2-=mimQueue.poll();
+
+            //比较最小值
+            ans=Math.min(ans,part1[i-n]-sum2);
+        }
+
+        return ans;
+    }
+
     class UnionFind{
         int [] parent;
 
