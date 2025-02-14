@@ -37,8 +37,13 @@ public class GridDFSTest {
 //        System.out.print(nums[x][y] +",");
         visited[x][y] = true;
         list.add(nums[x][y]);
-
+        int size=list.size();
         dfs(nums,x+1,y,visited,list);
+
+
         dfs(nums,x,y+1,visited,list);
+
+        list.remove(size-1);
+        visited[x][y]=false;
     }
 }
