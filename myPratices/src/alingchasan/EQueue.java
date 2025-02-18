@@ -1171,6 +1171,50 @@ public class EQueue {
         return cost;
     }
 
+
+    /**
+     * 1851. 包含每个查询的最小区间
+     * 方案一：离线计算+优先级队列:把query 先进行排序，然后每个query 都去 intervals 中查找符合条件的区间集合，然后在把这些集合 放在优先级队列中(按长度进行排序)
+     * 然后在过滤：去掉区间的end不在当前query 范围内的数据，然后在获取第一个最短的区间。同时下一个query 需要再
+     * @param intervals
+     * @param queries
+     * @return
+     */
+    public int[] minInterval(int[][] intervals, int[] queries) {
+        int k = queries.length;
+        Integer queryIds[] = new Integer[k];
+        for (int i = 0; i < k; i++) {
+            queryIds[i] = i;
+        }
+        Arrays.sort(queryIds, (a, b) -> queries[a] - queries[b]);
+
+        //按起点升序排列
+        Arrays.sort(intervals, (a, b) -> a[0] - b[0]);
+
+        //小跟堆：长度最小的在第一位
+        PriorityQueue<int[]> queue = new PriorityQueue<>((a, b) -> a[0] - b[0]);
+
+        int ans[] = new int[k];
+        Arrays.fill(ans, -1);
+        int intIdx = 0;
+        for (int q = 0; q < k; q++) {
+            int queryValue = queries[queryIds[q]];
+            //筛选符合条件的
+            while (intIdx < intervals.length && intervals[intIdx][0] <= queryValue) {
+                queue.offer(new int[]{intervals[intIdx][1] - intervals[intIdx][0] + 1, intervals[intIdx][0], intervals[intIdx][1]});
+                intIdx++;
+            }
+
+            //提出不符合条件的(可能是上一次查询遗留的结果)
+            while (!queue.isEmpty() && queue.peek()[2] < queryValue) {
+                queue.poll();
+            }
+            if (!queue.isEmpty()) {
+                ans[queryIds[q]] = queue.peek()[0];
+            }
+        }
+        return ans;
+    }
     /**
      * 1834. 单线程 CPU
      *  设计一个带有优先级的等待队列，等待中的人物可以先放在等待队列中
