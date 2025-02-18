@@ -2346,6 +2346,131 @@ public class EQueue {
         return ans;
     }
 
+    /**
+     * 857. 雇佣 K 名工人的最低成本
+     * 定义 变量 r=每单位工作质量的工资==(salary/qualiy),然后在按r 递增排序,依次选择k个工人作为， 他们的质量之和是sum
+     * 则这k个人的成本是 r[k-1]*sum（注意：这里选择第k个人的r当做基准，避免了 如果选择前面的人的 r，则其他人的工资/质量 的比例
+     * 可能小于其 期望工资，则不太好计算了）
+     * 后续如果有 更低的工作期望(小于堆顶的值)，则使用删除堆顶的元素，把他加入进来
+     * @param quality
+     * @param wage
+     * @param k
+     * @return
+     */
+    public double mincostToHireWorkers(int[] quality, int[] wage, int k) {
+        int m=wage.length;
+        Integer [] wageIds=new Integer[m];
+        for (int i=0;i<m;i++){
+            wageIds[i]=i;
+        }
+        //按i递增排序
+        Arrays.sort(wageIds,(i,j)->wage[i]*quality[j]-wage[j]*quality[i]);
+        //使用大根堆：把大的排除掉
+        PriorityQueue<Integer> queue=new PriorityQueue<>((i,j)->quality[j]-quality[i]);
+        int sumQuality=0;
+        for (int i=0;i<k;i++){
+            queue.offer(wageIds[i]);
+            sumQuality+=quality[wageIds[i]];
+        }
+
+        //初始答案
+        double ans=sumQuality*((double)wage[wageIds[k-1]]/quality[wageIds[k-1]]);
+        for (int i=k;i<m;i++){
+            //当前元素的质量 要小于之前的某个元素
+            if (quality[wageIds[i]]<quality[queue.peek()]){
+                sumQuality-=quality[queue.poll()]-quality[wageIds[i]];
+                ans=Math.min(ans,sumQuality*((double)wage[wageIds[i]]/quality[wageIds[i]]));
+                queue.offer(wageIds[i]);
+            }
+        }
+        return ans;
+
+    }
+
+    /**
+     *1606. 找到处理最多请求的服务器
+     * 方案：按时间进行模拟便利遍历，优先寻找id%k的第一个节点，如果找不到，则寻找第一个节点
+     * 优化点：这里使用有序集合进行保存(可处理超时问题)
+     * @param k
+     * @param arrival
+     * @param load
+     * @return
+     */
+    public List<Integer> busiestServers(int k, int[] arrival, int[] load) {
+
+        int[] cnt = new int[k];
+        boolean[] buss = new boolean[k];//
+
+        //空闲机器
+        TreeSet<Integer> avaliable=new TreeSet<>();
+
+        for (int i=0;i<k;i++){
+            avaliable.add(i);
+        }
+        //二维数组：根据结束时间进行排序：使用小跟堆
+        PriorityQueue<int[]> queue = new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[1] - o2[1];
+            }
+        });
+
+        int m = arrival.length;
+        int time = 0;
+
+        int max = 0;
+        for (int i = 0; i < m; i++) {
+            time = arrival[i];
+            //判断是否有任务结束
+            while (!queue.isEmpty() && queue.peek()[1] <= time) {
+                int p[] = queue.poll();
+                buss[p[0]] = false;//释放机器
+                avaliable.add(p[0]);
+            }
+
+            //没有可用的
+            if (avaliable.isEmpty()){
+                continue;
+            }
+            Integer shouldId = i % k;// 理论使用的机器id
+            Integer targetId = avaliable.ceiling(shouldId);
+            if (targetId==null){
+                targetId= avaliable.first();
+            }
+//            Integer targetId = null;
+//            if (!buss[shouldId]) {
+//                targetId = shouldId;
+//
+//            } else {
+//                //向后找id
+//                for (int next = shouldId + 1; next % k != shouldId; next++) {
+//                    if (!buss[next]) {
+//                        targetId = next;
+//                        break;
+//                    }
+//                }
+//            }
+//            if (targetId == null) {
+//                //抛弃任务
+//                continue;
+//            }
+
+            buss[targetId] = true;
+            cnt[targetId]++;
+            max = Math.max(max, cnt[targetId]);
+            queue.offer(new int[]{targetId, time + load[i]});
+            avaliable.remove(targetId);
+        }
+
+        List<Integer> ans = new ArrayList<>();
+        for (int i = 0; i < k; i++) {
+            if (cnt[i] !=0&&cnt[i] == max) {
+                ans.add(i);
+            }
+        }
+        return ans;
+    }
+
     class UnionFind{
         int [] parent;
 
