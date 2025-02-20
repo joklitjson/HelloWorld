@@ -14,7 +14,6 @@ public class PrioryQueueMain {
         while (!pq1.isEmpty()){
             System.out.println(pq1.poll());
         }
-        System.out.println(magicTower(new int[]{-9635,71923,-37495,8366,54303,-86422,-48303,-47858,98424}));
         System.out.println(magicTower2(new int[]{-9635,71923,-37495,8366,54303,-86422,-48303,-47858,98424}));
 
         System.out.println(topKFrequent(new int[]{1,1,2,2,3},2));
@@ -94,41 +93,7 @@ public class PrioryQueueMain {
         return fuel < 0 ? -1 : ans;
     }
 
-    /**
-     * 魔塔项目，调整关卡
-     * @param nums
-     * @return
-     */
-    public static int magicTower(int[] nums) {
-        long sum = 1;
 
-        //创建小跟堆
-        PriorityQueue<Integer> queue = new PriorityQueue<>();
-
-        int ans = 0;
-        int delay = 0;//延迟扣血
-        for (int i = 0; i < nums.length; i++) {
-
-            //记录消耗的值
-            if (nums[i] < 0) {
-                queue.offer(nums[i]);
-            }
-
-            //记录当前的血值
-            sum += nums[i];
-            if (sum <= 0) {
-                ans++;
-                if (!queue.isEmpty()){
-                    int tmp=queue.poll();
-                    sum -= tmp;
-                    delay += tmp;
-                }
-
-            }
-
-        }
-        return (sum + delay) <= 0 ? -1 : ans;
-    }
     public static int magicTower2(int[] nums) {
 
         int delay = 0, ans = 0;
