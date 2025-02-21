@@ -12,7 +12,9 @@ public class NthWithQueue {
     public static void main(String[] args) {
         NthWithQueue test=new NthWithQueue();
 
-        System.out.println(Arrays.toString(test.kthSmallestPrimeFraction(new int[]{1,2,3,5},3)));
+//        System.out.println(Arrays.toString(test.kthSmallestPrimeFraction(new int[]{1,2,3,5},3)));
+
+        test.kSum(new int[]{4,2,-1,-7},5);
     }
     /**
      * 264. 丑数 II
@@ -206,25 +208,29 @@ public class NthWithQueue {
         PriorityQueue<long[]> minQueue = new PriorityQueue<long[]>((a, b) -> (int) (a[0] - b[0]));
 
         minQueue.offer(new long[]{0, 0});
-//
+        System.out.println("寻找最小子序列的和-----"+Arrays.toString(nums));
+
 //        while (k-- > 1) {
 //            long[] p = minQueue.poll();
 //            long t = p[0];
 //            int i = (int) p[1];
-//
+//            System.out.println("当前最小和是"+t+";index="+i);
+//        满足子序列每个元素选或不选的要求
 //            if (i < n) {
 //                minQueue.offer(new long[] { t + nums[i ], i + 1 });// 只往序列中添加元素
 //                if (i > 0) {
-//                    minQueue.offer(new long[] { t + nums[i] - nums[i -1], i + 1 });
+//                    minQueue.offer(new long[] { t + nums[i] - nums[i -1], i + 1 });// 去掉序列中倒数第二大的元素,添加下一个
 //                }
 //            }
 //        }
+
 
         long ret=0;
         for (int j = 2; j <= k; j++) {
             long[] arr = minQueue.poll();
             long t = arr[0];
             int i = (int) arr[1];
+            System.out.println("当前最小和是"+t+";index="+i);
             ret = t;
             if (i == n - 1) {
                 continue;
