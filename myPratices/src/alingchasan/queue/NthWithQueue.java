@@ -15,6 +15,8 @@ public class NthWithQueue {
 //        System.out.println(Arrays.toString(test.kthSmallestPrimeFraction(new int[]{1,2,3,5},3)));
 
         test.kSum(new int[]{4,2,-1,-7},5);
+
+        test.kthSmallest2(new int[][]{{1,3,11},{2,4,6}},5);
     }
     /**
      * 264. 丑数 II
@@ -273,4 +275,55 @@ public class NthWithQueue {
 
         return new int[]{arr[minQueue.peek()[0]],arr[minQueue.peek()[1]]};
     }
+
+
+    /**
+     * 1439. 有序矩阵中的第 k 个最小数组和
+     * 方案：进行两两归并，然后使用小跟堆求两个数组的前k个最小的和，问题转换成了上面的求两个数组的第k小的值
+     * @param mat
+     * @param k
+     * @return
+     */
+    public int kthSmallest2(int[][] mat, int k) {
+
+        int m=mat.length;
+
+        int pre[]=mat[0];
+
+        for (int i=1;i<m;i++){
+           pre= merge(pre,mat[i],k);
+        }
+        return pre[k-1];
+    }
+
+    private int[] merge(int []a,int [] b,int k) {
+        PriorityQueue<int[]> minQueue = new PriorityQueue<>((p, q) -> p[0] - q[0]);
+
+        //把第一个数组的小标和第二 数组的第一个节点都加入到集合中
+
+        for (int i = 0; i < Math.min(k, a.length); i++) {
+            minQueue.offer(new int[]{a[i] + b[0], i, 0});
+        }
+        List<Integer> ans = new ArrayList<>();
+        int idx = 0;
+        while (k-- > 0 && !minQueue.isEmpty()) {
+            int[] pp = minQueue.poll();
+            ans.add(pp[0]);
+            if (pp[2] + 1 < b.length) {
+                pp[2]++;
+                pp[0] = a[pp[1]] + b[pp[2]];
+                minQueue.offer(pp);
+            }
+        }
+        //合并成k个
+        int result[] = new int[ans.size()];//注意：为啥不能直接把答案放在数组中？比如k很大，数组的后半部分就会变成了0，
+        // 在下一次和下一个数组进行归并时，则会把0加入进去，影响正确的结果了
+        for (int i = 0; i < ans.size(); i++) {
+            result[i] = ans.get(i);
+        }
+        return result;
+    }
+
+
+
 }
