@@ -13,6 +13,14 @@ import java.util.*;
  */
 public class DelayDeleteHeap {
 
+    public static void main(String[] args) {
+        DelayDeleteHeap delayDeleteHeap=new DelayDeleteHeap();
+
+        delayDeleteHeap.mostFrequentIDs(new int[]{7,7},new int[]{3,5});
+
+        Map<Integer,Integer> mm=new HashMap<>();
+
+    }
     /**
      * 2349. 设计数字容器系统
      * 使用有序集合+保持正确值(延迟更新、删除)
@@ -202,6 +210,60 @@ public class DelayDeleteHeap {
         }
 
 
+    }
+
+
+    /**
+     *3092. 最高频率的 ID
+     *方案一：map+懒删除堆
+     * 方案二：hash+ 有序集合(频率是键，元素值是value)
+     * @param nums
+     * @param freq
+     * @return
+     */
+    public long[] mostFrequentIDs(int[] nums, int[] freq) {
+
+        //频率|元素值
+        //设置大根堆
+        PriorityQueue<long[]> queue = new PriorityQueue<long[]>((a, b) -> (int) (b[0] - a[0]));
+
+        Map<Long, Long> numToFre = new HashMap<>();
+        long[] ans = new long[freq.length];
+
+        for (int i = 0; i < freq.length; i++) {
+
+            long currentFre = numToFre.getOrDefault((Long.valueOf( nums[i])), 0L);
+            currentFre += freq[i];
+            currentFre=Math.max(currentFre,0);
+            numToFre.put((long) nums[i], currentFre);
+            //加入进去:不删除旧的数据
+            queue.offer(new long[]{currentFre, nums[i]});
+            //判断当前堆顶的元素的频率是否 和他真正的频率一直
+            while (queue.peek()[0]!=numToFre.get(queue.peek()[1])) {
+                queue.poll();
+            }
+            ans[i] = queue.peek()[0];
+        }
+
+        TreeMap<Long,Integer> freToNum=new TreeMap<>();
+
+        for (int i = 0; i < freq.length; i++) {
+            int num=nums[i];
+            int fr=freq[i];
+            long currentFre = numToFre.getOrDefault((Long.valueOf(num)), 0L);
+            currentFre += fr;
+            currentFre=Math.max(currentFre,0);
+
+            //移除之前的
+            if (numToFre.containsKey(num)){
+                freToNum.remove((Long) numToFre.get(num));
+            }
+            //更新
+            numToFre.put((long) num,currentFre);
+            freToNum.put(currentFre,num);
+            ans[i] = freToNum.lastKey();
+        }
+        return ans;
     }
 
 
