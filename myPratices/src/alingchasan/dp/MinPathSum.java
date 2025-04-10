@@ -1,7 +1,9 @@
 package alingchasan.dp;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 1、定义dp方程：dp[i][j]表示 从左上角的顶点到i,j 点的最小距离，状态转移方程为 f(i,j)=min(f(i-1,j),f(i,j-1)),可以使用递归写法
@@ -19,6 +21,8 @@ public class MinPathSum {
 //        System.out.println(minPathSum.minFallingPathSum(new int[][]{{2,1,3},{6,5,4},{7,8,9}}));
 
         System.out.println(minPathSum.minFallingPathSum2(new int[][]{{2,1,3},{6,5,4},{7,8,9}}));
+
+        System.out.println(minPathSum.maxMoves(new int[][]{{2,4,3,5},{5,4,9,3},{3,4,2,11},{10,9,13,15}}));
     }
     /**
      * 64. 最小路径和
@@ -306,6 +310,76 @@ public class MinPathSum {
             min = Math.min(min, f[k]);
         }
         return min;
+    }
+
+
+    /**
+     * 2684. 矩阵中移动的最大次数
+     * 方案一：使用深度dfs 算法，遍历第一列的所有元素，然后逐个向后进行，最大的列j就是可以移动的最大步数，同时我们还可以使用vis 数组记录单元格 被访问过了，在此题中我们可以直接设置单元格的值是0
+     * 这就表示已经被访问(注意：如果不设置vis数组也是可行的，但是会存储多次搜索的过程)
+     *
+     * 方案二：BFS写法(其实就是广度遍历每一列 可以达到的下一列的 行号元素，收集行号，内部在遍历这些行号 在向后一列进行判断收集)
+     *
+     * @param grid
+     * @return
+     */
+    public int maxMoves(int[][] grid) {
+        //方案一：dfs
+//        int m=grid.length,n=grid[0].length;
+//        for (int i=0;i<m;i++){
+//            dfs(i,0,grid);
+//        }
+//        return ans;
+
+        //方案二：bfs
+
+        int m = grid.length, n = grid[0].length;
+        Set<Integer> rowIdxSet = new HashSet<>();
+        //把初始行号都加入进来
+        for (int i = 0; i < m; i++) {
+            rowIdxSet.add(i);
+        }
+
+        for (int j = 0; j < n - 1; j++) {
+            //遍历行号：这就能定位到二维数组了
+            Set<Integer> nextRowIdxSet = new HashSet<>();
+            for (Integer rowIdx : rowIdxSet) {
+
+                //2、遍历可以到达的三个元素的行号
+                for (int k = Math.max(0, rowIdx - 1); k < Math.min(m, rowIdx + 2); k++) {
+                    if (grid[k][j + 1] > grid[rowIdx][j]) {
+                        nextRowIdxSet.add(k);//使用set的原因就是不用重复
+                    }
+                }
+            }
+            //没有大于后面的行号了
+            if (nextRowIdxSet.isEmpty()) {
+                return j;
+            }
+            //下一次的遍历集合
+            rowIdxSet = nextRowIdxSet;
+        }
+
+        return n - 1;
+    }
+
+    int ans =0;
+    private  void dfs(int i,int j,  int[][] grid) {
+        ans = Math.max(ans, j);
+        //达到了最后一列
+        if (ans == grid[0].length - 1) {
+            return;
+        }
+
+        //其实就是遍历 右上、右、右下三个坐标点位
+        for (int k = Math.max(0, i - 1); k < Math.min(i + 2,grid.length); k++) {
+            //后面的点位值 要大于当前的值
+            if (grid[k][j + 1] > grid[i][j]) {
+                dfs(k, j + 1, grid);
+            }
+        }
+
+        grid[i][j]=0;
     }
 
 }
