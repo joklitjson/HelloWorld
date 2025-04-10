@@ -1,3 +1,6 @@
+/**
+ * 技巧：遍历二维数组，有时候需要设置vis数组记录是否被访问，可以使用原数组，把值设置成负数、0之类的表示已经被访问了
+ */
 public class Skill {
 
     public static void main(String[] args) {
