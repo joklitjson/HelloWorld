@@ -20,9 +20,11 @@ public class MinPathSum {
 
 //        System.out.println(minPathSum.minFallingPathSum(new int[][]{{2,1,3},{6,5,4},{7,8,9}}));
 
-        System.out.println(minPathSum.minFallingPathSum2(new int[][]{{2,1,3},{6,5,4},{7,8,9}}));
+//        System.out.println(minPathSum.minFallingPathSum2(new int[][]{{2,1,3},{6,5,4},{7,8,9}}));
 
-        System.out.println(minPathSum.maxMoves(new int[][]{{2,4,3,5},{5,4,9,3},{3,4,2,11},{10,9,13,15}}));
+        System.out.println(minPathSum.minFallingPathSum111(new int[][]{{1,2,3},{4,5,6},{7,8,9}}));
+
+//        System.out.println(minPathSum.maxMoves(new int[][]{{2,4,3,5},{5,4,9,3},{3,4,2,11},{10,9,13,15}}));
     }
     /**
      * 64. 最小路径和
@@ -382,4 +384,113 @@ public class MinPathSum {
         grid[i][j]=0;
     }
 
+
+    /**
+     * 1289. 下降路径最小和 II
+     * 使用动态规划解决：
+     * 定义函数 f(i,j)：选择第i行的第j个元素的最小路径和 因此状态转移方式是
+     * f(i,j)=grid(i,j) i=0;
+     * f(i,j)=min(f(i-1,k)) + grid(i,j) i!=0&&j=k; 在第i-1行的基础上转移过来的
+     * @param grid
+     * @return
+     */
+    public int minFallingPathSum111(int[][] grid) {
+
+        int min = Integer.MAX_VALUE;
+        int m = grid.length, n = grid[0].length;
+
+//        //使用备忘录
+//        int meme[][]=new int[m][n];
+//        for (int[] mm:meme){
+//            Arrays.fill(mm,Integer.MIN_VALUE);
+//        }
+//        for (int j = 0; j < n; j++) {
+//            min = Math.min(min, dfs2(m - 1, j, grid,meme));
+//        }
+
+        //方案二：使用自底向上的方式 循环计算
+//        int f[][]=new int[m][n];//从第0行开始，到底i行的第j个元素的最小路径
+//        f[0]=grid[0];//
+//
+//        for (int i=1;i<m;i++){
+//            for (int j=0;j<n;j++){
+//                f[i][j]=Integer.MAX_VALUE;//默认先设置一个最大子
+//                //求f[i][j] 子问题的最小值:遍历上一行中的所有元素，然后求最小值
+//                for (int k=0;k<n;k++){
+//                    //遍历非同一列的元素
+//                    if (j!=k) {
+//                        f[i][j] = Math.min(f[i][j], f[i - 1][k] + grid[i][j]);
+//                    }
+//                }
+//            }
+//        }
+//
+//        //比较最后一行：获取最小值
+//        for (int j = 0; j < n; j++) {
+//            min = Math.min(min, f[m-1][j]);
+//        }
+//        return min;
+        //优化三：在方案二中 我们最内部的一个循环一直在寻找上一次的最小值，因此我们可以使用三个变量来记录上一行中的【最小值、最小值下表、次小值]这样就能快速获取到结果
+
+        int lastMinPathSum = 0;//上一行的路径最小值
+        int lastMinPathSumIndex = -1;//上一行的路径最小值小标
+        int lastSecondMinSum = 0;//上一行的路径和的第二最小值
+        for (int i = 0; i < m; i++) {
+            int currentRowFirstMinSum = Integer.MAX_VALUE;//当前行下 路径和的最小值
+            int currentRowMinPathSumIndex = -1;//当前行下的路径和的最小值下表
+            int currentRowSecondMinSum = Integer.MAX_VALUE;//第二最小值
+
+            for (int j = 0; j < n; j++) {
+                //计算选择grid[i][j]状态下的最小值
+                int currentSum = (j != lastMinPathSumIndex ? lastMinPathSum : lastSecondMinSum) + grid[i][j];
+                if (currentSum < currentRowFirstMinSum) {
+                    currentRowSecondMinSum = currentRowFirstMinSum;
+                    currentRowFirstMinSum = currentSum;
+                    currentRowMinPathSumIndex = j;
+                } else if (currentSum < currentRowSecondMinSum) {
+                    //如果小于当前第二小的值
+                    currentRowSecondMinSum = currentSum;
+                }
+            }
+            //把当前行的最小值给全局变量，然后继续遍历下一行
+            lastMinPathSum = currentRowFirstMinSum;
+            lastMinPathSumIndex = currentRowMinPathSumIndex;
+            lastSecondMinSum = currentRowSecondMinSum;
+        }
+
+        return lastMinPathSum;
+    }
+
+    /**
+     * 自上而下的子问题的最小值
+     * @param i
+     * @param j
+     * @param grid
+     * @return
+     */
+    private int dfs2(int i,int j, int[][] grid,int meme[][]) {
+
+        //使用备忘录
+        if (meme[i][j]!=Integer.MIN_VALUE){
+            return meme[i][j];
+        }
+
+        //如果到达第一列了，他没有子问题了，因此他本身就是最小值
+        if (i==0){
+            return grid[i][j];
+        }
+
+        int subProbromMin = Integer.MAX_VALUE;
+        //求子问题的最小值
+        for (int k = 0; k < grid[0].length; k++) {
+            //不是同一列
+            if (k != j) {
+                subProbromMin = Math.min(subProbromMin,dfs2(i - 1, k, grid,meme));
+            }
+        }
+
+        meme[i][j]=subProbromMin + grid[i][j];
+        //子问题的最小值
+        return subProbromMin + grid[i][j];
+    }
 }
