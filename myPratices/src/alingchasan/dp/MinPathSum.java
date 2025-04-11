@@ -493,4 +493,57 @@ public class MinPathSum {
         //子问题的最小值
         return subProbromMin + grid[i][j];
     }
+
+
+    /**
+     * 3418. 机器人可以获得的最大金币数
+     * 分析：定义f[i][j][k]:表示在最大感化次数为k的情况下，在点 i,j位置可以获取的最大金币数。
+     * 自顶向下的进行 分析：f[i][j] 的最大值 是来自f[i-1][j] 或者f[i][j-1]中的最大值，然后在加上conin[i][j]
+     * 情况二：如果当前位置是小于0的，而且有剩余感化次数k的情况下，可以选择感化
+     * 然后我们在加上 使用备忘录模式，记录已经计算的情况，防止反复计算
+     * @param coins
+     * @return
+     */
+    public int maximumAmount(int[][] coins) {
+
+        int m=coins.length,n=coins[0].length;
+        //注意：这里为啥是3？代表这 有0、1、2次感化次数的情况下的 可以获得的金币的最大值
+        int[][][] memo=new int[m][n][3];
+        //设置初始值是最小值
+        for (int[][] mat : memo) {
+            for (int[] row : mat) {
+                Arrays.fill(row, Integer.MIN_VALUE);
+            }
+        }
+
+        return dfs(m-1, n-1,memo,2,coins);
+    }
+
+    private int dfs(int i,int j, int[][][] mem, int k,int[][] coins) {
+        //越界处理
+        if (i < 0 || j < 0) {
+            return Integer.MIN_VALUE;
+        }
+
+        int x = coins[i][j];
+        if (i == 0 && j == 0) {
+            return k > 0 ? Math.max(x, 0) : x;
+        }
+
+
+        if (mem[i][j][k] != Integer.MIN_VALUE) { // 之前计算过
+            return mem[i][j][k];
+        }
+
+        //不使用感化次数
+        int res = Math.max(dfs(i - 1, j, mem, k, coins), dfs(i, j - 1, mem, k, coins)) + coins[i][j];
+
+        //可以使用感化次数
+        if (k > 0 && coins[i][j] < 0) {
+            res = Math.max(res, Math.max(dfs(i - 1, j, mem, k - 1, coins), dfs(i, j - 1, mem, k - 1, coins)));
+        }
+
+        mem[i][j][k] = res;// 记忆化
+        return mem[i][j][k];
+    }
 }
