@@ -3,9 +3,16 @@ public class RuanKao {
     public static void main(String[] args) {
         RuanKao ruanKao=new RuanKao();
         int p[] = {30,35,15,5,10,20,25};
-        int n=p.length;
-        ruanKao.MatrixChain(p,p.length-1,new int[n][n],new int[n][n]);
+        int n=p.length-1;
+        ruanKao.MatrixChain(p,n,new int[n+1][n+1],new int[n+1][n+1]);
+//        System.out.println(ruanKao.RNA_2("ACCGGUAGU".toCharArray(),"ACCGGUAGU".length()-1));
+
+        String string = "ACCGGUAGU";
+        System.out.println();
+        System.out.println("==="+maxPairs(string));
     }
+
+
     /**
      * 计算矩阵乘法的最小次数:
      * p:表示矩阵的行列 比如： {20,15,12,3,18};//第1个矩阵是20X15，第二个矩阵是15X12，等等。
@@ -67,4 +74,58 @@ public class RuanKao {
             System.out.print(")");
         }
     }
+
+
+    /*求最大配对数*/
+    int RNA_2(char B[], int n) {
+        int i, j, k, t;
+        int max;
+        int C[][] = new int[n + 2][n + 2];
+
+        for (k = 5; k <= n - 1; k++) {
+            for (i = 1; i <= n - k + 1; i++) {
+                j = i + k;
+                // 此处代码缺失，标记为(1)
+                max = C[i][j - 1];
+                for (t = i; t <= j - 4; t++) {
+                    if (isMatch(B[t], B[j-1]) == 1 && (max < C[i][t - 1] + 1 + C[t + 1][j - 1])) {
+                        max = C[i][t - 1] + 1 + C[t + 1][j - 1];
+                    }
+
+                }
+                C[i][j] = max;
+                System.out.println( String.format("c[%d][%d] = %d--", i, j, C[i][j]));
+            }
+        }
+        return C[1][n];
+    }
+
+    int isMatch(char a, char b){
+        if((a == 'A' && b == 'U') || (a == 'U' && b == 'A'))
+            return 1;
+        if((a == 'C' && b == 'G') || (a == 'G' && b == 'C'))
+            return 1;
+        return 0;
+    }
+
+
+    public static int maxPairs(String s) {
+        int n = s.length();
+        int[][] dp = new int[n][n];
+        for (int k = 4; k < n; k++) {
+            for (int i = 0; i < n - k; i++) {
+                int j = i + k;
+                int maxVal = dp[i][j - 1];
+                for (int t = i + 1; t < j - 3; t++) {
+                    if ((s.charAt(i) == 'A' && s.charAt(t) == 'U' || s.charAt(i) == 'U' && s.charAt(t) == 'A' ||
+                            s.charAt(i) == 'C' && s.charAt(t) == 'G' || s.charAt(i) == 'G' && s.charAt(t) == 'C')) {
+                        maxVal = Math.max(maxVal, dp[i + 1][t - 1] + 1 + dp[t + 1][j]);
+                    }
+                }
+                dp[i][j] = maxVal;
+            }
+        }
+        return dp[0][n - 1];
+    }
+
 }
