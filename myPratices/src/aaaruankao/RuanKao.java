@@ -1,15 +1,18 @@
+package aaaruankao;
+
 public class RuanKao {
 
     public static void main(String[] args) {
         RuanKao ruanKao=new RuanKao();
         int p[] = {30,35,15,5,10,20,25};
         int n=p.length-1;
-        ruanKao.MatrixChain(p,n,new int[n+1][n+1],new int[n+1][n+1]);
+        ruanKao.MatrixChain(p,new int[n+1][n+1],new int[n+1][n+1]);
+
 //        System.out.println(ruanKao.RNA_2("ACCGGUAGU".toCharArray(),"ACCGGUAGU".length()-1));
 
-        String string = "ACCGGUAGU";
-        System.out.println();
-        System.out.println("==="+maxPairs(string));
+//        String string = "ACCGGUAGU";
+//        System.out.println();
+//        System.out.println("==="+maxPairs(string));
     }
 
 
@@ -28,21 +31,28 @@ public class RuanKao {
      * @param s
      * @return
      */
-    public void MatrixChain(int [] p,int n,int [][] m,int [][] s) {
+    public void MatrixChain(int [] p,int [][] m,int [][] s) {
 
-        //对角线设置成0
+        int N=p.length; //矩阵链的长度
+        int n=N-1;//矩阵链的最后一个元素下表
+        //对角线设置成0:以你为矩阵链的长度都是0，所以设置成0
         for (int i = 1; i <= n; i++) {
             m[i][i] = 0;
         }
 
-        for (int r = 1; r < n; r++) {//矩阵长度
+        // l=2时，计算 m[i,i+1],i=1,2,...,n-1 (长度l=2的链的最小代价)
 
-            for (int i = 1; i <= n - r + 1; i++) {//矩阵乘法的起点,链长是r
-                int j = i + r - 1;//j依次取值i+1,i+2,……,n
+        for (int l = 2; l <= n; l++) {//矩阵长度
+
+            for (int i = 1; i <= n - l + 1; i++) {//矩阵乘法的起点,链长是r
+                int j = i + l - 1;////以i为起始位置，j为长度为l的链的末位， j依次取值i+1,i+2,……,n
+
                 m[i][j] = Integer.MAX_VALUE;
 //                m[i][j] = m[i][i] + m[i + 1][j] + p[i - 1] * p[i] * p[j];//即m[i][j] = m[i][i]+m[i+1][j]+ p[i-1]*p[i]*p[j]
                 s[i][j] = i;//表示i~j的断开点在i处，
-                for (int k = i + 1; k < j; k++) {//使用绝对位置表示k的位置:k表示断开点
+
+                //k从i到j-1,以k为位置划分
+                for (int k = i ; k <= j-1; k++) {//使用绝对位置表示k的位置:k表示断开点
                     int t = m[i][k] + m[k + 1][j] + p[i - 1] * p[k] * p[j];//计算断开点在k处的最小乘法数
                     if (t < m[i][j]) {
                         m[i][j] = t;
@@ -52,8 +62,9 @@ public class RuanKao {
             }
         }
 
+        System.out.println("最小乘法次数是："+m[1][N - 1]);
         //cong1,dao
-        traceBack(s, 1, n - 1);
+        traceBack(s, 1, N - 1);
     }
 
     /**
