@@ -1,5 +1,9 @@
 package aaaruankao;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class RuanKao {
 
     public static void main(String[] args) {
@@ -13,6 +17,15 @@ public class RuanKao {
 //        String string = "ACCGGUAGU";
 //        System.out.println();
 //        System.out.println("==="+maxPairs(string));
+
+
+        System.out.println();
+        List<Integer> array=new ArrayList<>();
+        array.add(3);
+        array.add(2);
+        array.add(1);
+        array.add(0);
+        ruanKao.hanota(array,new ArrayList<>(),new ArrayList<>());
     }
 
 
@@ -26,7 +39,7 @@ public class RuanKao {
      *
      * 采用动态规划写法：自底向上的写法
      * @param p
-     * @param n
+     * @param
      * @param m
      * @param s
      * @return
@@ -139,4 +152,40 @@ public class RuanKao {
         return dp[0][n - 1];
     }
 
+
+    /**
+     * 面试题 08.06. 汉诺塔问题
+     * 考察递归:首先将n-1个盘子 移动到B中(临时盘子)，然后在将第n个盘子移动到目标盘中，然后在将B中的盘子n-1个盘子移动到C中
+     * @param A
+     * @param B
+     * @param C
+     */
+    public void hanota(List<Integer> A, List<Integer> B, List<Integer> C) {
+
+        move(0,A.size(),A,B,C);
+
+        System.out.println(Arrays.toString(C.toArray()));
+    }
+
+    private void move(int idx, int n,List<Integer> start, List<Integer> temp, List<Integer> target){
+
+        if (n==1){
+            target.add(start.remove(start.size()-1));
+            return;
+        }
+
+//        System.out.println(String.format("idx===%d,准备把0~%d,元素移动到temp 中",idx,n-1));
+        //先把n-1个元素移动到temp 临时
+        move(idx+1,n-1,start,target,temp);
+
+        System.out.println("temp==="+Arrays.toString(temp.toArray())+";target==="+Arrays.toString(target.toArray()));
+//        System.out.println(String.format("idx===%d,把%d,元素移动到target 中",idx+1,start.get(start.size()-1)));
+        //2、        //然后将最后一个盘子移动到第三个柱子上
+        target.add(start.remove(start.size()-1));
+        //3、把临时数组中n-1个元素在移动到目标数组中（        //最后将第二个柱子上的 n-1 个盘子，移动到第三个柱子上）
+        System.out.println("temp==="+Arrays.toString(temp.toArray())+";target==="+Arrays.toString(target.toArray()));
+//        System.out.println(String.format("idx===%d,准备temp中 元素移动到target中",idx));
+        move(idx+1,n-1,temp,start,target);
+        System.out.println("temp==="+Arrays.toString(temp.toArray())+";target==="+Arrays.toString(target.toArray()));
+    }
 }

@@ -1,9 +1,6 @@
 package alingchasan.dp;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 1、定义dp方程：dp[i][j]表示 从左上角的顶点到i,j 点的最小距离，状态转移方程为 f(i,j)=min(f(i-1,j),f(i,j-1)),可以使用递归写法
@@ -16,15 +13,23 @@ public class MinPathSum {
 
     public static void main(String[] args) {
 
-        MinPathSum minPathSum=new MinPathSum();
+        MinPathSum minPathSum = new MinPathSum();
 
 //        System.out.println(minPathSum.minFallingPathSum(new int[][]{{2,1,3},{6,5,4},{7,8,9}}));
 
 //        System.out.println(minPathSum.minFallingPathSum2(new int[][]{{2,1,3},{6,5,4},{7,8,9}}));
 
-        System.out.println(minPathSum.minFallingPathSum111(new int[][]{{1,2,3},{4,5,6},{7,8,9}}));
+        System.out.println(minPathSum.minFallingPathSum111(new int[][]{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}));
 
 //        System.out.println(minPathSum.maxMoves(new int[][]{{2,4,3,5},{5,4,9,3},{3,4,2,11},{10,9,13,15}}));
+
+        System.out.println(minPathSum.maxProductPath(new int[][]{{1, -2, 1}, {1, -2, 1}, {3, -4, 1}}));
+
+        List<String> path=new ArrayList<>(Arrays.asList("E12","1X1","21S"));
+//        path=new ArrayList<>(Arrays.asList("E11","XXX","11S"));
+//        System.out.println(Arrays.toString(minPathSum.pathsWithMaxScore(path)));
+
+        System.out.println(minPathSum.numberOfPaths(new int[][] {{5,2,4},{3,0,5},{0,7,2}},3));
     }
     /**
      * 64. 最小路径和
@@ -546,4 +551,196 @@ public class MinPathSum {
         mem[i][j][k] = res;// 记忆化
         return mem[i][j][k];
     }
+
+
+    /**
+     * 1594. 矩阵的最大非负积
+     * 分析：求矩阵的非负数 乘机最大值，需要记录每个单元格从0,0到此单元格的最大值和最小值，然后在乘以当前单元格的值，在进行比较，在计算出单元格的最大
+     * 值和最小值
+     * @param grid
+     * @return
+     */
+    public int maxProductPath(int[][] grid) {
+
+        int N = (int) (Math.pow(10, 9) + 7);
+        int m = grid.length, n = grid[0].length;
+        long maxDp[][] = new long[m][n];//防止溢出
+        long minDp[][] = new long[m][n];
+        maxDp[0][0] = grid[0][0];
+        minDp[0][0] = grid[0][0];//设置第一个空的最大和最小值
+
+        for (int i = 1; i < m; i++)
+            maxDp[i][0] = minDp[i][0] = grid[i][0] * maxDp[i - 1][0];//设置第一列元素的最大和最小值
+
+        for (int j = 1; j < n; j++) {
+            maxDp[0][j] = minDp[0][j] = grid[0][j] * maxDp[0][j - 1];//设置第一行元素的最大和最小值
+        }
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                long one = grid[i][j] * minDp[i - 1][j];
+                long one2 = grid[i][j] * maxDp[i - 1][j];
+                long one3 = grid[i][j] * minDp[i][j - 1];
+                long one4 = grid[i][j] * maxDp[i][j - 1];
+                minDp[i][j] = Math.min(Math.min(one, one2), Math.min(one3, one4));
+                maxDp[i][j] = Math.max(Math.max(one, one2), Math.max(one3, one4));
+            }
+        }
+
+        return maxDp[m - 1][n - 1] >= 0 ? (int) (maxDp[m - 1][n - 1] % N) : -1;
+    }
+
+
+    /**
+     * 1301. 最大得分的路径数目
+     * 把是X的字符表示成 到达该字符的最大路径和表示成-1，如果一个元素的 【前面的三个元素】都是-1 则这个元素不可达，
+     * 然后在求 到达每个节点的最大值，在比较 【前面的三个元素】 与最大值的关系，相等则把方案书相加
+     * @param board
+     * @return
+     */
+    public int[] pathsWithMaxScore(List<String> board) {
+
+        int mod= (int) (Math.pow(10,9)+7);
+        int m = board.size(), n = board.get(0).length();
+        int[][] dp = new int[m][m];//表示从左上角到dian[i][j]的最的路径和
+        long[][] dpCnt = new long[m][m];
+
+        dp[0][0] = 0;
+        dpCnt[0][0]=1;
+        for (int i = 1; i < m; i++) {
+            //设置第一列的最大路径和
+            dp[i][0] = (board.get(i).charAt(0) == 'X' || dp[i - 1][0] == -1) ? -1 : dp[i - 1][0] + (board.get(i).charAt(0) - '0');
+            dpCnt[i][0]=(board.get(i).charAt(0) == 'X' || dp[i - 1][0] == -1) ? 0 : 1;
+        }
+
+        for (int j = 1; j < n; j++) {
+            //设置第一行的最大值
+            char c = board.get(0).charAt(j);
+            if (c == 'X' || dp[0][j - 1] == -1) {
+                dp[0][j] = -1;//表示过不去
+            } else {
+                dp[0][j] = dp[0][j - 1] + (board.get(0).charAt(j) - '0');
+                dpCnt[0][j]=1L;
+            }
+
+        }
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                char c = board.get(i).charAt(j);
+                if (c == 'X') {
+                    dp[i][j] = -1;//表示过不去
+                } else {
+                    if (dp[i - 1][j] == -1 && dp[i - 1][j - 1] == -1 && dp[i][j - 1] == -1) {
+                        dp[i][j] = -1;//表示过不去
+                    } else if (c == 'S') {
+                        dp[i][j] = Math.max(Math.max(dp[i - 1][j], dp[i][j - 1]), dp[i - 1][j - 1]);
+
+                        //计算最大次数
+                        if (dp[i - 1][j] == dp[i][j]) {
+                            dpCnt[i][j]+=dpCnt[i-1][j];
+                        }
+                        if (dp[i - 1][j - 1] == dp[i][j]) {
+                            dpCnt[i][j]+=dpCnt[i-1][j-1];
+                        }
+                        if (dp[i][j - 1] == dp[i][j]) {
+                            dpCnt[i][j]+=dpCnt[i][j-1];
+                        }
+                        dpCnt[i][j]=dpCnt[i][j]%mod;
+                    } else {
+                        int max = Math.max(Math.max(dp[i - 1][j], dp[i][j - 1]), dp[i - 1][j - 1]) ;
+                        dp[i][j] = max + (c - '0');
+                        //达到最大值的 方案数 累加
+                        if (dp[i - 1][j] == max) {
+                            dpCnt[i][j]+=dpCnt[i-1][j];
+                        }
+                        if (dp[i - 1][j - 1] == max) {
+                            dpCnt[i][j]+=dpCnt[i-1][j-1];
+                        }
+                        if (dp[i][j - 1] == max) {
+                            dpCnt[i][j]+=dpCnt[i][j-1];
+                        }
+
+                        dpCnt[i][j]=dpCnt[i][j]%mod;
+                    }
+
+                }
+            }
+        }
+
+        return dp[m - 1][n - 1] == -1 ? new int[]{0, 0} : new int[]{dp[m - 1][n - 1], (int) (dpCnt[m - 1][n - 1]%mod)};
+    }
+
+    /**
+     * 2435. 矩阵中和能被 K 整除的路径
+     * 分析：其实就是求 矩阵中从 左上角 到右下角 有多少中路径组合，需要记录每个点的 每个路径的组合
+     *
+     * 具体地，定义 f[i][j][v] 表示从左上走到 (i,j)，且路径和模 k 的结果为 v 时的路径数。
+     * @param grid
+     * @param k
+     * @return
+     */
+    public int numberOfPaths(int[][] grid, int k) {
+
+
+        int MOD = (int) (Math.pow(10, 9) + 7);
+        int m = grid.length, n = grid[0].length;
+
+//        //点位信息|路径和%k-->个数
+//        Map<Long, Long>[][] dp = new Map[m][n];
+//        dp[0][0] = new HashMap();
+//        dp[0][0].put((long) grid[0][0]%k, 1L);
+//        for (int i = 1; i < m; i++) {
+//            //设置第一列的元素
+//            dp[i][0] = new HashMap();
+//            //统计个数
+//            for (Long preSum : dp[i-1][0].keySet()) {
+//                dp[i][0].put((preSum + grid[i][0])%k, 1L);
+//            }
+//
+//        }
+//        for (int j = 1; j < n; j++) {
+//            //设置第一行的元素
+//            dp[0][j] = new HashMap();
+//            //统计个数
+//            for (Long preSum : dp[0][j-1].keySet()) {
+//                dp[0][j].put((preSum + grid[0][j])%k, 1L);
+//            }
+//        }
+//
+//
+//        for (int i = 1; i < m; i++) {
+//            for (int j = 1; j < n; j++) {
+//                dp[i][j] = new HashMap( );
+//                //计算从上方移动下来路径的和
+//                for (Map.Entry<Long, Long> entry : dp[i - 1][j].entrySet()) {
+//                    Long pathSum = (entry.getKey() + grid[i][j])%k;
+//                    dp[i][j].put(pathSum, (dp[i][j].getOrDefault(pathSum, 0L) + entry.getValue()) % MOD);
+//                }
+//
+//                //计算从左边移动下来路径的和的余数
+//                for (Map.Entry<Long, Long> entry : dp[i][j - 1].entrySet()) {
+//                    Long pathSum = (entry.getKey() + grid[i][j])%k;
+//                    dp[i][j].put(pathSum, (dp[i][j].getOrDefault(pathSum, 0L) + entry.getValue()) % MOD);
+//                }
+//            }
+//        }
+//
+//        //获取模是0的个数
+//        return (int) (dp[m - 1][n - 1].getOrDefault(0L,0L)%MOD);
+
+        //优化：直接定义一个三维数组:定义 f[i][j][v] 表示从左上走到 (i,j)，且路径和模 k 的结果为 v 时的路径数。
+
+        int dp[][][] = new int[m + 1][n + 1][k];
+        dp[0][1][0] = 1;//设置第一个是1
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                for (int v = 0; v < k; v++) {
+                    //把上方、左方余数是v 的结果数相加，然后在计算 新的余数
+                    dp[i + 1][j + 1][(v + grid[i][j]) % k] = (dp[i][j + 1][v] + dp[i + 1][j][v]) % MOD;
+                }
+            }
+        }
+
+        return dp[m][n][0];
+    }
+
 }
