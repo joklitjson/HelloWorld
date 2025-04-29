@@ -30,6 +30,8 @@ public class MinPathSum {
 //        System.out.println(Arrays.toString(minPathSum.pathsWithMaxScore(path)));
 
         System.out.println(minPathSum.numberOfPaths(new int[][] {{5,2,4},{3,0,5},{0,7,2}},3));
+
+        System.out.println(minPathSum.countPaths(new int[][]{{1,1},{3,4}}));
     }
     /**
      * 64. 最小路径和
@@ -781,5 +783,92 @@ public class MinPathSum {
         }
 
         return dp[0][0];
+    }
+
+
+    /**
+     * 329. 矩阵中的最长递增路径
+     * 分析：使用深度优先搜索+记忆化,逐个遍历节点
+     * @param matrix
+     * @return
+     */
+    public int longestIncreasingPath(int[][] matrix) {
+        int m = matrix.length, n = matrix[0].length;
+        int mem[][] = new int[m][n];
+
+        int ans = 0;//最长的结果
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                //计算点 i,j的最大递增长度
+                ans = Math.max(ans, dfsGetLongestIncre(matrix, i, j, mem));
+            }
+        }
+
+        return ans;
+    }
+
+    static  int [][] DIR={{-1,0},{1,0},{0,1},{0,-1}};
+    private int dfsGetLongestIncre(int[][] matrix,int i,int j,int mem[][]) {
+        //已经搜索过了
+        if (mem[i][j] != 0) {
+            return mem[i][j];
+        }
+        mem[i][j] = 1;//他自己构成一个长度,而是表示这个点已经被搜索了，防止搜索的过程中形成环
+
+        for (int[] dir : DIR) {
+            int xx = dir[0] + i;
+            int yy = dir[1] + j;
+            //新的坐标不越界，并且大于当前这个元素
+            if (xx >= 0 && xx < mem.length && yy >= 0 && yy < mem[0].length && matrix[xx][yy] > matrix[i][j]) {
+                //搜邻居节点xx,yy，查看他得最大递增长度
+                mem[i][j] = Math.max(mem[i][j], dfsGetLongestIncre(matrix, xx, yy, mem)+1);
+            }
+        }
+
+        return mem[i][j];
+    }
+
+    int     MOD = (int) (Math.pow(10,9)+7);
+    /**
+     * 2328. 网格图中递增路径的数目
+     * @param grid
+     * @return
+     */
+    public int countPaths(int[][] grid) {
+
+        int m=grid.length,n=grid[0].length;
+        int ans=0;
+        int mem[][] = new int[m][n]; //记录按某个点开始的递增的个数
+
+        for (int []tmp:mem){
+            Arrays.fill(tmp,-1);
+        }
+        for (int i=0;i<m;i++){
+            for (int j=0;j<n;j++){
+                ans=(ans+count(grid,i,j,mem))%MOD;
+            }
+        }
+
+        return ans;
+    }
+
+    private int count(int[][] matrix,int i,int j,int mem[][]) {
+        if (mem[i][j] != -1) {
+            return mem[i][j];
+        }
+
+        int res = 1;
+        //向四个方向遍历
+        for (int[] dir : DIR) {
+            int xx = dir[0] + i;
+            int yy = dir[1] + j;
+            //新的坐标不越界，并且大于当前这个元素
+            if (xx >= 0 && xx < mem.length && yy >= 0 && yy < mem[0].length && matrix[xx][yy] > matrix[i][j]) {
+                //统计个数
+                res = (res + count(matrix, xx, yy, mem)) % MOD;
+            }
+        }
+        mem[i][j] = res;
+        return mem[i][j];
     }
 }
