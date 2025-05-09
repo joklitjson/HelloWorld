@@ -6,7 +6,13 @@ package dp;
 public class MaximumBags {
 
     public static void main(String[] args) {
+        int[] weights = {2, 3, 1};
+        int[] values = {3, 4, 2};
+        int[] counts = {2, 3, 1};
+        int capacity = 5;
 
+        int maxVal = maxValue(weights, values, counts, capacity);
+        System.out.println("背包能装入的最大价值为: " + maxVal); // 输出应为10
     }
     /**
      * 0-1背包问题，每个元素只能选择一次，
@@ -93,6 +99,41 @@ public class MaximumBags {
             }
         }
         return dp[m][capacity];
+    }
+
+    /**
+     * 多重背包问题--每个物品可以选择的数量有限制
+     */
+    public static int maxValue(int[] weights, int[] values, int[] counts, int capacity) {
+        int n = weights.length;
+        int[] dp = new int[capacity + 1];
+
+        for (int i = 0; i < n; i++) {
+            int weight = weights[i];
+            int value = values[i];
+            int count = counts[i];
+
+            // 二进制优化，将第i个物品拆分成多个不同数量的物品
+            for (int k = 1; k <= count; k *= 2) {
+                int curWeight = k * weight;
+                int curValue = k * value;
+                // 0-1背包处理
+                for (int j = capacity; j >= curWeight; j--) {
+                    dp[j] = Math.max(dp[j], dp[j - curWeight] + curValue);
+                }
+                count -= k;
+            }
+            // 处理剩余的物品数量
+            if (count > 0) {
+                int curWeight = count * weight;
+                int curValue = count * value;
+                for (int j = capacity; j >= curWeight; j--) {
+                    dp[j] = Math.max(dp[j], dp[j - curWeight] + curValue);
+                }
+            }
+        }
+
+        return dp[capacity];
     }
 
 }
