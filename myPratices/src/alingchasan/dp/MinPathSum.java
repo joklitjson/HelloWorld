@@ -871,4 +871,83 @@ public class MinPathSum {
         mem[i][j] = res;
         return mem[i][j];
     }
+
+
+    /**
+     * 1937. 扣分后的最大得分
+     * @param points
+     * @return
+     */
+    public long maxPoints(int[][] points) {
+
+//        int m = points.length, n = points[0].length;
+//        long[][] maxScoreDp = new long[m][n];//定义数组：表示从上到下 选择这个元素的最大分数
+//
+//        //第一列直接转移
+//        for (int j = 0; j < n; j++) {
+//            maxScoreDp[0][j] = (long) points[0][j];
+//        }
+//
+////      状态转移方程  dp[i][j]= point[i][j]+Max(dp[i-1][k]-abs(k-j));
+//        for (int i = 1; i < m; i++) {
+//            //遍历这一行的元素
+//            for (int j = 0; j < n; j++) {
+//                maxScoreDp[i][j] = Integer.MIN_VALUE;
+////                计算元素  maxScoreDp[i][j] 和上一行的所有元素的组合
+//                for (int k = 0; k < n; k++) {
+//                    maxScoreDp[i][j] = Math.max(maxScoreDp[i][j], maxScoreDp[i - 1][k] - Math.abs(k - j));
+//                }
+//                //在加上本身
+//                maxScoreDp[i][j]+= points[i][j];
+//            }
+//        }
+//        long max = maxScoreDp[m - 1][0];
+//        for (int k = 1; k < n; k++) {
+//            max = Math.max(max, maxScoreDp[m - 1][k]);
+//        }
+//        return max;
+
+
+        //方案二：优化：根据状态转移方程dp[i][j]= point[i][j]+Max(dp[i-1][k]-abs(k-j)); 我们可以把方程拆分出两部分
+
+//        dp[i][j]= point[i][j]+Max(dp[i-1][k]-j+k) (k<j;)====>point[i][j]-j+Max(dp[i-1][k]+k)
+//        dp[i][j]= point[i][j]+Max(dp[i-1][k]-k+j) (k>=j;)====>point[i][j]+j+Max(dp[i-1][k]-k)
+//        其实我们就是求j左侧的【dp[i-1][k]+k】最大值，以及位置j右侧【Max(dp[i-1][k]-k)】的最大值，然后在 比较 就能快速求出j位置处的最值
+
+        int m = points.length, n = points[0].length;
+
+        //分析可知    我们求当前行的最大值 是和上一行的数据有关，因此我们只需要创建两个数组，然后交替使用就行了
+        long pre[] = new long[n];
+
+        for (int i = 0; i < m; i++) {
+
+            long cur[] = new long[n];
+
+            long leftMaxValue=Integer.MIN_VALUE;//寻找j左侧最大值[point[i][j]-j+Max(dp[i-1][k]+k)]
+            //以下循环的说明
+            // 1、以下循环会从左到右循环：会记录j左边的最大值
+            // 2、会更新cur[j],当k<j时的最大值
+            // 3、此种写法的好处：一个循环就能找到每个每个元素j左边的最大值
+            for (int j=0;j<n;j++) {
+                leftMaxValue = Math.max(leftMaxValue, pre[j] + j);
+                cur[j] = Math.max(cur[j], points[i][j]-j + leftMaxValue);
+            }
+
+            long rightMaxValue=Integer.MIN_VALUE;//记录j左右的最大值
+            //从右向左遍历：一次就能找到每个元素右边的最大值，然后在和当前比较，就能获取到当前的最大值值了
+            for (int j=n-1;j>=0;j--) {
+                rightMaxValue = Math.max(rightMaxValue, pre[j] - j);
+                cur[j] = Math.max(cur[j], points[i][j] + j + rightMaxValue);
+            }
+            //准备遍历下一行了，则把当前行求的结果给上一行
+            pre = cur;
+        }
+
+        //获取最大值
+        long max = pre[0];
+        for (long value : pre) {
+            max = Math.max(max, value);
+        }
+        return max;
+    }
 }
