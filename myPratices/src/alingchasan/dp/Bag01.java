@@ -19,7 +19,9 @@ public class Bag01 {
 
         Bag01 test=new Bag01();
 
-        System.out.println(test.maxTotalReward(new int[]{1,1,3,3}));
+//        System.out.println(test.maxTotalReward(new int[]{1,1,3,3}));
+
+        System.out.println(test.findMaxForm(new String[]{"10","0001","111001","1","0"},5,3));
     }
 
     /**
@@ -170,5 +172,61 @@ public class Bag01 {
             }
         }
         return 0;
+    }
+
+
+    /**
+     * 474. 一和零
+     * 分析：此问题可以看作是0-1背包的二维背包问题，把背包看作 有两个口袋，一个装0，一个装1，问 再容量为m,n的情况下 能装的最大的个数
+     * dfs(i,j,k)=max(dfs(i−1,j,k),dfs(i−1,j−cnt
+     *  入口就是dfs(l,m,n);
+     * @param strs
+     * @param m
+     * @param n
+     * @return
+     */
+    public int findMaxForm(String[] strs, int m, int n) {
+
+        int l=strs.length;
+        //统计每个字符串中 0 的个数
+        int cnt0[]=new int[l];
+
+        for (int i=0;i<l;i++){
+            cnt0[i]= (int) strs[i].chars().filter(c->c=='0').count();
+        }
+
+        int [][][] memery=new int[l][m+1][n+1];
+
+        //填充默认值
+        for (int i=0;i<l;i++){
+            for (int j=0;j<=m;j++){
+                Arrays.fill(memery[i][j],-1);
+            }
+        }
+
+        //入口
+        return dfs(strs,cnt0,l-1,m,n,memery);
+    }
+
+    private int dfs(String[] strs, int cnt0[], int i,int m,int n, int [][][] memery){
+
+        if (i<0){
+            return 0;
+        }
+        if (memery[i][m][n]!=-1){
+            return memery[i][m][n];
+        }
+        //不选择 第i个数
+        int res=dfs(strs,cnt0,i-1,m,n,memery);
+
+        int cnt1=strs[i].length()-cnt0[i];
+        //可以选择 第i个数组:因为他的0、1不超过 m、n
+        if (m>=cnt0[i]&&n>=cnt1){
+            res=Math.max(res,dfs(strs,cnt0,i-1,m-cnt0[i],n-cnt1,memery)+1);
+        }
+
+        //记忆化
+        return memery[i][m][n]=res;
+
     }
 }
