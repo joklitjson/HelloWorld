@@ -24,14 +24,17 @@ public class ReverseLinkedList {
     //反转链表前n个节点
     ListNode successor=null;//第n个节点的后记节点（用于连接后续的节点）
     ListNode reverseN(ListNode head, int n) {
-        //找到了第N个节点
+        // 递归终止条件：翻转 1 个节点，自身就是头节点，记录后继节点
         if (n==1){
-            //只有一个节点了，所以不在尽心翻转了
+            //只有一个节点了，所以不用往后 翻转了
             successor=head.next;
             return head;
         }
         ListNode last=reverseN(head.next,n-1);
+
+        // 翻转当前节点的指向
         head.next.next=head;
+        // 让原来的头节点指向第 n+1 个节点，完成拼接
         head.next=successor;//让他的后续节点只想后面的节点，把链表串起来
         return last;
     }
