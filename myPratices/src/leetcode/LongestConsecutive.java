@@ -53,7 +53,7 @@ public class LongestConsecutive {
         }
 
         int longst = 0;
-        for (int val : nums) {
+        for (int val : set) {
 
             //说明当前元素还有比他小的值，因此不是最小值
             if (set.contains(val - 1)) {
