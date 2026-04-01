@@ -1,5 +1,6 @@
 package array;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,6 +50,34 @@ public class PreSum {
         return  sum;
     }
 
+
+    /**
+     * LCR 0238. 除自身以外数组的乘积
+     * @param nums
+     * @return
+     */
+    public static int[] productExceptSelf(int[] nums) {
+        int length=nums.length;
+        int [] pre=new int[length];
+        pre[0]=1;
+        for (int i=1;i<length;i++){
+            pre[i]=pre[i-1]*nums[i-1];
+        }
+        System.out.println(Arrays.toString(nums));
+        System.out.println(Arrays.toString(pre));
+        int [] after=new int[length];
+        after[length-1]=1;
+        for (int i=length-2;i>=0;i--){
+            after[i]=after[i+1]*nums[i+1];
+        }
+
+        int [] ans=new int[length];
+        for (int i=0;i<length;i++){
+            ans[i]=pre[i]*after[i];
+        }
+
+        return ans;
+    }
 
     /**
      * 和为k的子数组
@@ -102,7 +131,10 @@ public class PreSum {
     }
 
     public static void main(String[] args) {
-        System.out.println(pivotIndex(new int[]{1,7,3,6,5,6}));
+
+        System.out.println(Arrays.toString(productExceptSelf(new int[]{1,2,3,4})));
+
+//        System.out.println(pivotIndex(new int[]{1,7,3,6,5,6}));
     }
 
 
